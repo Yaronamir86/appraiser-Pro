@@ -363,7 +363,7 @@ body.field-mode #main{padding:12px;}
         <span class="ni">💬</span><div><div class="nt">נסיבות המקרה</div><div class="ns">גרסה ושאלות</div></div>
       </div>
       <div class="nav-item" data-card="6" onclick="goCard(6)">
-        <span class="ni">🔍</span><div><div class="nt">ממצאי שמאי</div><div class="ns">אזורים וסימני פגיעה</div></div>
+        <span class="ni">🔍</span><div><div class="nt">ממצאים וסיבות לנזק</div><div class="ns">אזורים וסימני פגיעה</div></div>
       </div>
       <div class="nav-item" data-card="7" onclick="goCard(7)">
         <span class="ni">📊</span><div><div class="nt">כתב כמויות</div><div class="ns">עבודות ותמחור</div></div>
@@ -528,12 +528,12 @@ function selectMode(m){
   STATE = {
     base:{fullName:'',idNum:'',phone:'',email:'',eventDate:'',visitDate:'',city:'',street:'',streetNum:'',apartment:''},
     property:{type:'apartment',usage:'residential',sqm:'',floor:'',yearBuilt:'',material:'',preCondition:''},
-    insurance:{company:'',policyNum:'',claimNum:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false},
+    insurance:{company:'',policyNum:'',claimNum:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extWaterPipe:false,extNaturalDisaster:false,extBurglary:false,extTerror:false},
     event:{eventType:'',eventSubType:'',plumberType:'',requestedBy:'',requesterName:'',visitPurpose:[],policeReport:'',policeNum:'',professionals:[],profDetails:{},appraiserDeclaration:''},
     circ:{infoSource:'',infoName:'',discDate:'',discTime:'',wasOccupied:'',immediateAction:'',ongoingDmg:'',pastEvent:'',waterOrigin:'',waterDuration:'',wallOpened:'',prevRepair:'',prevRepairDate:'',prevRepairBy:'',prevRepairReason:'',recentPlumber:'',recentPlumberDate:'',recentPlumberReason:'',fireLocation:'',fireType:'',fireDept:'',burglaryMethod:'',stolenItems:'',alarmExists:'',camerasExist:'',extraNotes:'',circumOverride:''},
     findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:''},
     boq:{structItems:[],contentsItems:[],serviceItems:[],vat:false,hasClaim:false,claimAmount:'',restoredState:'',genItems:{cleaning:true,waste:false,container:false,moveContents:false,drying:false},genNote:'',boqOverride:''},
-    summary:{openingOverride:'',appraisalNotes:'',explanations:'',recommendations:'',signature:'',claimTotal:''},
+    summary:{openingOverride:'',appraisalNotes:'',explanations:'',recommendations:'',signature:'',claimTotal:'',rehabTime:'',rehabNotes:''},
     photos:{main:null,mainCaption:'',items:[]}
   };
   document.getElementById('landing').classList.add('hidden');
@@ -605,7 +605,7 @@ function renderCard(n){
     3:{title:'ביטוח וכיסויים',icon:'📋',sub:'פרטי פוליסה וסכומי ביטוח'},
     4:{title:'פרטי האירוע',icon:'⚡',sub:'סוג האירוע, מקור פנייה וגורמים'},
     5:{title:'נסיבות המקרה',icon:'💬',sub:'גרסת המבוטח ושאלות חקירה'},
-    6:{title:'ממצאי שמאי',icon:'🔍',sub:'אזורים שנבדקו וסימני פגיעה'},
+    6:{title:'ממצאים וסיבות לנזק',icon:'🔍',sub:'אזורים שנבדקו וסימני פגיעה'},
     7:{title:'כתב כמויות',icon:'📊',sub:'עבודות שיקום ותמחור'},
     8:{title:'סיכום ומסקנות',icon:'✅',sub:'הערכה שמאית וסכום סופי'},
     9:{title:'תמונות',icon:'📷',sub:'תיעוד ביקור וממצאים'}
@@ -696,6 +696,11 @@ function renderCard2(){
   </div>`;
 }
 
+const INSURANCE_COMPANIES = [
+  'הפניקס','מנורה מבטחים','מגדל','הראל','כלל ביטוח','איילון',
+  'הכשרה ביטוח','ביטוח ישיר','שלמה ביטוח','AIG','אנקור ביטוח','לייף',
+  'ביטוח חקלאי','מיטב דש','אחר'
+];
 // ══════════════════════════════════════════════════
 // CARD 3 – INSURANCE
 // ══════════════════════════════════════════════════
@@ -713,29 +718,54 @@ function renderCard3(){
   const structUnder = structSum>0 && structActual>0 && structActual > structSum*1.1;
   const contUnder = contSum>0 && contActual>0 && contActual > contSum*1.1;
   const sqmEstUnder = sqm>0 && structSum>0 && estStructValue > structSum*1.15;
+  const cvg = ins.coverageType||'both';
+  const showStruct = cvg==='structure'||cvg==='both';
+  const showCont = cvg==='contents'||cvg==='both';
   return `<div class="grid2">
-    <div class="field ${isIns?'span2':''}"><label class="label">חברת ביטוח ${isIns?'*':''}</label><input type="text" value="${esc(ins.company)}" oninput="STATE.insurance.company=this.value"></div>
+    <div class="field ${isIns?'span2':''}"><label class="label">חברת ביטוח ${isIns?'*':''}</label>
+      <select onchange="STATE.insurance.company=this.value">
+        <option value="">-- בחר חברת ביטוח --</option>
+        ${INSURANCE_COMPANIES.map(c=>`<option value="${c}" ${ins.company===c?'selected':''}>${c}</option>`).join('')}
+        ${ins.company && !INSURANCE_COMPANIES.includes(ins.company)?`<option value="${esc(ins.company)}" selected>${esc(ins.company)}</option>`:''}
+      </select>
+    </div>
     ${isIns?`<div class="field"><label class="label">מספר פוליסה *</label><input type="text" value="${esc(ins.policyNum)}" oninput="STATE.insurance.policyNum=this.value"></div>
     <div class="field"><label class="label">מספר תביעה *</label><input type="text" value="${esc(ins.claimNum)}" oninput="STATE.insurance.claimNum=this.value"></div>`:''}
     <div class="divider span2"></div>
-    <div class="label span2" style="font-size:11px;color:var(--accent);font-weight:700;">📐 מבנה</div>
-    <div class="field"><label class="label">סכום ביטוח מבנה (₪)</label><input type="number" value="${esc(ins.structureSum)}" oninput="STATE.insurance.structureSum=this.value;renderCard(3)" min="0"></div>
-    <div class="field"><label class="label">שווי בפועל מבנה (₪)</label><input type="number" value="${esc(ins.structureActual)}" oninput="STATE.insurance.structureActual=this.value;renderCard(3)" min="0" placeholder="אומדן שוק / שמאי"></div>
+    <div class="span2">
+      <div class="label" style="color:var(--accent);font-size:12px;margin-bottom:8px;">📋 סוג כיסוי</div>
+      <div class="pill-group" id="cvgPills">
+        ${[{v:'structure',l:'מבנה בלבד'},{v:'contents',l:'תכולה בלבד'},{v:'both',l:'מבנה + תכולה'}].map(o=>`<button class="pill ${cvg===o.v?'active':''}" onclick="STATE.insurance.coverageType='${o.v}';renderCard(3)">${o.l}</button>`).join('')}
+      </div>
+    </div>
+    <div class="span2" style="margin-top:10px;">
+      <div class="label" style="font-size:11px;color:var(--muted);margin-bottom:8px;">הרחבות בפוליסה</div>
+      <div class="flex flex-wrap gap8">
+        <button class="chip ${ins.extWaterPipe?'checked':''}" onclick="STATE.insurance.extWaterPipe=!STATE.insurance.extWaterPipe;this.classList.toggle('checked')">🔧 צנרת פנים</button>
+        <button class="chip ${ins.extNaturalDisaster?'checked':''}" onclick="STATE.insurance.extNaturalDisaster=!STATE.insurance.extNaturalDisaster;this.classList.toggle('checked')">🌪️ נזקי טבע</button>
+        <button class="chip ${ins.extBurglary?'checked':''}" onclick="STATE.insurance.extBurglary=!STATE.insurance.extBurglary;this.classList.toggle('checked')">🚪 פריצה</button>
+        <button class="chip ${ins.extTerror?'checked':''}" onclick="STATE.insurance.extTerror=!STATE.insurance.extTerror;this.classList.toggle('checked')">🏛️ מלחמה/טרור</button>
+        <button class="chip ${ins.thirdParty?'checked':''}" onclick="STATE.insurance.thirdParty=!STATE.insurance.thirdParty;this.classList.toggle('checked')">צד ג'</button>
+        <button class="chip ${ins.lossOfProfits?'checked':''}" onclick="STATE.insurance.lossOfProfits=!STATE.insurance.lossOfProfits;this.classList.toggle('checked')">אובדן רווחים</button>
+      </div>
+    </div>
+    <div class="divider span2"></div>
+    ${showStruct?`<div class="label span2" style="font-size:11px;color:var(--accent);font-weight:700;">📐 מבנה</div>
+    <div class="field"><label class="label">סכום ביטוח מבנה (₪)</label><input type="number" value="${esc(ins.structureSum)}" oninput="STATE.insurance.structureSum=this.value" onchange="renderCard(3)" min="0"></div>
+    <div class="field"><label class="label">שווי מבנה בפועל (₪)</label><input type="number" value="${esc(ins.structureActual)}" oninput="STATE.insurance.structureActual=this.value" onchange="renderCard(3)" min="0" placeholder="אומדן שוק / שמאי"></div>
     ${structUnder?`<div class="span2"><span class="under-badge under-warn">⚠️ תת-ביטוח מבנה: ${Math.round((1-(structSum/structActual))*100)}% מתחת לשווי</span></div>`:''}
     ${sqmEstUnder&&!structUnder&&!structActual?`<div class="span2"><span class="under-badge under-warn">⚠️ לפי ${sqm} מ"ר × ₪8,500 – שווי מוערך ₪${fmtNum(estStructValue)} מול סכום ₪${fmtNum(structSum)} – בדוק תת-ביטוח</span></div>`:''}
     ${structSum>0&&structActual>0&&!structUnder?`<div class="span2"><span class="under-badge under-ok">✓ אין תת-ביטוח מבנה</span></div>`:''}
-    <div class="field"><label class="label">השתתפות עצמית מבנה (₪)</label><input type="number" value="${esc(ins.deductStruct)}" oninput="STATE.insurance.deductStruct=this.value" min="0"></div>
-    <div class="divider span2"></div>
+    <div class="field"><label class="label">השתתפות עצמית מבנה (₪)</label><input type="number" value="${esc(ins.deductStruct)}" oninput="STATE.insurance.deductStruct=this.value" min="0"></div>`:''}
+    ${showCont?`<div class="divider span2"></div>
     <div class="label span2" style="font-size:11px;color:var(--green);font-weight:700;">🛋️ תכולה</div>
-    <div class="field"><label class="label">סכום ביטוח תכולה (₪)</label><input type="number" value="${esc(ins.contentsSum)}" oninput="STATE.insurance.contentsSum=this.value;renderCard(3)" min="0"></div>
-    <div class="field"><label class="label">שווי בפועל תכולה (₪)</label><input type="number" value="${esc(ins.contentsActual)}" oninput="STATE.insurance.contentsActual=this.value;renderCard(3)" min="0" placeholder="הערכת שווי תכולה"></div>
+    <div class="field"><label class="label">סכום ביטוח תכולה (₪)</label><input type="number" value="${esc(ins.contentsSum)}" oninput="STATE.insurance.contentsSum=this.value" onchange="renderCard(3)" min="0"></div>
+    <div class="field"><label class="label">שווי תכולה בפועל (₪)</label><input type="number" value="${esc(ins.contentsActual)}" oninput="STATE.insurance.contentsActual=this.value" onchange="renderCard(3)" min="0" placeholder="הערכת שווי תכולה"></div>
     ${contUnder?`<div class="span2"><span class="under-badge under-warn">⚠️ תת-ביטוח תכולה: ${Math.round((1-(contSum/contActual))*100)}% מתחת לשווי</span></div>`:''}
     ${contSum>0&&contActual>0&&!contUnder?`<div class="span2"><span class="under-badge under-ok">✓ אין תת-ביטוח תכולה</span></div>`:''}
-    <div class="field"><label class="label">השתתפות עצמית תכולה (₪)</label><input type="number" value="${esc(ins.deductContents)}" oninput="STATE.insurance.deductContents=this.value" min="0"></div>
+    <div class="field"><label class="label">השתתפות עצמית תכולה (₪)</label><input type="number" value="${esc(ins.deductContents)}" oninput="STATE.insurance.deductContents=this.value" min="0"></div>`:''}
     <div class="divider span2"></div>
     <div class="span2 flex gap12 flex-wrap mt8">
-      <button class="chip ${ins.thirdParty?'checked':''}" onclick="STATE.insurance.thirdParty=!STATE.insurance.thirdParty;this.classList.toggle('checked')">הרחבת צד ג'</button>
-      <button class="chip ${ins.lossOfProfits?'checked':''}" onclick="STATE.insurance.lossOfProfits=!STATE.insurance.lossOfProfits;this.classList.toggle('checked')">אובדן רווחים</button>
       <button class="chip ${ins.vatBiz?'checked':''}" onclick="STATE.insurance.vatBiz=!STATE.insurance.vatBiz;this.classList.toggle('checked')">עסק מקזז מע"מ</button>
       ${isIns?`<button class="chip ${ins.arrangementPlumber?'checked':''}" onclick="STATE.insurance.arrangementPlumber=!STATE.insurance.arrangementPlumber;renderCard(3)">שרברב הסדר</button>`:''}
     </div>
@@ -781,7 +811,10 @@ function renderCard4(){
   }
   html += `<div class="divider"></div>`;
   html += `<div class="grid2">`;
-  html += `<div class="field"><label class="label">מקור הפנייה</label><select onchange="STATE.event.requestedBy=this.value">
+  // Auto-set requestedBy for insurance mode
+  if(mode==='insurance' && !ev.requestedBy){ STATE.event.requestedBy='insurance_co'; }
+  const insAutoReq = mode==='insurance' && ev.requestedBy==='insurance_co';
+  html += `<div class="field"><label class="label">מקור הפנייה</label><select onchange="STATE.event.requestedBy=this.value;renderCard(4)">
     <option value="">בחר...</option>
     <option value="insured" ${ev.requestedBy==='insured'?'selected':''}>המבוטח / דייר</option>
     <option value="owner" ${ev.requestedBy==='owner'?'selected':''}>בעל הנכס</option>
@@ -790,7 +823,8 @@ function renderCard4(){
     ${mode==='insurance'?`<option value="insurance_co" ${ev.requestedBy==='insurance_co'?'selected':''}>חברת הביטוח</option>`:''}
     <option value="other" ${ev.requestedBy==='other'?'selected':''}>אחר</option>
   </select></div>`;
-  html += `<div class="field"><label class="label">שם הפונה</label><input type="text" value="${esc(ev.requesterName)}" oninput="STATE.event.requesterName=this.value" placeholder="שם מלא..."></div>`;
+  html += `<div class="field"><label class="label" style="${insAutoReq?'color:var(--subtle);':''}">${insAutoReq?'שם הפונה (לא רלוונטי)':'שם הפונה'}</label>
+    <input type="text" value="${esc(ev.requesterName)}" oninput="STATE.event.requesterName=this.value" ${insAutoReq?'disabled placeholder="חברת הביטוח" style=\'opacity:0.4;\'':`placeholder="שם מלא..."`}></div>`;
   html += `</div>`;
   html += `<div class="field mt16"><label class="label">מטרת הביקור (ניתן לסמן מספר)</label><div class="flex flex-wrap gap8" id="purposeChips">`;
   ['הערכת נזק לצורך תביעה','בדיקת היקף שיקום','חקירה ראשונית','בדיקת תכולה/מלאי','ביקור חוזר/עדכון אומדן','אחר'].forEach(p=>{
@@ -830,8 +864,8 @@ function renderCard4(){
     html += `<div class="note mt8">⚠️ במקרי שריפה נדרש לרוב דו"ח כבאות/אישור אירוע, במידה וקיים.</div>`;
   }
   html += `<div class="divider"></div>
-  <div class="field"><label class="label">הצהרת שמאי + היקף הבדיקה (אוטומטי, ניתן לעריכה)</label>
-    <textarea oninput="STATE.event.appraiserDeclaration=this.value" rows="3" placeholder="הח&quot;מ מאשר כי ביצע בדיקה עצמאית, עיין במסמכים שנמסרו לו, ביקר בנכס וסקר את הנזקים בהתאם לממצאיו בלבד.">${esc(ev.appraiserDeclaration)}</textarea>
+  <div class="field"><label class="label">הצהרת שמאי – היקף הבדיקה (אוטומטי, ניתן לעריכה)</label>
+    <textarea oninput="STATE.event.appraiserDeclaration=this.value" rows="4">${esc(ev.appraiserDeclaration||genAppraiserDeclarationText())}</textarea>
   </div>`;
   return html;
 }
@@ -995,6 +1029,7 @@ function renderCard6(){
         <div class="flex items-center gap12">
           <span class="area-title">${area.label}</span>
           <input class="area-sqm" type="number" value="${area.sqm}" oninput="setAreaField('${area.id}','sqm',this.value)" placeholder='מ"ר'>
+          <span style="font-size:12px;color:var(--muted);font-weight:600;">מ"ר</span>
         </div>
         <button class="btn btn-danger btn-xs" onclick="removeArea('${area.id}')">✕ הסר</button>
       </div>
@@ -1219,9 +1254,27 @@ function renderCard8(){
     </div></div>`;
 
   html += `<div class="sc">
-    <div class="sc-head" onclick="toggleSection(this)"><div class="sc-title">📌 המלצות שמאי</div><span class="sc-toggle">▼</span></div>
+    <div class="sc-head" onclick="toggleSection(this)"><div class="sc-title">🔧 המלצות לשיקום</div><span class="sc-toggle">▼</span></div>
     <div class="sc-body">
-      <div class="field"><textarea oninput="STATE.summary.recommendations=this.value" rows="3" placeholder="המלצות לשיקום, טיפול, תיקון...">${esc(s.recommendations)}</textarea></div>
+      ${genRehabRecommendations()?`<div class="preview-box mb12"><div class="pb-label">המלצות אוטומטיות</div><div class="pb-text">${esc(genRehabRecommendations())}</div></div>`:''}
+      <div class="field"><label class="label">עריכה ידנית (ריק = אוטומטי)</label><textarea oninput="STATE.summary.recommendations=this.value" rows="5" placeholder="${esc(genRehabRecommendations()||'המלצות לשיקום...')}">${esc(s.recommendations)}</textarea></div>
+    </div></div>`;
+
+  html += `<div class="sc">
+    <div class="sc-head" onclick="toggleSection(this)"><div class="sc-title">⏱️ זמן שיקום משוער</div><span class="sc-toggle">▼</span></div>
+    <div class="sc-body">
+      <div class="grid2">
+        <div class="field"><label class="label">משך שיקום צפוי</label>
+          <select onchange="STATE.summary.rehabTime=this.value">
+            <option value="">-- בחר --</option>
+            ${['שבוע אחד','שבועיים','3 שבועות','חודש','חודש וחצי','חודשיים','3 חודשים','4–6 חודשים','מעל 6 חודשים'].map(t=>`<option value="${t}" ${STATE.summary.rehabTime===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label class="label">הערת זמן שיקום</label>
+          <input type="text" value="${esc(STATE.summary.rehabNotes||'')}" oninput="STATE.summary.rehabNotes=this.value" placeholder="לאחר קבלת אישור, בכפוף לספקים...">
+        </div>
+      </div>
+      <div class="note note-blue" style="font-size:12px;">⚠️ זמן השיקום מותנה בביצוע עבודות תשתית קודם לגמר ובזמינות קבלנים.</div>
     </div></div>`;
 
   const modeColor = mode==='private'?'var(--blue)':mode==='insurance'?'var(--red)':'var(--green)';
@@ -1263,6 +1316,16 @@ function renderCard8(){
 // ══════════════════════════════════════════════════
 // TEXT ENGINES
 // ══════════════════════════════════════════════════
+function genAppraiserDeclarationText(){
+  const b = STATE.base, ev = STATE.event;
+  const evMap={water:'נזקי מים/צנרת',fire:'שריפה ועשן',burglary:'פריצה וגניבה',electrical:'נזק חשמלי',storm:'סערה ורוח',thirdparty:"נזק צד ג'",other:'נזק'};
+  const evName = evMap[ev.eventType]||'נזק';
+  const addr = [b.street,b.streetNum,b.city].filter(Boolean).join(' ');
+  const addrStr = addr?`בנכס הממוקם ברחוב ${addr}`:'בנכס';
+  const evDate = b.eventDate||'___';
+  const visitDate = b.visitDate||'___';
+  return `הח"מ התבקש לערוך חוות דעת שמאית בגין ${evName} אשר אירעו ביום ${evDate}, ${addrStr}.\nהביקור בנכס נערך ביום ${visitDate}. במהלך הביקור נבדקו הנזקים, תועדו הממצאים ונערכה בדיקה מקצועית במקום.`;
+}
 function genOpeningText(){
   const b = STATE.base, ev = STATE.event;
   if(!b.eventDate && !ev.eventType && !ev.eventSubType) return '';
@@ -1326,21 +1389,49 @@ function genFindingsText(){
     Object.values(sm).forEach(arr=>allSigns.push(...arr));
   });
   const getLabel = id => (allSigns.find(s=>s.id===id)||{}).l||id;
-  const sevMap={none:'אין ממצאי פגיעה',light:'ממצאי פגיעה קלים',medium:'ממצאי פגיעה בינוניים',severe:'ממצאי פגיעה משמעותיים'};
-  const paras = areas.map(area=>{
+  // Sign → professional finding description mapping
+  const signToDesc = {
+    w_stain_wall:'סימני רטיבות בקירות במספר מוקדים',
+    w_stain_ceil:'כתמי רטיבות בתקרה',
+    w_capillary:'סימני רטיבות בשיפולי קירות (עליות קפילריות)',
+    w_plaster_swell:'פגיעה בטיח, בשכבות שפכטל ובצבע',
+    w_plaster_fall:'התפרקות וקילוף טיח',
+    w_paint_peel:'קילופי צבע וניתוק גבס',
+    w_humid_ind:'אינדיקציה ללחות חריגה בקירות',
+    w_false_ceil:'נזק לתקרה משנית (גבס/מינרלית)',
+    w_parquet:'נזקי רטיבות והתנפחות בריצוף פרקט',
+    w_water_up:'עליות מים מעל פני הריצוף',
+    w_grout:'סימני תפרחת מלחים בין אריחים',
+    w_subfloor:'סימני רטיבות והתנפחות בשכבות תשתית מתחת לריצוף',
+    w_ceramic_sep:'הפרדות קרמיקה בחדר רטוב',
+    w_seal:'ליקויי איטום ורובה בחדר רטוב',
+    w_kit_back:'רטיבות והתנפחות גב ארון מטבח',
+    w_kit_base:'רטיבות והתנפחות בצוקל מטבח',
+    w_frame:'נזקי רטיבות והתנפחות למשקופים פנימיים',
+    w_elec_panel:'פגיעה בארון חשמל',
+    w_elec_sys:'פגיעה במערכת חשמל',
+    w_mold:'סימני עובש ופטריות',
+    w_smell:'ריח טחב – חשש לזיהום בקטריאלי'
+  };
+  const heLetters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ'];
+  const paras = areas.map((area,i)=>{
     if(!area.signs||!area.signs.length) return null;
-    const labels = area.signs.map(getLabel);
-    let txt = `בבדיקתנו ב${area.label} נמצאו ${sevMap[area.severity]||'ממצאי פגיעה'} הכוללים: ${labels.join(', ')}.`;
-    if(area.humidTest==='high') txt += ` בבדיקה באמצעות מד לחות נמצאה אינדיקציה ללחות חריגה באזור הנבדק.`;
-    if(area.notes) txt += ` ${area.notes}`;
+    const letter = heLetters[i]||String(i+1);
+    const bullets = area.signs.map(s=>signToDesc[s]||getLabel(s));
+    let txt = `${letter}. ${area.label}\nבמהלך הביקור בנכס נצפו הממצאים הבאים:`;
+    bullets.forEach(b=>{ txt += `\n   • ${b}`; });
+    if(area.humidTest==='high'){
+      txt += `\n   • רטיבות במצע שמתחת לריצוף, לרבות חשש לזיהום בקטריאלי עקב שהות מים ממושכת`;
+    }
+    if(area.notes) txt += `\n   • ${area.notes}`;
     return txt;
   }).filter(Boolean);
   if(f.matchesStory){
-    const mm={yes:'הממצאים תואמים את גרסת המבוטח',partial:'הממצאים תואמים חלקית את גרסת המבוטח',no:'הממצאים אינם תואמים את גרסת המבוטח',tbd:'ההתאמה לגרסת המבוטח טרם הוכרעה'};
-    if(mm[f.matchesStory]) paras.push(mm[f.matchesStory]+'.');
+    const mm={yes:'הממצאים תואמים את גרסת המבוטח.',partial:'הממצאים תואמים חלקית את גרסת המבוטח.',no:'הממצאים אינם תואמים את גרסת המבוטח.',tbd:'ההתאמה לגרסת המבוטח טרם הוכרעה.'};
+    if(mm[f.matchesStory]) paras.push(mm[f.matchesStory]);
   }
   if(f.generalNotes) paras.push(f.generalNotes);
-  return paras.join('\n');
+  return paras.join('\n\n');
 }
 
 // ══════════════════════════════════════════════════
@@ -1459,7 +1550,11 @@ function runBOQEngine(){
   if(hasDemo) serv.push({id:'S'+sv++,desc:'פינוי פסולת בניין',unit:"קומפ'",qty:'1',price:'',zeroPrice:false});
   if(et==='fire'&&cont.length>0) serv.push({id:'S'+sv++,desc:'פינוי ריהוט ותכולה חרוכה',unit:"קומפ'",qty:'1',price:'',zeroPrice:false});
   serv.push({id:'S'+sv++,desc:'ניקיון לאחר שיפוץ',unit:"קומפ'",qty:'1',price:'',zeroPrice:false});
-  if(struct.length+cont.length>=6) serv.push({id:'S'+sv++,desc:'פיקוח וניהול',unit:"קומפ'",qty:'1',price:'',zeroPrice:false});
+  if(struct.length+cont.length>=6){
+    const repairTotalForSupervision = struct.reduce((s,i)=>s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0),0)+cont.reduce((s,i)=>s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0),0);
+    const supervisionAmt = repairTotalForSupervision>0?Math.round(repairTotalForSupervision*0.05):0;
+    serv.push({id:'S'+sv++,desc:'פיקוח וניהול עבודות (5% מעלויות תיקון)',unit:"קומפ'",qty:'1',price:supervisionAmt>0?supervisionAmt.toString():'',zeroPrice:false});
+  }
 
   STATE.boq.structItems = struct;
   STATE.boq.contentsItems = cont;
@@ -1601,12 +1696,17 @@ function generateReport(){
   }
 
   if(expl) rpt+=`<div class="rpt-section"><h3>ביאורים והסברים להערכה</h3><p class="rpt-p">${esc(expl).replace(/\n/g,'<br>')}</p></div>`;
-  if(s.recommendations) rpt+=`<div class="rpt-section"><h3>המלצות</h3><p class="rpt-p">${esc(s.recommendations).replace(/\n/g,'<br>')}</p></div>`;
+  const rehabRec = s.recommendations || genRehabRecommendations();
+  if(rehabRec) rpt+=`<div class="rpt-section"><h3>המלצות לשיקום</h3><p class="rpt-p" style="white-space:pre-line;">${esc(rehabRec)}</p></div>`;
   if(s.claimTotal) rpt+=`<div class="rpt-section"><h3>הערת סיכום</h3><p class="rpt-p">${esc(s.claimTotal)}</p></div>`;
 
   const sigLine = s.signature || 'ירון אמיר, שמאי רכוש מוסמך';
+  const declText = `הצהרת שמאי\nאני הח"מ מצהיר כי חוות דעת זו נערכה על ידי באופן מקצועי, עצמאי ובלתי תלוי, בהתאם לממצאים שנצפו בביקור בנכס ולנתונים שעמדו בפניי במועד עריכת הדו"ח.\nההערכה בוצעה בהתאם לכללים המקובלים בתחום שמאות הרכוש ועל בסיס ניסיון מקצועי ומקורות תמחור מקובלים.\nחוות דעת זו מיועדת להערכת הנזק נשוא האירוע בלבד.`;
+  rpt+=`<div class="rpt-section" style="border-top:2px solid #E5E7EB;margin-top:24px;padding-top:20px;">
+    <h3>הצהרת שמאי</h3>
+    <p class="rpt-p" style="white-space:pre-line;">${esc(declText)}</p>
+  </div>`;
   rpt+=`<div class="rpt-signature">
-    <p>חוות דעת זו הוכנה ע"י השמאי הח"מ בהתבסס על ממצאי הביקור והמידע שנמסר.</p>
     <p style="margin:24px 0 6px;">_______________________</p>
     <p style="font-weight:700;">${esc(sigLine)}</p>
     <p style="color:#9CA3AF;margin-top:4px;">תאריך: ${b.visitDate||new Date().toLocaleDateString('he-IL')}</p>
@@ -1667,18 +1767,29 @@ function renderCard9(){
 }
 
 // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 // TEXT ENGINE – ביאורים והסברים (א-ח style)
 // ══════════════════════════════════════════════════
 function genExplanationsText(){
-  const parts = [];
   const boq = STATE.boq;
   const ins = STATE.insurance;
+  const prop = STATE.property;
   const grand = calcSectionTotal(boq.structItems)+calcSectionTotal(boq.contentsItems)+calcSectionTotal(boq.serviceItems);
+  const isVatBiz = ins.vatBiz;
+  const isBiz = prop.usage==='business';
   const letters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י'];
-  let idx = 0;
-  const add = (txt) => parts.push(`${letters[idx++]}. ${txt}`);
+  let idx=0;
+  const parts=[];
+  const add=(txt)=>parts.push(`${letters[idx++]}. ${txt}`);
 
-  add('הערכת הנזק בוצעה על-פי ממצאי הביקור בנכס, מסמכים שנמסרו לשמאי ועקרונות שמאות מקובלים.');
+  add('הערכת הנזק נקבעה על בסיס הממצאים שנצפו במועד הביקור בנכס ותיעוד הנזקים בשטח ועל פי מסמכים שנמסרו לשמאי ועקרונות שמאות מקובלים.');
+  add('הבדיקה בנכס בוצעה באופן חזותי בלבד, ללא פירוק אלמנטים וללא ביצוע בדיקות הנדסיות או מעבדתיות.');
+
+  if(!isVatBiz && !isBiz){
+    add('מדובר בדירת מגורים, ולפיכך ההערכה כוללת מע"מ. המחירים מבוססים על הצעות מחיר שהתקבלו ועל מחירון דקל שיפוצים בהתאם למקובל בשוק.');
+  } else {
+    add('המחירים מבוססים על הצעות מחיר שהתקבלו ועל מחירון דקל שיפוצים בהתאם למקובל בשוק. '+(isVatBiz?'הנכס מקזז מע"מ – הסכומים מוצגים ללא מע"מ.':''));
+  }
 
   if(mode==='insurance'){
     const structSum = parseFloat(ins.structureSum)||0;
@@ -1686,27 +1797,52 @@ function genExplanationsText(){
     const structUnder = structSum>0 && structActual>0 && structActual > structSum*1.1;
     if(structUnder){
       const ratio = Math.round((structSum/structActual)*100);
-      add(`נמצא תת-ביטוח מבנה. יחס ביטוח: ${ratio}%. השיפוי יחושב לפי ערך הביטוח ביחס לשווי בפועל בהתאם לסעיף תת-ביטוח בפוליסה.`);
-    } else {
-      add('לא נמצא תת-ביטוח בבדיקה. הסכום המגיע לפיצוי חושב לפי ערך שיפוי מלא.');
+      add(`נמצא תת-ביטוח מבנה – יחס ביטוח: ${ratio}%. השיפוי יחושב יחסית לפי ערך הביטוח ביחס לשווי בפועל בהתאם לסעיף תת-ביטוח בפוליסה.`);
     }
     add('הנזקים הוערכו לפי ערך כינון (עלות שיקום למצב טרום-נזק). ערך השיפוי הופחת בשליש בהתאם לנוהל.');
     if(parseFloat(ins.deductStruct)>0) add(`מסכום השיפוי הופחתה השתתפות עצמית בסך ₪${fmtNum(parseFloat(ins.deductStruct))} בהתאם לתנאי הפוליסה.`);
-    if(ins.lossOfProfits) add('הנכס כולל הרחבת אובדן רווחים – נא לבדוק רלוונטיות לאירוע הנוכחי בנפרד.');
-    if(ins.thirdParty) add("הפוליסה כוללת הרחבת צד ג' – יש לבדוק אם ישנה חשיפה לצד ג' באירוע זה.");
-  } else if(mode==='private'){
-    add('הערכת הנזק מבוססת על עלויות שיקום מלא לרמה הקיימת ערב האירוע.');
-    if(boq.vat) add('הסכומים כוללים מע"מ בשיעור 18% כנדרש.');
-  } else {
-    add('הנזקים הוערכו בהתאם לקריטריונים ולנהלים הרלוונטיים של רשות מס רכוש ורכוש המדינה.');
-    add('הפיצוי מחושב לפי ערך שיפוי בהתאם לתקנות מס רכוש.');
   }
 
+  add('כל האמור בדו"ח זה נכון למועד הביקור בנכס. ייתכן כי במהלך ביצוע העבודות יתגלו ליקויים נוספים שלא היו גלויים לעין במועד הבדיקה, ובמקרה זה תעודכן ההערכה בהתאם.');
   if(STATE.findings.labTest) add('בוצעה/תבוצע בדיקת מעבדה (מכון התקנים) לצורך אישור ממצאי לחות – התוצאות ישמשו להמשך הטיפול.');
-  if(grand>0) add(`סכום הנזק הכולל מוערך בסכום של ₪${fmtNum(Math.round(grand))} לפני מע"מ.`);
-  add('חוות דעת זו הוכנה ע"י השמאי הח"מ בהתבסס על הנתונים שנמסרו לו ועל ממצאיו בלבד, ואינה מהווה הכרה בחבות כלשהי.');
+  if(grand>0) add(`סכום הנזק הכולל מוערך בסכום של ₪${fmtNum(Math.round(grand))}${boq.vat?' (כולל מע"מ)':' (לפני מע"מ)'}.`);
 
   return parts.join('\n');
+}
+
+// ══════════════════════════════════════════════════
+// TEXT ENGINE – המלצות שיקום
+// ══════════════════════════════════════════════════
+function genRehabRecommendations(){
+  const et = STATE.event.eventType;
+  const areas = STATE.findings.areas||[];
+  const boq = STATE.boq;
+  const grand = calcSectionTotal(boq.structItems)+calcSectionTotal(boq.contentsItems)+calcSectionTotal(boq.serviceItems);
+  if(!areas.length && !grand) return '';
+  const evMap={water:'מים',fire:'שריפה',burglary:'פריצה',electrical:'חשמל',storm:'סערה',thirdparty:"צד ג'",tax:'מס רכוש',other:'נזק'};
+  const evName = evMap[et]||'נזק';
+  const hasWater = et==='water';
+  const hasFire = et==='fire';
+  const hasFloor = (boq.structItems||[]).some(i=>i.desc&&i.desc.includes('ריצוף'));
+  const hasWall = (boq.structItems||[]).some(i=>i.desc&&i.desc.includes('טיח'));
+  const hasMold = (boq.structItems||[]).some(i=>i.desc&&i.desc.includes('עובש'));
+  const anyHighHumid = areas.some(a=>a.humidTest==='high');
+  const rehabTime = STATE.summary.rehabTime;
+
+  let txt = `🔧 סדר עדיפויות מומלץ לשיקום הנכס:\n`;
+  let step=1;
+  if(hasWater&&anyHighHumid) txt+=`${step++}️⃣ ייבוש הנכס וטיפול בלחות לפני כל עבודת גמר.\n`;
+  if(hasMold) txt+=`${step++}️⃣ טיפול יסודי בעובש ופטריות (ריסוס מקצועי) לפני כיסוי הקירות.\n`;
+  txt+=`${step++}️⃣ תיקון מקור הנזק${hasWater?' (צנרת/איטום)':hasFire?' (חשמל/מקור ההצתה)':''} – תנאי מוקדם לכל שיקום.\n`;
+  txt+=`${step++}️⃣ ביצוע עבודות תשתית (טיח, איטום${hasWater?', צנרת':''}${(boq.structItems||[]).some(i=>i.desc.includes('חשמל'))?', חשמל':''}) לפי כתב הכמויות.\n`;
+  txt+=`${step++}️⃣ עבודות גמר (${hasFloor?'ריצוף, ':''}${hasWall?'צבע, ':''}נגרות) רק לאחר אישור שכבות התשתית.\n`;
+  txt+=`${step++}️⃣ ניקיון סופי ובדיקת קבלה.\n`;
+  if(rehabTime) txt+=`\n⏱️ זמן שיקום צפוי: ${rehabTime}${STATE.summary.rehabNotes?' – '+STATE.summary.rehabNotes:''}.\n`;
+  txt+=`\n⚠️ הערות חשובות:\n`;
+  txt+=`• טרם ביצוע תיקוני גמר נדרש טיפול יסודי במקור הנזק.\n`;
+  txt+=`• מומלץ פיקוח הנדסי לאורך כל שלבי השיקום.\n`;
+  txt+=`• יש לוודא תאימות החומרים והשיטות לתקנים הישראליים.`;
+  return txt;
 }
 
 // ══════════════════════════════════════════════════
@@ -1904,7 +2040,7 @@ function calcSectionTotal(items){return(items||[]).reduce((s,i)=>s+(parseFloat(i
 function makePills(opts, curVal, onClickExpr){
   return opts.map(o=>{
     const isActive = curVal===o.v;
-    const cb = onClickExpr.replace(/v/g,"'"+o.v+"'");
+    const cb = onClickExpr.replace(/\bv\b/g,"'"+o.v+"'");
     return `<button class="pill ${isActive?'active':''}" onclick="${cb}">${o.l}</button>`;
   }).join('');
 }
