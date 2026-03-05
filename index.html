@@ -696,6 +696,53 @@ footer {
 </style>
 </head>
 <body>
+<!-- ══════ LOGIN SCREEN ══════ -->
+<div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
+  <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
+    <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
+    <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;">שמאי רכוש</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:32px;">מערכת ניהול תיקים</div>
+    <div style="margin-bottom:14px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
+      <input id="loginUser" type="text" placeholder="admin" autocomplete="username"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div style="margin-bottom:24px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">סיסמה</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginErr" style="color:#f87171;font-size:13px;margin-bottom:16px;display:none;">שם משתמש או סיסמה שגויים</div>
+    <button onclick="doLogin()"
+      style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;padding:13px;color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">כניסה למערכת</button>
+  </div>
+</div>
+<script>
+(function(){
+  const USER='admin', PASS='appraiser', KEY='shamai_auth';
+  function doLogin(){
+    const u=document.getElementById('loginUser').value.trim();
+    const p=document.getElementById('loginPass').value;
+    if(u===USER && p===PASS){
+      sessionStorage.setItem(KEY,'1');
+      document.getElementById('loginScreen').style.display='none';
+    } else {
+      document.getElementById('loginErr').style.display='block';
+      document.getElementById('loginPass').value='';
+    }
+  }
+  window.doLogin=doLogin;
+  if(sessionStorage.getItem(KEY)!=='1'){
+    document.getElementById('loginScreen').style.display='flex';
+  } else {
+    document.getElementById('loginScreen').style.display='none';
+  }
+})();
+</script>
+
 
 <header>
   <div class="header-inner">
