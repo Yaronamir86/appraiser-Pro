@@ -281,8 +281,8 @@ body.field-mode #main{padding:12px;}
 <div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:none;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
   <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
     <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
-    <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;">שמאי רכוש</div>
-    <div style="font-size:13px;color:#6b7280;margin-bottom:32px;">מערכת ניהול תיקים</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56"><rect width="64" height="64" rx="16" fill="#f59e0b"/><text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#fff;">ירון אמיר</div><div style="font-size:12px;color:#f59e0b;font-weight:700;">שמאי רכוש</div></div></div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
     <div style="margin-bottom:14px;text-align:right;">
       <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
       <input id="loginUser" type="text" placeholder="admin" autocomplete="username"
@@ -443,6 +443,16 @@ body.field-mode #main{padding:12px;}
 // STATE
 // ══════════════════════════════════════════════════
 let mode = null;
+
+const APPRAISER = {
+  nameHe: 'ירון אמיר',
+  nameEn: 'Yaron Amir',
+  title: 'שמאי רכוש',
+  phone: '050-3292066',
+  email: 'yaronamir86@gmail.com',
+  city: 'בת-ים',
+  license: ''
+};
 let currentCard = 1;
 let currentCaseId = null;
 let STATE = {
@@ -1461,7 +1471,7 @@ function renderCard8(){
     <div class="sc-head" onclick="toggleSection(this)"><div class="sc-title">✍️ חתימה ושם השמאי</div><span class="sc-toggle">▼</span></div>
     <div class="sc-body">
       <div class="field"><label class="label">טקסט חתימה / סיום (יופיע בדוח)</label>
-        <textarea oninput="STATE.summary.signature=this.value" rows="2" placeholder="ירון אמיר, שמאי רכוש מוסמך...">${esc(s.signature)}</textarea>
+        <textarea oninput="STATE.summary.signature=this.value" rows="2" placeholder="ירון אמיר, שמאי רכוש">${esc(s.signature)}</textarea>
       </div>
     </div></div>`;
 
@@ -1774,10 +1784,28 @@ function generateReport(){
     return h;
   };
 
+  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="44" height="44"><rect width="48" height="48" rx="12" fill="#f59e0b"/><text x="24" y="33" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg>`;
   let rpt = `<div class="rpt-header">
-    <h1>חוות דעת שמאית</h1>
-    <h2>${modeLabels[mode]}</h2>
-    ${b.visitDate?`<div style="margin-top:10px;font-size:13px;color:#9CA3AF;">תאריך ביקור: ${b.visitDate}</div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:20px;border-bottom:2px solid #E5E7EB;">
+      <div style="text-align:right;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          ${logoSvg}
+          <div>
+            <div style="font-size:20px;font-weight:900;color:#111;">${APPRAISER.nameHe}</div>
+            <div style="font-size:12px;color:#6B7280;font-weight:600;">${APPRAISER.title}</div>
+          </div>
+        </div>
+        ${APPRAISER.license?`<div style="font-size:11px;color:#9CA3AF;">רישיון מס' ${APPRAISER.license}</div>`:''}
+      </div>
+      <div style="text-align:left;font-size:12px;color:#6B7280;line-height:1.9;">
+        <div>📞 ${APPRAISER.phone}</div>
+        <div>✉️ ${APPRAISER.email}</div>
+        <div>📍 ${APPRAISER.city}</div>
+      </div>
+    </div>
+    <h1 style="font-size:24px;font-weight:900;color:#111;margin-bottom:4px;">חוות דעת שמאית</h1>
+    <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:8px;">${modeLabels[mode]}</h2>
+    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${b.visitDate}</div>`:''}
   </div>`;
 
   // Main photo
