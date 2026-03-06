@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מערכת שמאות | טופס</title>
+<title>ירון אמיר | מערכת שמאות | טופס</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -275,6 +275,87 @@ body.field-mode #main{padding:12px;}
 .gen-item-cb input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);}
 .gen-item-cb.checked{border-color:var(--accent);background:rgba(245,158,11,.08);}
 </style>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs,
+         deleteDoc, query, where, orderBy, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain: "yaron-appraiser.firebaseapp.com",
+  projectId: "yaron-appraiser",
+  storageBucket: "yaron-appraiser.firebasestorage.app",
+  messagingSenderId: "179370141848",
+  appId: "1:179370141848:web:d5843d9641dce3adabc8ed"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+window._FB = { auth, db, signOut, serverTimestamp,
+               doc, setDoc, getDoc, getDocs, deleteDoc,
+               collection, query, where, orderBy };
+
+// ─── Auth guard ───
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window._currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.body.style.overflow = '';
+  } else {
+    window._currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    // redirect to login after 2s
+    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+  }
+});
+
+// ─── Firestore case save ───
+window._saveCase = async function(id, caseData) {
+  if (!window._currentUser) return;
+  await setDoc(doc(db, 'cases', id), {
+    ...caseData,
+    uid: window._currentUser.uid,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+
+// ─── Firestore case load ───
+window._loadCase = async function(id) {
+  const snap = await getDoc(doc(db, 'cases', id));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+};
+
+// ─── All cases (for case manager sidebar) ───
+window._getCases = async function() {
+  if (!window._currentUser) return [];
+  try {
+    const q = query(
+      collection(db, 'cases'),
+      where('uid', '==', window._currentUser.uid),
+      orderBy('updatedAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { return []; }
+};
+
+window._deleteCase = async function(id) {
+  await deleteDoc(doc(db, 'cases', id));
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+
+</script>
 </head>
 <body>
 <!-- ══════ LOGIN SCREEN ══════ -->
@@ -301,28 +382,7 @@ body.field-mode #main{padding:12px;}
       onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">כניסה למערכת</button>
   </div>
 </div>
-<script>
-(function(){
-  const USER='admin', PASS='appraiser', KEY='shamai_auth';
-  function doLogin(){
-    const u=document.getElementById('loginUser').value.trim();
-    const p=document.getElementById('loginPass').value;
-    if(u===USER && p===PASS){
-      sessionStorage.setItem(KEY,'1');
-      document.getElementById('loginScreen').style.display='none';
-    } else {
-      document.getElementById('loginErr').style.display='block';
-      document.getElementById('loginPass').value='';
-    }
-  }
-  window.doLogin=doLogin;
-  // Show login if not authenticated
-  if(sessionStorage.getItem(KEY)!=='1'){
-    document.getElementById('loginScreen').style.display='flex';
-    document.body.style.overflow='hidden';
-  }
-})();
-</script>
+<!-- login handled by Firebase module -->
 
 
 <!-- ══════════════════ LANDING ══════════════════ -->
@@ -2100,10 +2160,15 @@ function toggleFieldMode(){
 // CASE MANAGER
 // ══════════════════════════════════════════════════
 function getCases(){
-  try{ return JSON.parse(localStorage.getItem('appraisal_cases')||'[]'); }catch(e){ return []; }
+  // compatibility shim — returns cached or empty
+  return window._casesCache || [];
+}
+async function getCasesAsync(){
+  window._casesCache = await (window._getCases ? window._getCases() : Promise.resolve([]));
+  return window._casesCache;
 }
 function saveCases(cases){
-  try{ localStorage.setItem('appraisal_cases', JSON.stringify(cases)); }catch(e){}
+  // no-op — cases saved individually via saveCurrentCase()
 }
 function openCaseMgr(){
   document.getElementById('caseMgr').classList.add('open');
@@ -2112,7 +2177,7 @@ function openCaseMgr(){
 function closeCaseMgr(){
   document.getElementById('caseMgr').classList.remove('open');
 }
-function renderCaseList(){
+async function renderCaseList(){
   const cases = getCases();
   const list = document.getElementById('caseList');
   if(!cases.length){
@@ -2370,15 +2435,24 @@ function attachListeners(n){/* no-op, inline handlers used */}
 // Load case from URL: form.html?case=CASE_ID
 // Or new case:        form.html?case=CASE_ID&mode=insurance
 // ══════════════════════════════════════════════════
-(function initFromUrl(){
+(async function initFromUrl(){
   const params = new URLSearchParams(window.location.search);
   const caseId = params.get('case');
   const modeParam = params.get('mode');
   if(!caseId) return;
 
-  // Check if case exists in storage
-  const cases = getCases();
-  const found = cases.find(c => c.id === caseId);
+  // Wait for auth to be ready
+  await new Promise(resolve => {
+    const unsub = (window._FB?.auth || {onAuthStateChanged: (cb) => { cb(null); return ()=>{}; }})
+      .onAuthStateChanged ? window._FB.auth.onAuthStateChanged((u) => { unsub(); resolve(u); })
+      : resolve(null);
+  });
+
+  // Load case from Firestore
+  let found = null;
+  if (window._loadCase) {
+    found = await window._loadCase(caseId);
+  }
 
   if(found && found.state){
     // Load existing case with state
