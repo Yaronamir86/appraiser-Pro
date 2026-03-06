@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הרשמה | מערכת שמאות מקצועית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card{background:#0d1117;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:48px 40px;width:440px;max-width:100%;box-shadow:0 32px 80px rgba(0,0,0,.6);}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;}
+.subtitle{text-align:center;font-size:12px;color:#6b7280;margin-bottom:28px;}
+.trial-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:28px;}
+.section-title{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.field input{width:100%;background:#030712;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;}
+.field input:focus{border-color:#f59e0b;}
+.field input::placeholder{color:#4b5563;}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:22px 0;}
+.btn-register{width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:12px;padding:14px;color:#000;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-top:8px;}
+.btn-register:hover{opacity:.88;}
+.btn-register:disabled{opacity:.4;cursor:not-allowed;}
+.terms{font-size:11px;color:#4b5563;text-align:center;margin-top:14px;line-height:1.6;}
+.terms a{color:#6b7280;text-decoration:underline;}
+.login-link{text-align:center;margin-top:20px;font-size:13px;color:#6b7280;}
+.login-link a{color:#f59e0b;text-decoration:none;font-weight:700;}
+.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:13px;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:none;}
+.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;font-size:14px;border-radius:12px;padding:24px;text-align:center;display:none;}
+.pw-bar{height:3px;border-radius:2px;margin-top:6px;background:#1f2937;overflow:hidden;}
+.pw-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0%;}
+.pw-hint{font-size:11px;color:#6b7280;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="logo-row">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="52" height="52">
+      <rect width="64" height="64" rx="16" fill="#f59e0b"/>
+      <text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text>
+    </svg>
+    <div style="text-align:right;">
+      <div style="font-size:19px;font-weight:900;color:#fff;">מערכת שמאות מקצועית</div>
+      <div style="font-size:12px;color:#f59e0b;font-weight:700;">כלי עבודה לשמאי רכוש עצמאי</div>
+    </div>
+  </div>
+  <div class="subtitle">050-3292066 &nbsp;|&nbsp; yaronamir86@gmail.com</div>
+
+  <div style="text-align:center;margin-bottom:28px;">
+    <span class="trial-badge">✅ ניסיון חינמי 14 יום — ללא כרטיס אשראי</span>
+  </div>
+
+  <div class="success" id="successMsg">
+    <div style="font-size:36px;margin-bottom:10px;">🎉</div>
+    <div style="font-size:17px;font-weight:800;margin-bottom:6px;">ברוך הבא למערכת!</div>
+    <div style="font-size:13px;opacity:.8;">החשבון נוצר. מועבר לדשבורד...</div>
+  </div>
+
+  <div id="regErr" class="err"></div>
+
+  <div id="regForm">
+    <div class="section-title">פרטים אישיים</div>
+    <div class="row-2">
+      <div class="field">
+        <label>שם פרטי</label>
+        <input type="text" id="firstName" placeholder="ישראל" autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label>שם משפחה</label>
+        <input type="text" id="lastName" placeholder="ישראלי" autocomplete="family-name">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label>טלפון</label>
+        <input type="tel" id="phone" placeholder="050-0000000">
+      </div>
+      <div class="field">
+        <label>עיר</label>
+        <input type="text" id="city" placeholder="תל אביב">
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-title">פרטי כניסה</div>
+
+    <div class="field">
+      <label>אימייל</label>
+      <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>סיסמה</label>
+      <input type="password" id="regPass" placeholder="לפחות 8 תווים" autocomplete="new-password" oninput="checkPW(this.value)">
+      <div class="pw-bar"><div class="pw-fill" id="pwFill"></div></div>
+      <div class="pw-hint" id="pwHint">לפחות 8 תווים</div>
+    </div>
+    <div class="field">
+      <label>אימות סיסמה</label>
+      <input type="password" id="regPass2" placeholder="הקלד שוב" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
+
+    <button class="btn-register" id="regBtn" onclick="doRegister()">התחל ניסיון חינמי ←</button>
+
+    <div class="terms">
+      בלחיצה מסכים ל<a href="#">תנאי השימוש</a>. אחרי 14 יום — 99₪/חודש.
+    </div>
+  </div>
+
+  <div class="login-link">כבר יש לך חשבון? <a href="index.html">כניסה למערכת</a></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey:"AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain:"yaron-appraiser.firebaseapp.com",
+  projectId:"yaron-appraiser",
+  storageBucket:"yaron-appraiser.firebasestorage.app",
+  messagingSenderId:"179370141848",
+  appId:"1:179370141848:web:d5843d9641dce3adabc8ed"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// Already logged in → go to dashboard
+onAuthStateChanged(auth, user => {
+  if(user) window.location.href = 'index.html';
+});
+
+window.doRegister = async function(){
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const phone     = document.getElementById('phone').value.trim();
+  const city      = document.getElementById('city').value.trim();
+  const email     = document.getElementById('regEmail').value.trim();
+  const pass      = document.getElementById('regPass').value;
+  const pass2     = document.getElementById('regPass2').value;
+  const btn       = document.getElementById('regBtn');
+
+  showErr('');
+
+  if(!firstName||!lastName)  return showErr('נא למלא שם פרטי ושם משפחה');
+  if(!email||!email.includes('@')) return showErr('נא למלא אימייל תקין');
+  if(pass.length < 8)        return showErr('הסיסמה חייבת להכיל לפחות 8 תווים');
+  if(pass !== pass2)         return showErr('הסיסמאות אינן זהות');
+
+  btn.textContent='יוצר חשבון...'; btn.disabled=true;
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid  = cred.user.uid;
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 14);
+
+    await setDoc(doc(db,'users',uid), {
+      uid, firstName, lastName,
+      fullName: firstName+' '+lastName,
+      phone, city, email,
+      role: 'appraiser',
+      plan: 'trial',
+      trialEnd: trialEnd.toISOString(),
+      createdAt: serverTimestamp()
+    });
+
+    document.getElementById('regForm').style.display='none';
+    document.getElementById('successMsg').style.display='block';
+    setTimeout(()=>{ window.location.href='index.html'; }, 2000);
+
+  } catch(e) {
+    btn.textContent='התחל ניסיון חינמי ←'; btn.disabled=false;
+    const msgs = {
+      'auth/email-already-in-use': 'אימייל זה כבר רשום. <a href="index.html" style="color:#f59e0b">כניסה</a>',
+      'auth/invalid-email':        'כתובת האימייל אינה תקינה',
+      'auth/weak-password':        'הסיסמה חלשה — השתמש ב-8 תווים עם מספרים'
+    };
+    showErr(msgs[e.code]||'שגיאה: '+e.message);
+  }
+};
+
+function showErr(msg){
+  const el = document.getElementById('regErr');
+  el.innerHTML = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+</script>
+
+<script>
+function checkPW(v){
+  const fill=document.getElementById('pwFill');
+  const hint=document.getElementById('pwHint');
+  if(!v){fill.style.width='0%';hint.textContent='לפחות 8 תווים';hint.style.color='#6b7280';return;}
+  let s=0;
+  if(v.length>=8)s++;
+  if(/[0-9]/.test(v))s++;
+  if(/[A-Za-z]/.test(v))s++;
+  if(/[^A-Za-z0-9]/.test(v))s++;
+  const c=['#ef4444','#f59e0b','#3b82f6','#10b981'];
+  const l=['חלשה','בינונית','טובה','חזקה'];
+  const p=['25%','50%','75%','100%'];
+  const i=Math.max(s-1,0);
+  fill.style.width=p[i]; fill.style.background=c[i];
+  hint.textContent='חוזק: '+l[i]; hint.style.color=c[i];
+}
+</script>
+</body>
+</html>
