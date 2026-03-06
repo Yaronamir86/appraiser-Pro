@@ -814,4 +814,538 @@ window._deleteCase = async function(id) {
 <div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:none;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
   <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
     <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56"><rect width="64" height="64" rx="16" fill="#f59e0b"/><text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#fff;">ירון אמיר</div><div style="font-size:12px;color:#f59e0b;font-weight:700;">שמאי רכוש</div></div></div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
+    <div style="margin-bottom:14px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
+      <input id="loginUser" type="text" placeholder="your@email.com" autocomplete="email" type="email"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div style="margin-bottom:24px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">סיסמה</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginErr" style="color:#f87171;font-size:13px;margin-bottom:16px;display:none;">שם משתמש או סיסמה שגויים</div>
+    <div style="text-align:left;margin-bottom:12px;"><a href="#" onclick="doForgotPassword();return false;" style="font-size:12px;color:#6b7280;text-decoration:none;">שכחתי סיסמה</a></div>
+    <button onclick="doLogin()"
+      style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;padding:13px;color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">כניסה למערכת</button>
+  </div>
+</div>
+<!-- login handled by Firebase module -->
+
+
+<header>
+  <div class="header-inner" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="logo" style="display:flex;align-items:center;gap:10px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><rect width="48" height="48" rx="12" fill="#f59e0b"/><text x="24" y="33" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="line-height:1.2;"><div style="font-size:15px;font-weight:800;color:#fff;">ירון אמיר</div><div style="font-size:11px;color:var(--amber);font-weight:600;letter-spacing:.04em;">שמאי רכוש</div></div></div>
+      <div>
+        <span class="logo-text">מערכת שמאות</span>
+        <span class="logo-sub">Professional Appraisal System</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge-new"><span class="pulse"></span> מערכת פעילה</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportAll()">📤 ייצוא הכל</button>
+      <button class="btn btn-primary" onclick="openNewCase()">+ תיק חדש</button>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:#f87171;border-color:rgba(248,113,113,.3);" title="התנתקות">🚪 התנתקות</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Page Title -->
+  <div class="page-title-wrap">
+    <h1 class="page-title">לוח <span>בקרה</span></h1>
+    <p class="page-subtitle" id="subtitleText">טוען נתונים...</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card gold" style="animation-delay:.05s">
+      <span class="stat-icon">📁</span>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">סה"כ תיקים</div>
+    </div>
+    <div class="stat-card red" style="animation-delay:.1s">
+      <span class="stat-icon">🏢</span>
+      <div class="stat-value" id="statInsurance">0</div>
+      <div class="stat-label">ביטוח</div>
+    </div>
+    <div class="stat-card blue" style="animation-delay:.15s">
+      <span class="stat-icon">👤</span>
+      <div class="stat-value" id="statPrivate">0</div>
+      <div class="stat-label">פרטי</div>
+    </div>
+    <div class="stat-card green" style="animation-delay:.2s">
+      <span class="stat-icon">🏛️</span>
+      <div class="stat-value" id="statTax">0</div>
+      <div class="stat-label">מס רכוש</div>
+    </div>
+  </div>
+
+  <!-- Filters + Cases -->
+  <div class="two-col">
+    <!-- Left: Cases -->
+    <div>
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot"></span> תיקים פתוחים</h2>
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="חיפוש תיק..." oninput="renderCases()">
+          </div>
+          <button class="filter-pill active" data-mode="all" onclick="setFilter('all')">הכל</button>
+          <button class="filter-pill" data-mode="insurance" onclick="setFilter('insurance')">ביטוח</button>
+          <button class="filter-pill" data-mode="private" onclick="setFilter('private')">פרטי</button>
+          <button class="filter-pill" data-mode="tax" onclick="setFilter('tax')">מס</button>
+        </div>
+      </div>
+      <div class="case-grid" id="caseGrid">
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <div class="empty-title">טוען תיקים...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div>
+      <!-- Mode breakdown -->
+      <div class="widget">
+        <div class="widget-title">📊 פילוח לפי סוג</div>
+        <div id="modeBreakdown">
+          <div class="mode-row">
+            <span class="mode-row-label" style="color:var(--muted)">טוען...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="widget">
+        <div class="widget-title">⚡ פעולות מהירות</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openNewCase()">➕ פתח תיק חדש</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="importAll()">📥 ייבוא מ-JSON</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="exportAll()">📤 ייצוא כל התיקים</button>
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div class="widget" style="padding:0;">
+        <div style="padding:20px 20px 12px;">
+          <div class="widget-title">🕐 פעילות אחרונה</div>
+        </div>
+        <div class="activity-list" id="activityList" style="border:none;border-radius:0 0 var(--r) var(--r);">
+          <div class="activity-item">
+            <span class="activity-dot" style="background:var(--subtle)"></span>
+            <div class="activity-info">
+              <div class="activity-name" style="color:var(--subtle)">אין פעילות עדיין</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  מערכת שמאות מקצועית &nbsp;·&nbsp; כל הנתונים נשמרים מקומית בדפדפן
+</footer>
+
+<!-- New Case Modal -->
+<div class="modal-overlay" id="newCaseModal">
+  <div class="modal-box">
+    <div class="modal-title">📋 תיק חדש</div>
+    <p class="modal-text">בחר את סוג השמאות עבור התיק החדש:</p>
+    <div class="new-case-grid">
+      <div class="mode-choice" id="mc-insurance" onclick="selectNewMode('insurance')">
+        <span class="mode-choice-icon">🏢</span>
+        <span class="mode-choice-label">ביטוח</span>
+      </div>
+      <div class="mode-choice" id="mc-private" onclick="selectNewMode('private')">
+        <span class="mode-choice-icon">👤</span>
+        <span class="mode-choice-label">פרטי</span>
+      </div>
+      <div class="mode-choice" id="mc-tax" onclick="selectNewMode('tax')">
+        <span class="mode-choice-icon">🏛️</span>
+        <span class="mode-choice-label">מס רכוש</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="createBtn" onclick="createCase()" disabled style="opacity:0.5">פתח תיק →</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('newCaseModal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-title">🗑️ מחיקת תיק</div>
+    <p class="modal-text" id="deleteModalText">האם למחוק את התיק? פעולה זו אינה ניתנת לביטול.</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()" style="background:rgba(239,68,68,0.2);border:1px solid var(--red);color:var(--red)">מחק</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('deleteModal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input for import -->
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+// ══════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════
+const CASES_KEY = 'appraisal_cases';
+const FORM_URL = 'form.html';
+let currentFilter = 'all';
+let deleteTargetId = null;
+let selectedNewMode = null;
+
+const MODE_LABELS = {
+  insurance: 'ביטוח',
+  private: 'פרטי',
+  tax: 'מס רכוש'
+};
+const MODE_COLORS = {
+  insurance: 'var(--red)',
+  private: 'var(--blue)',
+  tax: 'var(--green)'
+};
+const MODE_ICONS = {
+  insurance: '🏢',
+  private: '👤',
+  tax: '🏛️'
+};
+const MODE_CLASS = {
+  insurance: 'mode-insurance',
+  private: 'mode-private',
+  tax: 'mode-tax'
+};
+
+// ══════════════════════════════════════════════════
+// DATA — Firebase Firestore
+// ══════════════════════════════════════════════════
+let _casesCache = [];
+
+async function getCases() {
+  _casesCache = await (window._getCases ? window._getCases() : Promise.resolve([]));
+  return _casesCache;
+}
+
+async function saveCases(cases) {
+  // saveCases is now a no-op — each case is saved individually via _saveCase
+}
+
+function calcProgress(c) {
+  if (!c.state) return 0;
+  const s = c.state;
+  const checks = [
+    s.base?.fullName,
+    s.base?.eventDate,
+    s.base?.visitDate,
+    s.base?.city,
+    s.base?.street,
+    s.base?.sqm || s.property?.sqm,
+    s.event?.eventType,
+    s.circ?.waterOrigin || s.circ?.fireLocation || s.circ?.burglaryMethod || s.circ?.extraNotes,
+    s.findings?.areas?.length > 0,
+    s.boq?.structItems?.length > 0 || s.boq?.contentsItems?.length > 0
+  ];
+  const filled = checks.filter(Boolean).length;
+  return Math.round((filled / checks.length) * 100);
+}
+
+function getAddress(c) {
+  const s = c.state;
+  if (!s) return '';
+  const b = s.base || {};
+  const parts = [b.city, b.street, b.streetNum].filter(Boolean);
+  return parts.join(', ');
+}
+
+function getClientName(c) {
+  return c.state?.base?.fullName || c.name || 'תיק ללא שם';
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function renderStats() {
+  const cases = getCases();
+  const total = cases.length;
+  const byMode = { insurance: 0, private: 0, tax: 0 };
+  cases.forEach(c => { if (byMode[c.mode] !== undefined) byMode[c.mode]++; });
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statInsurance').textContent = byMode.insurance;
+  document.getElementById('statPrivate').textContent = byMode.private;
+  document.getElementById('statTax').textContent = byMode.tax;
+
+  const subtitle = total === 0
+    ? 'אין תיקים עדיין — התחל בלחיצה על "תיק חדש"'
+    : `${total} תיק${total !== 1 ? 'ים' : ''} במערכת`;
+  document.getElementById('subtitleText').textContent = subtitle;
+
+  // Mode breakdown widget
+  const bd = document.getElementById('modeBreakdown');
+  if (total === 0) {
+    bd.innerHTML = '<div class="mode-row"><span class="mode-row-label" style="color:var(--subtle)">אין תיקים עדיין</span></div>';
+    return;
+  }
+  bd.innerHTML = Object.entries(byMode).map(([mode, count]) => `
+    <div class="mode-row">
+      <span class="mode-row-label">${MODE_ICONS[mode]} ${MODE_LABELS[mode]}</span>
+      <span class="mode-row-count" style="color:${MODE_COLORS[mode]}">${count}</span>
+    </div>
+    ${count > 0 ? `<div class="mini-bar" style="width:${Math.round(count/total*100)}%;background:${MODE_COLORS[mode]};margin-bottom:4px;"></div>` : ''}
+  `).join('');
+}
+
+function renderActivity() {
+  const cases = getCases().slice(0, 5);
+  const al = document.getElementById('activityList');
+  if (cases.length === 0) {
+    al.innerHTML = '<div class="activity-item"><span class="activity-dot" style="background:var(--subtle)"></span><div class="activity-info"><div class="activity-name" style="color:var(--subtle)">אין פעילות עדיין</div></div></div>';
+    return;
+  }
+  al.innerHTML = cases.map(c => `
+    <a class="activity-item" href="${FORM_URL}?case=${c.id}">
+      <span class="activity-dot" style="background:${MODE_COLORS[c.mode] || 'var(--muted)'}"></span>
+      <div class="activity-info">
+        <div class="activity-name">${escHtml(getClientName(c))}</div>
+        <div class="activity-detail">${MODE_LABELS[c.mode] || c.mode} · ${c.createdAt || ''}</div>
+      </div>
+      <span class="activity-arrow">←</span>
+    </a>
+  `).join('');
+}
+
+async function renderCases() {
+  const cases = getCases();
+  const filter = currentFilter;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  let filtered = cases.filter(c => {
+    if (filter !== 'all' && c.mode !== filter) return false;
+    if (search) {
+      const name = getClientName(c).toLowerCase();
+      const addr = getAddress(c).toLowerCase();
+      if (!name.includes(search) && !addr.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('caseGrid');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">${cases.length === 0 ? '📭' : '🔍'}</span>
+        <div class="empty-title">${cases.length === 0 ? 'אין תיקים עדיין' : 'לא נמצאו תיקים'}</div>
+        <p class="empty-text">${cases.length === 0 ? 'לחץ על "תיק חדש" כדי להתחיל' : 'נסה לשנות את פילטר החיפוש'}</p>
+        ${cases.length === 0 ? '<button class="btn btn-primary" onclick="openNewCase()">➕ פתח תיק חדש</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((c, i) => {
+    const progress = calcProgress(c);
+    const addr = getAddress(c);
+    const name = getClientName(c);
+    const modeClass = MODE_CLASS[c.mode] || '';
+    const fillClass = progress < 30 ? 'low' : progress < 70 ? 'mid' : 'high';
+
+    return `
+      <div class="case-card ${modeClass}" style="animation-delay:${i * 0.04}s" onclick="openCase('${c.id}')">
+        <div class="case-card-header">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="case-avatar">${MODE_ICONS[c.mode] || '📋'}</div>
+            <div>
+              <div class="case-name">${escHtml(name)}</div>
+              ${addr ? `<div class="case-address">📍 ${escHtml(addr)}</div>` : '<div class="case-address" style="color:var(--subtle)">כתובת לא הוזנה</div>'}
+            </div>
+          </div>
+          <span class="case-badge">${MODE_LABELS[c.mode] || c.mode}</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label">
+            <span>השלמה</span>
+            <strong>${progress}%</strong>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill ${fillClass}" style="width:${progress}%"></div>
+          </div>
+        </div>
+        <div class="case-meta">
+          <span class="case-meta-item">📅 <strong>${c.createdAt || '—'}</strong></span>
+          ${c.state?.base?.eventDate ? `<span class="case-meta-item">🔔 <strong>${c.state.base.eventDate}</strong></span>` : ''}
+          ${c.state?.findings?.areas?.length ? `<span class="case-meta-item">📐 <strong>${c.state.findings.areas.length} אזורים</strong></span>` : ''}
+        </div>
+        <div class="case-actions" onclick="event.stopPropagation()">
+          <button class="action-btn" title="ייצוא" onclick="exportCase('${c.id}')">📤</button>
+          <button class="action-btn danger" title="מחיקה" onclick="promptDelete('${c.id}', '${escHtml(name).replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function render() {
+  renderStats();
+  renderActivity();
+  renderCases();
+}
+
+// ══════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════
+function openCase(id) {
+  window.location.href = `${FORM_URL}?case=${id}`;
+}
+
+function setFilter(mode) {
+  currentFilter = mode;
+  document.querySelectorAll('.filter-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.mode === mode);
+  });
+  renderCases();
+}
+
+function openNewCase() {
+  selectedNewMode = null;
+  ['insurance','private','tax'].forEach(m => {
+    document.getElementById('mc-'+m).className = 'mode-choice';
+  });
+  document.getElementById('createBtn').disabled = true;
+  document.getElementById('createBtn').style.opacity = '0.5';
+  openModal('newCaseModal');
+}
+
+function selectNewMode(mode) {
+  selectedNewMode = mode;
+  ['insurance','private','tax'].forEach(m => {
+    document.getElementById('mc-'+m).className = 'mode-choice';
+  });
+  const cls = { insurance: 'sel-ins', private: 'sel-priv', tax: 'sel-tax' };
+  document.getElementById('mc-'+mode).className = 'mode-choice ' + cls[mode];
+  document.getElementById('createBtn').disabled = false;
+  document.getElementById('createBtn').style.opacity = '1';
+}
+
+async function createCase() {
+  if (!selectedNewMode) return;
+  const id = 'case_' + Date.now();
+  const caseData = {
+    id,
+    name: 'תיק חדש',
+    mode: selectedNewMode,
+    createdAt: new Date().toLocaleDateString('he-IL'),
+    state: null
+  };
+  await window._saveCase(caseData);
+  closeModal('newCaseModal');
+  window.location.href = `${FORM_URL}?case=${id}&mode=${selectedNewMode}`;
+}
+
+function promptDelete(id, name) {
+  deleteTargetId = id;
+  document.getElementById('deleteModalText').textContent = `האם למחוק את תיק "${name}"? פעולה זו אינה ניתנת לביטול.`;
+  openModal('deleteModal');
+}
+
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  await window._deleteCase(deleteTargetId);
+  deleteTargetId = null;
+  closeModal('deleteModal');
+  await render();
+}
+
+function exportCase(id) {
+  const cases = getCases();
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `appraisal_${getClientName(c).replace(/\s+/g,'_')}_${id}.json`;
+  a.click();
+}
+
+function exportAll() {
+  const cases = getCases();
+  if (cases.length === 0) { alert('אין תיקים לייצוא.'); return; }
+  const blob = new Blob([JSON.stringify(cases, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `appraisal_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importAll() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const arr = Array.isArray(data) ? data : [data];
+      const existing = getCases();
+      const existingIds = new Set(existing.map(c => c.id));
+      let added = 0;
+      arr.forEach(c => {
+        if (c.id && !existingIds.has(c.id)) {
+          existing.unshift(c);
+          added++;
+        }
+      });
+      saveCases(existing);
+      render();
+      alert(`יובאו ${added} תיקים בהצלחה.`);
+    } catch {
+      alert('שגיאה בקריאת הקובץ.');
+    }
+    evt.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+// render is called by Firebase auth state listener
+</script>
+</body>
+</html>
