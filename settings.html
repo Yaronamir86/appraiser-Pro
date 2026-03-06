@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הגדרות פרופיל | מערכת שמאות</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getStorage, ref, uploadString, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+const app  = initializeApp({
+  apiKey:"AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain:"yaron-appraiser.firebaseapp.com",
+  projectId:"yaron-appraiser",
+  storageBucket:"yaron-appraiser.firebasestorage.app",
+  messagingSenderId:"179370141848",
+  appId:"1:179370141848:web:d5843d9641dce3adabc8ed"
+});
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ window.location.href='index.html'; return; }
+  window._currentUser = user;
+  document.getElementById('userEmail').textContent = user.email;
+  // Load profile
+  try{
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()) loadProfile(snap.data());
+  }catch(e){ console.error(e); }
+});
+
+window._saveProfile = async (data) => {
+  const uid = window._currentUser?.uid;
+  if(!uid) throw new Error('לא מחובר');
+  await setDoc(doc(db,'users',uid), {...data, updatedAt: serverTimestamp()}, {merge:true});
+};
+
+window._uploadLogo = async (dataUrl) => {
+  const uid = window._currentUser?.uid;
+  if(!uid) throw new Error('לא מחובר');
+  const r = ref(storage, `logos/${uid}/logo.png`);
+  await uploadString(r, dataUrl, 'data_url');
+  return await getDownloadURL(r);
+};
+
+window._uploadSig = async (dataUrl) => {
+  const uid = window._currentUser?.uid;
+  if(!uid) throw new Error('לא מחובר');
+  const r = ref(storage, `signatures/${uid}/sig.png`);
+  await uploadString(r, dataUrl, 'data_url');
+  return await getDownloadURL(r);
+};
+
+window._doLogout = async () => { await signOut(auth); window.location.href='index.html'; };
+</script>
+
+<style>
+:root{
+  --bg:#030712;--surface:#0d1117;--surface2:#111827;--surface3:#1a2332;
+  --border:#1f2937;--border2:#374151;
+  --text:#f9fafb;--muted:#9ca3af;--subtle:#6b7280;
+  --accent:#f59e0b;--accent2:#fde68a;
+  --blue:#3b82f6;--green:#10b981;--red:#ef4444;--purple:#8b5cf6;
+  --r:12px;--shadow:0 4px 24px rgba(0,0,0,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);direction:rtl;}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 40% at 15% 0%,rgba(245,158,11,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 85% 100%,rgba(59,130,246,.05) 0%,transparent 60%);
+}
+
+/* ── Layout ── */
+.app{display:flex;min-height:100vh;position:relative;z-index:1;}
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--surface);
+  border-left:1px solid var(--border);padding:24px 0;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.main{flex:1;padding:32px 40px;max-width:860px;}
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .main{padding:20px 16px;}
+}
+
+/* ── Sidebar ── */
+.sb-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:8px;
+}
+.sb-logo-sq{
+  width:34px;height:34px;border-radius:9px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:#0f1117;flex-shrink:0;
+}
+.sb-logo-name{font-size:13px;font-weight:800;}
+.sb-logo-sub{font-size:10px;color:var(--accent);font-weight:600;}
+
+.sb-nav a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;font-size:13px;font-weight:600;color:var(--muted);
+  text-decoration:none;transition:all .15s;border-right:2px solid transparent;
+}
+.sb-nav a:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.sb-nav a.active{color:var(--accent);border-right-color:var(--accent);background:rgba(245,158,11,.06);}
+.sb-nav .nav-icon{font-size:16px;width:20px;text-align:center;}
+
+.sb-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+.sb-user{font-size:11px;color:var(--subtle);margin-bottom:8px;word-break:break-all;}
+.btn-logout{
+  width:100%;padding:8px;background:rgba(239,68,68,.1);
+  border:1px solid rgba(239,68,68,.2);border-radius:8px;
+  color:#f87171;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Heebo',sans-serif;transition:background .2s;
+}
+.btn-logout:hover{background:rgba(239,68,68,.18);}
+
+/* ── Page header ── */
+.page-header{margin-bottom:32px;}
+.page-title{font-size:26px;font-weight:900;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--muted);}
+
+/* ── Section cards ── */
+.section{
+  background:rgba(255,255,255,.025);border:1px solid var(--border);
+  border-radius:16px;margin-bottom:24px;overflow:hidden;
+}
+.section-header{
+  padding:18px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-title{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.section-title .icon{font-size:18px;}
+.section-badge{
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;
+  letter-spacing:.04em;
+}
+.section-body{padding:24px;}
+
+/* ── Form fields ── */
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fields-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.field-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.field input,.field textarea,.field select{
+  background:#0f1117;border:1px solid var(--border2);border-radius:10px;
+  padding:10px 13px;color:var(--text);font-size:14px;font-family:'Heebo',sans-serif;
+  transition:border-color .2s,box-shadow .2s;outline:none;width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,158,11,.12);
+}
+.field input::placeholder,.field textarea::placeholder{color:#374151;}
+.field textarea{resize:vertical;min-height:80px;}
+.field select{cursor:pointer;}
+.field-hint{font-size:11px;color:var(--subtle);margin-top:2px;}
+
+@media(max-width:600px){
+  .fields-grid,.fields-grid.three{grid-template-columns:1fr;}
+  .field-full{grid-column:1;}
+}
+
+/* ── Logo section ── */
+.logo-builder{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+.logo-preview{
+  width:90px;height:90px;border-radius:16px;
+  background:var(--surface3);border:2px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;font-size:24px;font-weight:900;
+  color:var(--accent);cursor:pointer;transition:border-color .2s;position:relative;
+}
+.logo-preview:hover{border-color:var(--accent);}
+.logo-preview img{width:100%;height:100%;object-fit:cover;}
+.logo-preview .logo-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;font-size:20px;
+}
+.logo-preview:hover .logo-overlay{opacity:1;}
+.logo-controls{flex:1;min-width:200px;}
+.logo-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.logo-tab{
+  padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;
+  border:1px solid var(--border2);background:transparent;color:var(--muted);
+  cursor:pointer;font-family:'Heebo',sans-serif;transition:all .15s;
+}
+.logo-tab.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:var(--accent);}
+.logo-tab-content{display:none;}
+.logo-tab-content.active{display:block;}
+.logo-initials-input{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+}
+.color-swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.swatch{
+  width:24px;height:24px;border-radius:6px;cursor:pointer;
+  border:2px solid transparent;transition:border-color .15s;
+}
+.swatch.active{border-color:#fff;}
+
+/* ── Signature canvas ── */
+.sig-wrap{position:relative;}
+.sig-canvas{
+  width:100%;height:120px;border-radius:10px;
+  background:#0f1117;border:1px solid var(--border2);
+  cursor:crosshair;display:block;touch-action:none;
+}
+.sig-actions{display:flex;gap:8px;margin-top:8px;}
+.btn-sm{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;
+  font-family:'Heebo',sans-serif;cursor:pointer;border:1px solid var(--border2);
+  background:rgba(255,255,255,.04);color:var(--muted);transition:all .2s;
+}
+.btn-sm:hover{color:var(--text);border-color:var(--border2);}
+.btn-sm.danger{border-color:rgba(239,68,68,.3);color:#f87171;}
+.btn-sm.danger:hover{background:rgba(239,68,68,.1);}
+.sig-preview-img{max-height:60px;border-radius:6px;border:1px solid var(--border);margin-top:6px;}
+
+/* ── Templates section ── */
+.templates-list{display:flex;flex-direction:column;gap:10px;}
+.template-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.template-item .t-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.template-item .t-body{flex:1;}
+.template-item .t-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.template-item .t-val{font-size:12px;color:var(--muted);}
+.template-item .t-actions{display:flex;gap:6px;margin-top:8px;}
+.add-template-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border:1px dashed var(--border2);border-radius:12px;
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;
+  background:transparent;width:100%;font-family:'Heebo',sans-serif;
+  transition:all .2s;
+}
+.add-template-btn:hover{color:var(--accent);border-color:var(--accent);}
+
+/* ── Template modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:16px;padding:28px;width:100%;max-width:500px;
+}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+
+/* ── Save bar ── */
+.save-bar{
+  position:sticky;bottom:0;background:rgba(3,7,18,.9);
+  border-top:1px solid var(--border);padding:14px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(10px);z-index:10;
+}
+.save-status{font-size:13px;color:var(--muted);}
+.save-status.saved{color:var(--green);}
+.save-status.saving{color:var(--accent);}
+.btn-save{
+  padding:11px 28px;background:linear-gradient(135deg,#f59e0b,#d97706);
+  border:none;border-radius:10px;color:#0f1117;font-size:14px;font-weight:800;
+  font-family:'Heebo',sans-serif;cursor:pointer;transition:opacity .2s;
+}
+.btn-save:hover{opacity:.9;}
+.btn-save:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#1e293b;border:1px solid var(--border2);color:var(--text);
+  padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;
+  z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-sq" id="sbLogoSq">YA</div>
+    <div>
+      <div class="sb-logo-name" id="sbLogoName">שמאי רכוש</div>
+      <div class="sb-logo-sub">הגדרות</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <a href="index.html">
+      <span class="nav-icon">📊</span> דשבורד
+    </a>
+    <a href="settings.html" class="active">
+      <span class="nav-icon">⚙️</span> פרופיל והגדרות
+    </a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user" id="userEmail"></div>
+    <button class="btn-logout" onclick="window._doLogout()">🚪 התנתקות</button>
+  </div>
+</aside>
+
+<!-- ── Main content ── -->
+<main class="main">
+
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+      <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none;font-weight:600;">← דשבורד</a>
+    </div>
+    <h1 class="page-title">⚙️ פרופיל והגדרות</h1>
+    <p class="page-sub">הפרטים יופיעו בכל הדוחות שלך</p>
+  </div>
+
+  <!-- ══ SECTION 1: Logo ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="icon">🎨</span> לוגו</div>
+    </div>
+    <div class="section-body">
+      <div class="logo-builder">
+        <div class="logo-preview" id="logoPreview" onclick="document.getElementById('logoFileInput').click()">
+          <span id="logoInitialsDisplay">YA</span>
+          <div class="logo-overlay">📷</div>
+        </div>
+        <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+
+        <div class="logo-controls">
+          <div class="logo-tabs">
+            <button class="logo-tab active" onclick="switchLogoTab('initials',this)">אותיות</button>
+            <button class="logo-tab" onclick="switchLogoTab('upload',this)">תמונה</button>
+          </div>
+
+          <div class="logo-tab-content active" id="logoTab-initials">
+            <div class="logo-initials-input">
+              <input type="text" id="logoInitials" maxlength="3" placeholder="YA"
+                style="width:70px;background:#0f1117;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:#fff;font-size:16px;font-weight:900;text-align:center;outline:none;"
+                oninput="updateLogoPreview()">
+            </div>
+            <div style="font-size:11px;color:var(--subtle);margin-top:6px;">עד 3 תווים — ראשי תיבות מהשם</div>
+            <div class="color-swatches" id="logoColorSwatches">
+              <div class="swatch active" style="background:#f59e0b" onclick="setLogoColor('#f59e0b','#0f1117',this)"></div>
+              <div class="swatch" style="background:#3b82f6" onclick="setLogoColor('#3b82f6','#fff',this)"></div>
+              <div class="swatch" style="background:#10b981" onclick="setLogoColor('#10b981','#fff',this)"></div>
+              <div class="swatch" style="background:#ef4444" onclick="setLogoColor('#ef4444','#fff',this)"></div>
+              <div class="swatch" style="background:#8b5cf6" onclick="setLogoColor('#8b5cf6','#fff',this)"></div>
+              <div class="swatch" style="background:#ec4899" onclick="setLogoColor('#ec4899','#fff',this)"></div>
+              <div class="swatch" style="background:#f97316" onclick="setLogoColor('#f97316','#fff',this)"></div>
+              <div class="swatch" style="background:#1e293b" onclick="setLogoColor('#1e293b','#f59e0b',this)"></div>
+            </div>
+          </div>
+
+          <div class="logo-tab-content" id="logoTab-upload">
+            <button class="btn-sm" onclick="document.getElementById('logoFileInput').click()">📁 בחר תמונה</button>
+            <div class="field-hint" style="margin-top:8px;">PNG / JPG / SVG — מומלץ ריבוע 200×200</div>
+            <button class="btn-sm danger" style="margin-top:8px;" onclick="clearLogoImage()">🗑️ הסר תמונה</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: Personal details ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="icon">👤</span> פרטים אישיים</div>
+    </div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field">
+          <label>שם מלא (עברית)</label>
+          <input type="text" id="nameHe" placeholder="ישראל ישראלי">
+        </div>
+        <div class="field">
+          <label>שם מלא (אנגלית)</label>
+          <input type="text" id="nameEn" placeholder="Israel Israeli" dir="ltr">
+        </div>
+        <div class="field">
+          <label>תואר מקצועי</label>
+          <input type="text" id="title" placeholder="שמאי רכוש">
+        </div>
+        <div class="field">
+          <label>מספר רישיון</label>
+          <input type="text" id="license" placeholder="12345">
+        </div>
+        <div class="field">
+          <label>עיר</label>
+          <input type="text" id="city" placeholder="תל אביב">
+        </div>
+        <div class="field">
+          <label>כתובת מלאה</label>
+          <input type="text" id="address" placeholder="רחוב הרצל 1, תל אביב">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: Contact ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="icon">📞</span> פרטי יצירת קשר</div>
+    </div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field">
+          <label>טלפון</label>
+          <input type="tel" id="phone" placeholder="050-0000000">
+        </div>
+        <div class="field">
+          <label>פקס</label>
+          <input type="tel" id="fax" placeholder="03-0000000">
+        </div>
+        <div class="field">
+          <label>אימייל</label>
+          <input type="email" id="email" placeholder="your@email.com" dir="ltr">
+        </div>
+        <div class="field">
+          <label>אתר אינטרנט</label>
+          <input type="url" id="website" placeholder="https://yoursite.com" dir="ltr">
+        </div>
+        <div class="field">
+          <label>לינקדאין</label>
+          <input type="url" id="linkedin" placeholder="https://linkedin.com/in/..." dir="ltr">
+        </div>
+        <div class="field">
+          <label>פייסבוק / אינסטגרם</label>
+          <input type="url" id="social" placeholder="https://..." dir="ltr">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4: Digital Signature ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="icon">✍️</span> חתימה דיגיטלית</div>
+    </div>
+    <div class="section-body">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">חתום עם האצבע (מובייל) או העכבר — תופיע בתחתית הדוח</div>
+      <div class="sig-wrap">
+        <canvas id="sigCanvas" class="sig-canvas" width="700" height="120"></canvas>
+        <img id="sigPreview" class="sig-preview-img" style="display:none">
+      </div>
+      <div class="sig-actions">
+        <button class="btn-sm" onclick="clearSignature()">🗑️ נקה</button>
+        <button class="btn-sm" onclick="saveSignaturePreview()">💾 שמור חתימה</button>
+        <span id="sigStatus" style="font-size:12px;color:var(--muted);align-self:center;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 5: Templates (premium) ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="icon">📋</span> שבלונות ברירת מחדל
+      </div>
+      <div class="section-badge">פרמיום</div>
+    </div>
+    <div class="section-body">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">
+        ערכים שיתמלאו אוטומטית בכל תיק חדש — חסוך זמן על שדות שחוזרים על עצמם
+      </div>
+
+      <!-- Field defaults -->
+      <div style="font-size:12px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">ברירות מחדל לשדות</div>
+      <div id="fieldDefaultsList" class="templates-list" style="margin-bottom:12px;"></div>
+      <button class="add-template-btn" onclick="openTemplateModal('field')">
+        + הוסף ברירת מחדל לשדה
+      </button>
+
+      <div style="height:20px;"></div>
+
+      <!-- Text snippets -->
+      <div style="font-size:12px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">קטעי טקסט קבועים</div>
+      <div id="textSnippetsList" class="templates-list" style="margin-bottom:12px;"></div>
+      <button class="add-template-btn" onclick="openTemplateModal('text')">
+        + הוסף קטע טקסט קבוע
+      </button>
+    </div>
+  </div>
+
+  <div style="height:80px;"></div>
+</main>
+
+<!-- ── Save bar ── -->
+<div class="save-bar">
+  <div class="save-status" id="saveStatus">לא נשמר</div>
+  <button class="btn-save" onclick="saveAll()" id="saveBtn">💾 שמור הכל</button>
+</div>
+
+</div><!-- .app -->
+
+<!-- ── Template Modal ── -->
+<div class="modal-overlay" id="templateModal">
+  <div class="modal-box">
+    <div class="modal-title" id="templateModalTitle">הוסף שבלון</div>
+
+    <div id="fieldTemplateForm" style="display:none;">
+      <div class="field" style="margin-bottom:14px;">
+        <label>שדה</label>
+        <select id="tFieldKey">
+          <option value="insurance.company">חברת ביטוח</option>
+          <option value="insurance.policyNum">מספר פוליסה</option>
+          <option value="event.eventType">סוג אירוע</option>
+          <option value="circ.waterOrigin">מקור מים</option>
+          <option value="base.city">עיר הנכס</option>
+          <option value="property.type">סוג נכס</option>
+          <option value="summary.rehabTime">זמן שיקום</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>ערך ברירת מחדל</label>
+        <input type="text" id="tFieldVal" placeholder="לדוגמה: מגדל ביטוח">
+      </div>
+    </div>
+
+    <div id="textTemplateForm" style="display:none;">
+      <div class="field" style="margin-bottom:14px;">
+        <label>שם השבלון</label>
+        <input type="text" id="tSnipName" placeholder="לדוגמה: נסיבות נזק מים קבוע">
+      </div>
+      <div class="field" style="margin-bottom:14px;">
+        <label>פרק</label>
+        <select id="tSnipSection">
+          <option value="circ">נסיבות האירוע</option>
+          <option value="findings">ממצאים כלליים</option>
+          <option value="summary">סיכום והמלצות</option>
+          <option value="event.appraiserDeclaration">הצהרת שמאי</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>טקסט</label>
+        <textarea id="tSnipText" rows="5" placeholder="הכנס את הטקסט שיתמלא אוטומטית..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="closeTemplateModal()">ביטול</button>
+      <button class="btn-save" style="padding:10px 22px;" onclick="saveTemplate()">הוסף</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let logoColor     = '#f59e0b';
+let logoTextColor = '#0f1117';
+let logoMode      = 'initials'; // 'initials' | 'upload'
+let logoImageUrl  = null;       // uploaded image URL
+let sigDataUrl    = null;       // drawn signature
+let savedSigUrl   = null;       // uploaded signature URL
+let fieldDefaults = [];         // [{key, val}]
+let textSnippets  = [];         // [{name, section, text}]
+let currentTemplateType = 'field';
+
+// ══════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════
+function toast(msg, dur=2500){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), dur);
+}
+
+// ══════════════════════════════════════════════════
+// LOAD PROFILE
+// ══════════════════════════════════════════════════
+function loadProfile(p){
+  // Basic fields
+  const set = (id, v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
+  set('nameHe',   p.nameHe   || p.fullName || '');
+  set('nameEn',   p.nameEn   || '');
+  set('title',    p.title    || '');
+  set('license',  p.license  || '');
+  set('city',     p.city     || '');
+  set('address',  p.address  || '');
+  set('phone',    p.phone    || '');
+  set('fax',      p.fax      || '');
+  set('email',    p.email    || '');
+  set('website',  p.website  || '');
+  set('linkedin', p.linkedin || '');
+  set('social',   p.social   || '');
+
+  // Logo
+  if(p.logoInitials) document.getElementById('logoInitials').value = p.logoInitials;
+  if(p.logoColor)    { logoColor=p.logoColor; logoTextColor=p.logoTextColor||'#0f1117'; }
+  if(p.logoImageUrl) { logoImageUrl=p.logoImageUrl; logoMode='upload'; switchLogoTab('upload'); }
+  updateLogoPreview();
+
+  // Sidebar name
+  if(p.nameHe||p.fullName) document.getElementById('sbLogoName').textContent=p.nameHe||p.fullName;
+  if(p.logoInitials) document.getElementById('sbLogoSq').textContent=p.logoInitials;
+
+  // Signature
+  if(p.signatureUrl){
+    savedSigUrl = p.signatureUrl;
+    const prev = document.getElementById('sigPreview');
+    prev.src = p.signatureUrl; prev.style.display='block';
+    document.getElementById('sigStatus').textContent='✅ חתימה שמורה';
+  }
+
+  // Templates
+  if(p.fieldDefaults) fieldDefaults = p.fieldDefaults;
+  if(p.textSnippets)  textSnippets  = p.textSnippets;
+  renderTemplates();
+
+  setSaveStatus('saved');
+}
+
+// ══════════════════════════════════════════════════
+// LOGO
+// ══════════════════════════════════════════════════
+function updateLogoPreview(){
+  const preview = document.getElementById('logoPreview');
+  const initials = document.getElementById('logoInitials')?.value.trim() || 'YA';
+  document.getElementById('logoInitialsDisplay').textContent = initials;
+  document.getElementById('sbLogoSq').textContent = initials;
+
+  if(logoMode === 'upload' && logoImageUrl){
+    preview.innerHTML = `<img src="${logoImageUrl}"><div class="logo-overlay">📷</div>`;
+  } else {
+    preview.style.background = logoColor;
+    preview.style.color = logoTextColor;
+    preview.innerHTML = `<span id="logoInitialsDisplay" style="color:${logoTextColor};font-size:${initials.length>2?'20':'26'}px;font-weight:900;">${initials}</span><div class="logo-overlay">📷</div>`;
+  }
+}
+
+function setLogoColor(bg, text, el){
+  logoColor=bg; logoTextColor=text;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  updateLogoPreview();
+}
+
+function switchLogoTab(tab, btn){
+  logoMode = tab;
+  document.querySelectorAll('.logo-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.logo-tab-content').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else document.querySelector(`.logo-tab:nth-child(${tab==='initials'?1:2})`).classList.add('active');
+  document.getElementById(`logoTab-${tab}`).classList.add('active');
+  updateLogoPreview();
+}
+
+function handleLogoUpload(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    logoImageUrl = e.target.result;
+    logoMode = 'upload';
+    switchLogoTab('upload');
+    updateLogoPreview();
+    toast('✅ לוגו נטען');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearLogoImage(){
+  logoImageUrl = null; logoMode = 'initials';
+  switchLogoTab('initials');
+  updateLogoPreview();
+}
+
+// ══════════════════════════════════════════════════
+// SIGNATURE CANVAS
+// ══════════════════════════════════════════════════
+(function initSigCanvas(){
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle='#f59e0b';
+  ctx.lineWidth=2.5;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  let drawing=false, lastX=0, lastY=0;
+
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/r.width, scaleY=canvas.height/r.height;
+    if(e.touches){
+      return [(e.touches[0].clientX-r.left)*scaleX, (e.touches[0].clientY-r.top)*scaleY];
+    }
+    return [(e.clientX-r.left)*scaleX, (e.clientY-r.top)*scaleY];
+  }
+
+  canvas.addEventListener('mousedown',  e=>{drawing=true;[lastX,lastY]=getPos(e);});
+  canvas.addEventListener('touchstart', e=>{e.preventDefault();drawing=true;[lastX,lastY]=getPos(e);},{passive:false});
+
+  canvas.addEventListener('mousemove', e=>{
+    if(!drawing) return;
+    const [x,y]=getPos(e);
+    ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(x,y);ctx.stroke();
+    [lastX,lastY]=[x,y];
+  });
+  canvas.addEventListener('touchmove', e=>{
+    e.preventDefault();
+    if(!drawing) return;
+    const [x,y]=getPos(e);
+    ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(x,y);ctx.stroke();
+    [lastX,lastY]=[x,y];
+  },{passive:false});
+
+  const stop=()=>{ drawing=false; };
+  canvas.addEventListener('mouseup',    stop);
+  canvas.addEventListener('mouseleave', stop);
+  canvas.addEventListener('touchend',   stop);
+})();
+
+function clearSignature(){
+  const canvas=document.getElementById('sigCanvas');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  sigDataUrl=null;
+  document.getElementById('sigStatus').textContent='';
+}
+
+function saveSignaturePreview(){
+  const canvas=document.getElementById('sigCanvas');
+  sigDataUrl = canvas.toDataURL('image/png');
+  const prev = document.getElementById('sigPreview');
+  prev.src=sigDataUrl; prev.style.display='block';
+  document.getElementById('sigStatus').textContent='✅ חתימה מוכנה לשמירה';
+  toast('חתימה נשמרה — לחץ "שמור הכל" להעלאה');
+}
+
+// ══════════════════════════════════════════════════
+// TEMPLATES
+// ══════════════════════════════════════════════════
+const FIELD_LABELS = {
+  'insurance.company':'חברת ביטוח','insurance.policyNum':'מספר פוליסה',
+  'event.eventType':'סוג אירוע','circ.waterOrigin':'מקור מים',
+  'base.city':'עיר הנכס','property.type':'סוג נכס','summary.rehabTime':'זמן שיקום'
+};
+const SECTION_LABELS = {
+  'circ':'נסיבות האירוע','findings':'ממצאים','summary':'סיכום',
+  'event.appraiserDeclaration':'הצהרת שמאי'
+};
+
+function renderTemplates(){
+  // Field defaults
+  const fdList = document.getElementById('fieldDefaultsList');
+  if(fieldDefaults.length===0){
+    fdList.innerHTML='<div style="font-size:12px;color:var(--subtle);padding:8px 0;">אין ברירות מחדל — לחץ + להוספה</div>';
+  } else {
+    fdList.innerHTML = fieldDefaults.map((t,i)=>`
+      <div class="template-item">
+        <div class="t-icon">🔧</div>
+        <div class="t-body">
+          <div class="t-name">${FIELD_LABELS[t.key]||t.key}</div>
+          <div class="t-val">${t.val}</div>
+        </div>
+        <button class="btn-sm danger" onclick="removeFieldDefault(${i})">✕</button>
+      </div>`).join('');
+  }
+
+  // Text snippets
+  const tsList = document.getElementById('textSnippetsList');
+  if(textSnippets.length===0){
+    tsList.innerHTML='<div style="font-size:12px;color:var(--subtle);padding:8px 0;">אין קטעי טקסט — לחץ + להוספה</div>';
+  } else {
+    tsList.innerHTML = textSnippets.map((t,i)=>`
+      <div class="template-item">
+        <div class="t-icon">📝</div>
+        <div class="t-body">
+          <div class="t-name">${t.name}</div>
+          <div class="t-val" style="direction:rtl;">${(SECTION_LABELS[t.section]||t.section)} · ${t.text.substring(0,60)}${t.text.length>60?'...':''}</div>
+        </div>
+        <button class="btn-sm danger" onclick="removeSnippet(${i})">✕</button>
+      </div>`).join('');
+  }
+}
+
+function removeFieldDefault(i){ fieldDefaults.splice(i,1); renderTemplates(); }
+function removeSnippet(i){ textSnippets.splice(i,1); renderTemplates(); }
+
+function openTemplateModal(type){
+  currentTemplateType = type;
+  document.getElementById('templateModalTitle').textContent =
+    type==='field' ? '+ ברירת מחדל לשדה' : '+ קטע טקסט קבוע';
+  document.getElementById('fieldTemplateForm').style.display = type==='field'?'block':'none';
+  document.getElementById('textTemplateForm').style.display  = type==='text'?'block':'none';
+  document.getElementById('tFieldVal').value  = '';
+  document.getElementById('tSnipName').value  = '';
+  document.getElementById('tSnipText').value  = '';
+  document.getElementById('templateModal').classList.add('open');
+}
+
+function closeTemplateModal(){
+  document.getElementById('templateModal').classList.remove('open');
+}
+
+function saveTemplate(){
+  if(currentTemplateType==='field'){
+    const key=document.getElementById('tFieldKey').value;
+    const val=document.getElementById('tFieldVal').value.trim();
+    if(!val){ toast('⚠️ הכנס ערך'); return; }
+    fieldDefaults.push({key,val});
+  } else {
+    const name=document.getElementById('tSnipName').value.trim();
+    const section=document.getElementById('tSnipSection').value;
+    const text=document.getElementById('tSnipText').value.trim();
+    if(!name||!text){ toast('⚠️ מלא שם וטקסט'); return; }
+    textSnippets.push({name,section,text});
+  }
+  renderTemplates();
+  closeTemplateModal();
+  toast('✅ נוסף בהצלחה');
+}
+
+// ══════════════════════════════════════════════════
+// SAVE ALL
+// ══════════════════════════════════════════════════
+function setSaveStatus(s){
+  const el=document.getElementById('saveStatus');
+  el.className='save-status';
+  if(s==='saved'){el.textContent='✅ כל השינויים נשמרו';el.classList.add('saved');}
+  else if(s==='saving'){el.textContent='💾 שומר...';el.classList.add('saving');}
+  else{el.textContent='שינויים לא נשמרו';}
+}
+
+async function saveAll(){
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; setSaveStatus('saving');
+
+  try{
+    // Build profile object
+    const v = id => document.getElementById(id)?.value?.trim()||'';
+    const profile = {
+      nameHe:   v('nameHe'),   nameEn:  v('nameEn'),
+      title:    v('title'),    license: v('license'),
+      city:     v('city'),     address: v('address'),
+      phone:    v('phone'),    fax:     v('fax'),
+      email:    v('email'),    website: v('website'),
+      linkedin: v('linkedin'), social:  v('social'),
+      logoMode, logoColor, logoTextColor,
+      logoInitials: v('logoInitials') || 'YA',
+      fieldDefaults, textSnippets
+    };
+
+    // Upload logo image if changed
+    if(logoMode==='upload' && logoImageUrl && logoImageUrl.startsWith('data:')){
+      try{
+        profile.logoImageUrl = await window._uploadLogo(logoImageUrl);
+        logoImageUrl = profile.logoImageUrl; // update to remote URL
+      }catch(e){ console.warn('logo upload failed',e); }
+    } else if(logoMode==='upload' && logoImageUrl){
+      profile.logoImageUrl = logoImageUrl;
+    }
+
+    // Upload signature if drawn
+    if(sigDataUrl && sigDataUrl.startsWith('data:')){
+      try{
+        profile.signatureUrl = await window._uploadSig(sigDataUrl);
+        savedSigUrl = profile.signatureUrl;
+        document.getElementById('sigStatus').textContent='✅ חתימה הועלתה';
+      }catch(e){ console.warn('sig upload failed',e); profile.signatureUrl=savedSigUrl; }
+    } else if(savedSigUrl){
+      profile.signatureUrl = savedSigUrl;
+    }
+
+    await window._saveProfile(profile);
+    setSaveStatus('saved');
+    toast('✅ הפרופיל נשמר בהצלחה');
+
+    // Update sidebar
+    if(profile.nameHe) document.getElementById('sbLogoName').textContent=profile.nameHe;
+    document.getElementById('sbLogoSq').textContent=profile.logoInitials;
+
+  }catch(e){
+    setSaveStatus('unsaved');
+    toast('❌ שגיאה: '+e.message);
+  }
+
+  btn.disabled=false;
+}
+
+// Mark unsaved on any change
+document.addEventListener('input', ()=>setSaveStatus('unsaved'));
+
+// Init
+updateLogoPreview();
+renderTemplates();
+
+// Ctrl+S shortcut
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveAll();}
+});
+</script>
+</body>
+</html>
