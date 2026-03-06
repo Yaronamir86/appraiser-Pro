@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ירון אמיר | שמאי רכוש — דשבורד</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #030712;
+  --surface: #0d1117;
+  --surface2: #111827;
+  --surface3: #1a2332;
+  --border: #1f2937;
+  --border2: #374151;
+  --text: #f9fafb;
+  --muted: #9ca3af;
+  --subtle: #6b7280;
+  --accent: #f59e0b;
+  --accent2: #fde68a;
+  --accent3: #d97706;
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --green: #10b981;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --r: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(245,158,11,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,130,246,0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(3,7,18,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 3px 12px rgba(245,158,11,0.3);
+}
+.logo-text {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+  display: block;
+  margin-top: -2px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  color: #111;
+  box-shadow: 0 3px 12px rgba(245,158,11,0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 20px rgba(245,158,11,0.45);
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+
+/* ── MAIN LAYOUT ── */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* ── PAGE TITLE ── */
+.page-title-wrap {
+  margin-bottom: 40px;
+}
+.page-title {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.page-title span {
+  color: var(--accent);
+}
+.page-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-weight: 400;
+}
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border2);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 0 0 0 60px;
+  opacity: 0.15;
+}
+.stat-card.gold::before { background: var(--accent); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.red::before { background: var(--red); }
+.stat-card.green::before { background: var(--green); }
+.stat-icon {
+  font-size: 22px;
+  margin-bottom: 14px;
+  display: block;
+}
+.stat-value {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-card.gold .stat-value { color: var(--accent); }
+.stat-card.blue .stat-value { color: var(--blue); }
+.stat-card.red .stat-value { color: var(--red); }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stat-trend {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 8px;
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* ── CASE GRID ── */
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+/* ── CASE CARD ── */
+.case-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+.case-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.case-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.015));
+  pointer-events: none;
+}
+.case-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.case-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.mode-insurance .case-avatar { background: rgba(239,68,68,0.15); color: var(--red); }
+.mode-private .case-avatar { background: rgba(59,130,246,0.15); color: var(--blue); }
+.mode-tax .case-avatar { background: rgba(16,185,129,0.15); color: var(--green); }
+.case-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mode-insurance .case-badge { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.mode-private .case-badge { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+.mode-tax .case-badge { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.case-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.case-address {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.case-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.case-meta-item {
+  font-size: 11px;
+  color: var(--subtle);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.case-meta-item strong {
+  color: var(--muted);
+  font-weight: 600;
+}
+.progress-bar-wrap {
+  margin-top: 14px;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.progress-label span {
+  font-size: 11px;
+  color: var(--subtle);
+  font-weight: 600;
+}
+.progress-label strong {
+  font-size: 11px;
+  color: var(--muted);
+}
+.progress-track {
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent3), var(--accent));
+  transition: width 0.5s ease;
+}
+.progress-fill.low { background: linear-gradient(90deg, var(--red), #f97316); }
+.progress-fill.mid { background: linear-gradient(90deg, #f97316, var(--accent)); }
+.progress-fill.high { background: linear-gradient(90deg, var(--accent), var(--green)); }
+
+/* ── CASE ACTIONS ── */
+.case-actions {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.case-card:hover .case-actions { opacity: 1; }
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+.action-btn:hover { color: var(--text); border-color: var(--muted); }
+.action-btn.danger:hover { color: var(--red); border-color: var(--red); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  grid-column: 1/-1;
+}
+.empty-icon {
+  font-size: 52px;
+  margin-bottom: 16px;
+  display: block;
+  opacity: 0.5;
+}
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.empty-text {
+  font-size: 13px;
+  color: var(--subtle);
+  margin-bottom: 24px;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-pill:hover { border-color: var(--border2); color: var(--text); }
+.filter-pill.active {
+  border-color: var(--accent);
+  background: rgba(245,158,11,0.1);
+  color: var(--accent);
+}
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 280px;
+}
+.search-box input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px 8px 36px;
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--subtle);
+  font-size: 13px;
+}
+
+/* ── RECENT ACTIVITY ── */
+.activity-list {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: var(--surface3); }
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.activity-info { flex: 1; min-width: 0; }
+.activity-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activity-detail {
+  font-size: 11px;
+  color: var(--subtle);
+  margin-top: 2px;
+}
+.activity-time {
+  font-size: 11px;
+  color: var(--subtle);
+  white-space: nowrap;
+}
+.activity-arrow {
+  color: var(--subtle);
+  font-size: 12px;
+}
+
+/* ── TWO COL LAYOUT ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* ── SIDEBAR WIDGETS ── */
+.widget {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.widget-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mode-row:last-child { border-bottom: none; }
+.mode-row-label {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mode-row-count {
+  font-size: 16px;
+  font-weight: 800;
+}
+.mini-bar {
+  height: 3px;
+  border-radius: 3px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* ── CONFIRM MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal-box {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 380px;
+  width: 90%;
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+.modal-text { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-start; }
+
+/* ── NEW CASE MODAL ── */
+.new-case-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.mode-choice {
+  border: 2px solid var(--border2);
+  border-radius: 10px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface3);
+}
+.mode-choice:hover { border-color: var(--muted); }
+.mode-choice.sel-ins { border-color: var(--red); background: rgba(239,68,68,0.08); }
+.mode-choice.sel-priv { border-color: var(--blue); background: rgba(59,130,246,0.08); }
+.mode-choice.sel-tax { border-color: var(--green); background: rgba(16,185,129,0.08); }
+.mode-choice-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+.mode-choice-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+.mode-choice.sel-ins .mode-choice-label { color: var(--red); }
+.mode-choice.sel-priv .mode-choice-label { color: var(--blue); }
+.mode-choice.sel-tax .mode-choice-label { color: var(--green); }
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--subtle);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.case-card { animation: fadeUp 0.3s ease both; }
+.stat-card { animation: fadeUp 0.3s ease both; }
+
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(245,158,11,0.15);
+  color: var(--accent);
+  font-weight: 700;
+  border: 1px solid rgba(245,158,11,0.3);
+}
+.pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+#debugToast{position:fixed;bottom:20px;left:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:320px;}
+.toast-msg{background:#1e293b;border:1px solid #334155;color:#f1f5f9;font-size:12px;font-family:monospace;padding:10px 14px;border-radius:10px;animation:toastIn .3s ease;}
+.toast-msg.ok{border-color:#10b981;color:#6ee7b7;}
+.toast-msg.err{border-color:#ef4444;color:#fca5a5;}
+.toast-msg.info{border-color:#3b82f6;color:#93c5fd;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+         createUserWithEmailAndPassword, signOut, sendPasswordResetEmail }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs,
+         deleteDoc, query, where, orderBy, serverTimestamp, Timestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain: "yaron-appraiser.firebaseapp.com",
+  projectId: "yaron-appraiser",
+  storageBucket: "yaron-appraiser.firebasestorage.app",
+  messagingSenderId: "179370141848",
+  appId: "1:179370141848:web:d5843d9641dce3adabc8ed"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+// ─── expose to global scope ───
+window._FB = { auth, db, signInWithEmailAndPassword, signOut,
+               createUserWithEmailAndPassword, sendPasswordResetEmail,
+               onAuthStateChanged, collection, doc, setDoc, getDoc,
+               getDocs, deleteDoc, query, where, orderBy, serverTimestamp };
+
+// ─── Auth state listener ───
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    window._currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.body.style.overflow = '';
+    // Load profile
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) window._profile = snap.data();
+    } catch(e){}
+    await render();
+  } else {
+    window._currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+});
+
+// ─── Login ───
+window.doLogin = async function() {
+  const email = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  const btn = document.querySelector('#loginScreen button');
+  btn.textContent = 'מתחבר...';
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    err.style.display = 'none';
+  } catch(e) {
+    err.textContent = 'אימייל או סיסמה שגויים';
+    err.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+  }
+  btn.textContent = 'כניסה למערכת';
+  btn.disabled = false;
+};
+
+// ─── Logout ───
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// ─── Forgot password ───
+window.doForgotPassword = async function() {
+  const email = document.getElementById('loginUser').value.trim();
+  if (!email) { alert('הכנס אימייל קודם'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert('נשלח מייל לאיפוס סיסמה אל ' + email);
+  } catch(e) {
+    alert('שגיאה: ' + e.message);
+  }
+};
+
+// ─── Cases CRUD via Firestore ───
+window._getCases = async function() {
+  if (!window._currentUser) return [];
+  try {
+    const q = query(
+      collection(db, 'cases'),
+      where('uid', '==', window._currentUser.uid)
+    );
+    const snap = await getDocs(q);
+    const results = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Sort by updatedAt client-side (avoids Firestore composite index)
+    results.sort((a, b) => {
+      const ta = a.updatedAt?.seconds || 0;
+      const tb = b.updatedAt?.seconds || 0;
+      return tb - ta;
+    });
+    return results;
+  } catch(e) { console.error('getCases error', e); return []; }
+};
+
+window._saveCase = async function(caseData) {
+  if (!window._currentUser) return;
+  const id = caseData.id;
+  await setDoc(doc(db, 'cases', id), {
+    ...caseData,
+    uid: window._currentUser.uid,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+
+window._deleteCase = async function(id) {
+  await deleteDoc(doc(db, 'cases', id));
+};
+
+</script>
+</head>
+<body>
+<!-- ══════ LOGIN SCREEN ══════ -->
+<div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:none;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
+  <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
+    <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56"><rect width="64" height="64" rx="16" fill="#f59e0b"/><text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#fff;">ירון אמיר</div><div style="font-size:12px;color:#f59e0b;font-weight:700;">שמאי רכוש</div></div></div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
+    <div style="margin-bottom:14px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
+      <input id="loginUser" type="text" placeholder="your@email.com" autocomplete="email" type="email"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div style="margin-bottom:24px;text-align:right;">
+      <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">סיסמה</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"
+        style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginErr" style="color:#f87171;font-size:13px;margin-bottom:16px;display:none;">שם משתמש או סיסמה שגויים</div>
+    <div style="text-align:left;margin-bottom:12px;"><a href="#" onclick="doForgotPassword();return false;" style="font-size:12px;color:#6b7280;text-decoration:none;">שכחתי סיסמה</a></div>
+    <button onclick="doLogin()"
+      style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;padding:13px;color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">כניסה למערכת</button>
+  </div>
+</div>
+<!-- login handled by Firebase module -->
+
+
+<header>
+  <div class="header-inner" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="logo" style="display:flex;align-items:center;gap:10px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><rect width="48" height="48" rx="12" fill="#f59e0b"/><text x="24" y="33" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="line-height:1.2;"><div style="font-size:15px;font-weight:800;color:#fff;">ירון אמיר</div><div style="font-size:11px;color:var(--amber);font-weight:600;letter-spacing:.04em;">שמאי רכוש</div></div></div>
+      <div>
+        <span class="logo-text">מערכת שמאות</span>
+        <span class="logo-sub">Professional Appraisal System</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge-new"><span class="pulse"></span> מערכת פעילה</span>
+      <button class="btn btn-ghost btn-sm" onclick="exportAll()">📤 ייצוא הכל</button>
+      <button class="btn btn-primary" onclick="openNewCase()">+ תיק חדש</button>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:#f87171;border-color:rgba(248,113,113,.3);" title="התנתקות">🚪 התנתקות</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Page Title -->
+  <div class="page-title-wrap">
+    <h1 class="page-title">לוח <span>בקרה</span></h1>
+    <p class="page-subtitle" id="subtitleText">טוען נתונים...</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card gold" style="animation-delay:.05s">
+      <span class="stat-icon">📁</span>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">סה"כ תיקים</div>
+    </div>
+    <div class="stat-card red" style="animation-delay:.1s">
+      <span class="stat-icon">🏢</span>
+      <div class="stat-value" id="statInsurance">0</div>
+      <div class="stat-label">ביטוח</div>
+    </div>
+    <div class="stat-card blue" style="animation-delay:.15s">
+      <span class="stat-icon">👤</span>
+      <div class="stat-value" id="statPrivate">0</div>
+      <div class="stat-label">פרטי</div>
+    </div>
+    <div class="stat-card green" style="animation-delay:.2s">
+      <span class="stat-icon">🏛️</span>
+      <div class="stat-value" id="statTax">0</div>
+      <div class="stat-label">מס רכוש</div>
+    </div>
+  </div>
+
+  <!-- Filters + Cases -->
+  <div class="two-col">
+    <!-- Left: Cases -->
+    <div>
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot"></span> תיקים פתוחים</h2>
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="חיפוש תיק..." oninput="renderCases()">
+          </div>
+          <button class="filter-pill active" data-mode="all" onclick="setFilter('all')">הכל</button>
+          <button class="filter-pill" data-mode="insurance" onclick="setFilter('insurance')">ביטוח</button>
+          <button class="filter-pill" data-mode="private" onclick="setFilter('private')">פרטי</button>
+          <button class="filter-pill" data-mode="tax" onclick="setFilter('tax')">מס</button>
+        </div>
+      </div>
+      <div class="case-grid" id="caseGrid">
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <div class="empty-title">טוען תיקים...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div>
+      <!-- Mode breakdown -->
+      <div class="widget">
+        <div class="widget-title">📊 פילוח לפי סוג</div>
+        <div id="modeBreakdown">
+          <div class="mode-row">
+            <span class="mode-row-label" style="color:var(--muted)">טוען...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="widget">
+        <div class="widget-title">⚡ פעולות מהירות</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openNewCase()">➕ פתח תיק חדש</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="importAll()">📥 ייבוא מ-JSON</button>
+          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="exportAll()">📤 ייצוא כל התיקים</button>
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div class="widget" style="padding:0;">
+        <div style="padding:20px 20px 12px;">
+          <div class="widget-title">🕐 פעילות אחרונה</div>
+        </div>
+        <div class="activity-list" id="activityList" style="border:none;border-radius:0 0 var(--r) var(--r);">
+          <div class="activity-item">
+            <span class="activity-dot" style="background:var(--subtle)"></span>
+            <div class="activity-info">
+              <div class="activity-name" style="color:var(--subtle)">אין פעילות עדיין</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  מערכת שמאות מקצועית &nbsp;·&nbsp; כל הנתונים נשמרים מקומית בדפדפן
+</footer>
+
+<!-- New Case Modal -->
+<div class="modal-overlay" id="newCaseModal">
+  <div class="modal-box">
+    <div class="modal-title">📋 תיק חדש</div>
+    <p class="modal-text">שם התיק:</p>
+    <input type="text" id="newCaseName" placeholder="לדוגמה: משפחת כהן, רחוב הרצל 12" 
+      style="width:100%;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;font-family:inherit;margin-bottom:16px;box-sizing:border-box;"
+      onkeydown="if(event.key==='Enter')document.getElementById('createBtn').click()">
+    <p class="modal-text">סוג שמאות:</p>
+    <div class="new-case-grid">
+      <div class="mode-choice" id="mc-insurance" onclick="selectNewMode('insurance')">
+        <span class="mode-choice-icon">🏢</span>
+        <span class="mode-choice-label">ביטוח</span>
+      </div>
+      <div class="mode-choice" id="mc-private" onclick="selectNewMode('private')">
+        <span class="mode-choice-icon">👤</span>
+        <span class="mode-choice-label">פרטי</span>
+      </div>
+      <div class="mode-choice" id="mc-tax" onclick="selectNewMode('tax')">
+        <span class="mode-choice-icon">🏛️</span>
+        <span class="mode-choice-label">מס רכוש</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="createBtn" onclick="createCase()" disabled style="opacity:0.5">פתח תיק →</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('newCaseModal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-title">🗑️ מחיקת תיק</div>
+    <p class="modal-text" id="deleteModalText">האם למחוק את התיק? פעולה זו אינה ניתנת לביטול.</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()" style="background:rgba(239,68,68,0.2);border:1px solid var(--red);color:var(--red)">מחק</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('deleteModal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input for import -->
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+function showToast(msg, type='info', duration=4000){
+  let c = document.getElementById('debugToast');
+  if(!c){ c=document.createElement('div'); c.id='debugToast'; document.body.appendChild(c); }
+  const el = document.createElement('div');
+  el.className='toast-msg '+type; el.textContent=msg;
+  c.appendChild(el); setTimeout(()=>el.remove(), duration);
+}
+window.showToast = showToast;
+
+// ══════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════
+const CASES_KEY = 'appraisal_cases';
+const FORM_URL = 'form.html';
+let currentFilter = 'all';
+let deleteTargetId = null;
+let selectedNewMode = null;
+
+const MODE_LABELS = {
+  insurance: 'ביטוח',
+  private: 'פרטי',
+  tax: 'מס רכוש'
+};
+const MODE_COLORS = {
+  insurance: 'var(--red)',
+  private: 'var(--blue)',
+  tax: 'var(--green)'
+};
+const MODE_ICONS = {
+  insurance: '🏢',
+  private: '👤',
+  tax: '🏛️'
+};
+const MODE_CLASS = {
+  insurance: 'mode-insurance',
+  private: 'mode-private',
+  tax: 'mode-tax'
+};
+
+// ══════════════════════════════════════════════════
+// DATA — Firebase Firestore
+// ══════════════════════════════════════════════════
+let _casesCache = [];
+
+async function getCases() {
+  if(!window._getCases){ showToast('⚠️ Firebase לא מוכן', 'err'); _casesCache = []; return []; }
+  try {
+    _casesCache = await window._getCases();
+    showToast('✅ ' + _casesCache.length + ' תיקים נטענו', 'ok', 3000);
+  } catch(e) {
+    showToast('❌ ' + e.code + ': ' + e.message, 'err', 10000);
+    _casesCache = [];
+  }
+  return _casesCache;
+}
+
+async function saveCases(cases) {
+  // saveCases is now a no-op — each case is saved individually via _saveCase
+}
+
+function calcProgress(c) {
+  if (!c.state) return 0;
+  const s = c.state;
+  const checks = [
+    s.base?.fullName,
+    s.base?.eventDate,
+    s.base?.visitDate,
+    s.base?.city,
+    s.base?.street,
+    s.base?.sqm || s.property?.sqm,
+    s.event?.eventType,
+    s.circ?.waterOrigin || s.circ?.fireLocation || s.circ?.burglaryMethod || s.circ?.extraNotes,
+    s.findings?.areas?.length > 0,
+    s.boq?.structItems?.length > 0 || s.boq?.contentsItems?.length > 0
+  ];
+  const filled = checks.filter(Boolean).length;
+  return Math.round((filled / checks.length) * 100);
+}
+
+function getAddress(c) {
+  const s = c.state;
+  if (!s) return '';
+  const b = s.base || {};
+  const parts = [b.city, b.street, b.streetNum].filter(Boolean);
+  return parts.join(', ');
+}
+
+function getClientName(c) {
+  return c.state?.base?.fullName || c.name || 'תיק ללא שם';
+}
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
+function renderStats() {
+  const cases = _casesCache || [];
+  const total = cases.length;
+  const byMode = { insurance: 0, private: 0, tax: 0 };
+  cases.forEach(c => { if (byMode[c.mode] !== undefined) byMode[c.mode]++; });
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statInsurance').textContent = byMode.insurance;
+  document.getElementById('statPrivate').textContent = byMode.private;
+  document.getElementById('statTax').textContent = byMode.tax;
+
+  const subtitle = total === 0
+    ? 'אין תיקים עדיין — התחל בלחיצה על "תיק חדש"'
+    : `${total} תיק${total !== 1 ? 'ים' : ''} במערכת`;
+  document.getElementById('subtitleText').textContent = subtitle;
+
+  // Mode breakdown widget
+  const bd = document.getElementById('modeBreakdown');
+  if (total === 0) {
+    bd.innerHTML = '<div class="mode-row"><span class="mode-row-label" style="color:var(--subtle)">אין תיקים עדיין</span></div>';
+    return;
+  }
+  bd.innerHTML = Object.entries(byMode).map(([mode, count]) => `
+    <div class="mode-row">
+      <span class="mode-row-label">${MODE_ICONS[mode]} ${MODE_LABELS[mode]}</span>
+      <span class="mode-row-count" style="color:${MODE_COLORS[mode]}">${count}</span>
+    </div>
+    ${count > 0 ? `<div class="mini-bar" style="width:${Math.round(count/total*100)}%;background:${MODE_COLORS[mode]};margin-bottom:4px;"></div>` : ''}
+  `).join('');
+}
+
+function renderActivity() {
+  const cases = getCases().slice(0, 5);
+  const al = document.getElementById('activityList');
+  if (cases.length === 0) {
+    al.innerHTML = '<div class="activity-item"><span class="activity-dot" style="background:var(--subtle)"></span><div class="activity-info"><div class="activity-name" style="color:var(--subtle)">אין פעילות עדיין</div></div></div>';
+    return;
+  }
+  al.innerHTML = cases.map(c => `
+    <a class="activity-item" href="${FORM_URL}?case=${c.id}">
+      <span class="activity-dot" style="background:${MODE_COLORS[c.mode] || 'var(--muted)'}"></span>
+      <div class="activity-info">
+        <div class="activity-name">${escHtml(getClientName(c))}</div>
+        <div class="activity-detail">${MODE_LABELS[c.mode] || c.mode} · ${c.createdAt || ''}</div>
+      </div>
+      <span class="activity-arrow">←</span>
+    </a>
+  `).join('');
+}
+
+async function renderCases() {
+  const cases = await getCases();
+  const filter = currentFilter;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  let filtered = cases.filter(c => {
+    if (filter !== 'all' && c.mode !== filter) return false;
+    if (search) {
+      const name = getClientName(c).toLowerCase();
+      const addr = getAddress(c).toLowerCase();
+      if (!name.includes(search) && !addr.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('caseGrid');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">${cases.length === 0 ? '📭' : '🔍'}</span>
+        <div class="empty-title">${cases.length === 0 ? 'אין תיקים עדיין' : 'לא נמצאו תיקים'}</div>
+        <p class="empty-text">${cases.length === 0 ? 'לחץ על "תיק חדש" כדי להתחיל' : 'נסה לשנות את פילטר החיפוש'}</p>
+        ${cases.length === 0 ? '<button class="btn btn-primary" onclick="openNewCase()">➕ פתח תיק חדש</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((c, i) => {
+    const progress = calcProgress(c);
+    const addr = getAddress(c);
+    const name = getClientName(c);
+    const modeClass = MODE_CLASS[c.mode] || '';
+    const fillClass = progress < 30 ? 'low' : progress < 70 ? 'mid' : 'high';
+
+    return `
+      <div class="case-card ${modeClass}" style="animation-delay:${i * 0.04}s" onclick="openCase('${c.id}')">
+        <div class="case-card-header">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="case-avatar">${MODE_ICONS[c.mode] || '📋'}</div>
+            <div>
+              <div class="case-name">${escHtml(name)}</div>
+              ${addr ? `<div class="case-address">📍 ${escHtml(addr)}</div>` : '<div class="case-address" style="color:var(--subtle)">כתובת לא הוזנה</div>'}
+            </div>
+          </div>
+          <span class="case-badge">${MODE_LABELS[c.mode] || c.mode}</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label">
+            <span>השלמה</span>
+            <strong>${progress}%</strong>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill ${fillClass}" style="width:${progress}%"></div>
+          </div>
+        </div>
+        <div class="case-meta">
+          <span class="case-meta-item">📅 <strong>${c.createdAt || '—'}</strong></span>
+          ${c.state?.base?.eventDate ? `<span class="case-meta-item">🔔 <strong>${c.state.base.eventDate}</strong></span>` : ''}
+          ${c.state?.findings?.areas?.length ? `<span class="case-meta-item">📐 <strong>${c.state.findings.areas.length} אזורים</strong></span>` : ''}
+        </div>
+        <div class="case-actions" onclick="event.stopPropagation()">
+          <button class="action-btn" title="ייצוא" onclick="exportCase('${c.id}')">📤</button>
+          <button class="action-btn danger" title="מחיקה" onclick="promptDelete('${c.id}', '${escHtml(name).replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function render() {
+  await renderCases();
+  renderStats();
+  renderActivity();
+}
+
+// ══════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════
+function openCase(id) {
+  window.location.href = `${FORM_URL}?case=${id}`;
+}
+
+function setFilter(mode) {
+  currentFilter = mode;
+  document.querySelectorAll('.filter-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.mode === mode);
+  });
+  renderCases();
+}
+
+function openNewCase() {
+  selectedNewMode = null;
+  ['insurance','private','tax'].forEach(m => {
+    document.getElementById('mc-'+m).className = 'mode-choice';
+  });
+  document.getElementById('createBtn').disabled = true;
+  document.getElementById('createBtn').style.opacity = '0.5';
+  const nameInput = document.getElementById('newCaseName');
+  if(nameInput) { nameInput.value = ''; setTimeout(()=>nameInput.focus(), 100); }
+  openModal('newCaseModal');
+}
+
+function selectNewMode(mode) {
+  selectedNewMode = mode;
+  ['insurance','private','tax'].forEach(m => {
+    document.getElementById('mc-'+m).className = 'mode-choice';
+  });
+  const cls = { insurance: 'sel-ins', private: 'sel-priv', tax: 'sel-tax' };
+  document.getElementById('mc-'+mode).className = 'mode-choice ' + cls[mode];
+  document.getElementById('createBtn').disabled = false;
+  document.getElementById('createBtn').style.opacity = '1';
+}
+
+async function createCase() {
+  if (!selectedNewMode) return;
+  const nameInput = document.getElementById('newCaseName');
+  const caseName = (nameInput?.value || '').trim() || 'תיק חדש';
+  const id = 'case_' + Date.now();
+  const caseData = {
+    id,
+    name: caseName,
+    mode: selectedNewMode,
+    createdAt: new Date().toLocaleDateString('he-IL'),
+    state: null
+  };
+  if(window._saveCase) await window._saveCase(caseData);
+  closeModal('newCaseModal');
+  if(nameInput) nameInput.value = '';
+  window.location.href = `${FORM_URL}?case=${id}&mode=${selectedNewMode}`;
+}
+
+function promptDelete(id, name) {
+  deleteTargetId = id;
+  document.getElementById('deleteModalText').textContent = `האם למחוק את תיק "${name}"? פעולה זו אינה ניתנת לביטול.`;
+  openModal('deleteModal');
+}
+
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  await window._deleteCase(deleteTargetId);
+  deleteTargetId = null;
+  closeModal('deleteModal');
+  await render();
+}
+
+function exportCase(id) {
+  const cases = getCases();
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `appraisal_${getClientName(c).replace(/\s+/g,'_')}_${id}.json`;
+  a.click();
+}
+
+function exportAll() {
+  const cases = getCases();
+  if (cases.length === 0) { alert('אין תיקים לייצוא.'); return; }
+  const blob = new Blob([JSON.stringify(cases, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `appraisal_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importAll() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const arr = Array.isArray(data) ? data : [data];
+      const existing = getCases();
+      const existingIds = new Set(existing.map(c => c.id));
+      let added = 0;
+      arr.forEach(c => {
+        if (c.id && !existingIds.has(c.id)) {
+          existing.unshift(c);
+          added++;
+        }
+      });
+      saveCases(existing);
+      render();
+      alert(`יובאו ${added} תיקים בהצלחה.`);
+    } catch {
+      alert('שגיאה בקריאת הקובץ.');
+    }
+    evt.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+// render is called by Firebase auth state listener
+</script>
+<div id="debugToast"></div>
+</body>
+</html>
