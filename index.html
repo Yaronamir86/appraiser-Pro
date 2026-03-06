@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מערכת שמאות | דשבורד</title>
+<title>ירון אמיר | שמאי רכוש — דשבורד</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -694,6 +694,120 @@ footer {
   50% { opacity: 0.5; transform: scale(0.7); }
 }
 </style>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+         createUserWithEmailAndPassword, signOut, sendPasswordResetEmail }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs,
+         deleteDoc, query, where, orderBy, serverTimestamp, Timestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain: "yaron-appraiser.firebaseapp.com",
+  projectId: "yaron-appraiser",
+  storageBucket: "yaron-appraiser.firebasestorage.app",
+  messagingSenderId: "179370141848",
+  appId: "1:179370141848:web:d5843d9641dce3adabc8ed"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+// ─── expose to global scope ───
+window._FB = { auth, db, signInWithEmailAndPassword, signOut,
+               createUserWithEmailAndPassword, sendPasswordResetEmail,
+               onAuthStateChanged, collection, doc, setDoc, getDoc,
+               getDocs, deleteDoc, query, where, orderBy, serverTimestamp };
+
+// ─── Auth state listener ───
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    window._currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.body.style.overflow = '';
+    // Load profile
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) window._profile = snap.data();
+    } catch(e){}
+    await render();
+  } else {
+    window._currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+});
+
+// ─── Login ───
+window.doLogin = async function() {
+  const email = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  const btn = document.querySelector('#loginScreen button');
+  btn.textContent = 'מתחבר...';
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    err.style.display = 'none';
+  } catch(e) {
+    err.textContent = 'אימייל או סיסמה שגויים';
+    err.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+  }
+  btn.textContent = 'כניסה למערכת';
+  btn.disabled = false;
+};
+
+// ─── Logout ───
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// ─── Forgot password ───
+window.doForgotPassword = async function() {
+  const email = document.getElementById('loginUser').value.trim();
+  if (!email) { alert('הכנס אימייל קודם'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert('נשלח מייל לאיפוס סיסמה אל ' + email);
+  } catch(e) {
+    alert('שגיאה: ' + e.message);
+  }
+};
+
+// ─── Cases CRUD via Firestore ───
+window._getCases = async function() {
+  if (!window._currentUser) return [];
+  try {
+    const q = query(
+      collection(db, 'cases'),
+      where('uid', '==', window._currentUser.uid),
+      orderBy('updatedAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.error('getCases error', e); return []; }
+};
+
+window._saveCase = async function(caseData) {
+  if (!window._currentUser) return;
+  const id = caseData.id;
+  await setDoc(doc(db, 'cases', id), {
+    ...caseData,
+    uid: window._currentUser.uid,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+
+window._deleteCase = async function(id) {
+  await deleteDoc(doc(db, 'cases', id));
+};
+
+</script>
 </head>
 <body>
 <!-- ══════ LOGIN SCREEN ══════ -->
@@ -704,7 +818,7 @@ footer {
     <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
     <div style="margin-bottom:14px;text-align:right;">
       <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
-      <input id="loginUser" type="text" placeholder="admin" autocomplete="username"
+      <input id="loginUser" type="text" placeholder="your@email.com" autocomplete="email" type="email"
         style="width:100%;box-sizing:border-box;background:#0f1117;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;"
         onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     </div>
@@ -715,37 +829,17 @@ footer {
         onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div id="loginErr" style="color:#f87171;font-size:13px;margin-bottom:16px;display:none;">שם משתמש או סיסמה שגויים</div>
+    <div style="text-align:left;margin-bottom:12px;"><a href="#" onclick="doForgotPassword();return false;" style="font-size:12px;color:#6b7280;text-decoration:none;">שכחתי סיסמה</a></div>
     <button onclick="doLogin()"
       style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;padding:13px;color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;"
       onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">כניסה למערכת</button>
   </div>
 </div>
-<script>
-(function(){
-  const USER='admin', PASS='appraiser', KEY='shamai_auth';
-  function doLogin(){
-    const u=document.getElementById('loginUser').value.trim();
-    const p=document.getElementById('loginPass').value;
-    if(u===USER && p===PASS){
-      sessionStorage.setItem(KEY,'1');
-      document.getElementById('loginScreen').style.display='none';
-    } else {
-      document.getElementById('loginErr').style.display='block';
-      document.getElementById('loginPass').value='';
-    }
-  }
-  window.doLogin=doLogin;
-  // Show login if not authenticated
-  if(sessionStorage.getItem(KEY)!=='1'){
-    document.getElementById('loginScreen').style.display='flex';
-    document.body.style.overflow='hidden';
-  }
-})();
-</script>
+<!-- login handled by Firebase module -->
 
 
 <header>
-  <div class="header-inner">
+  <div class="header-inner" style="display:flex;align-items:center;justify-content:space-between;">
     <div class="logo" style="display:flex;align-items:center;gap:10px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36"><rect width="48" height="48" rx="12" fill="#f59e0b"/><text x="24" y="33" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="line-height:1.2;"><div style="font-size:15px;font-weight:800;color:#fff;">ירון אמיר</div><div style="font-size:11px;color:var(--amber);font-weight:600;letter-spacing:.04em;">שמאי רכוש</div></div></div>
       <div>
         <span class="logo-text">מערכת שמאות</span>
@@ -933,16 +1027,17 @@ const MODE_CLASS = {
 };
 
 // ══════════════════════════════════════════════════
-// DATA
+// DATA — Firebase Firestore
 // ══════════════════════════════════════════════════
-function getCases() {
-  try {
-    return JSON.parse(localStorage.getItem(CASES_KEY) || '[]');
-  } catch { return []; }
+let _casesCache = [];
+
+async function getCases() {
+  _casesCache = await (window._getCases ? window._getCases() : Promise.resolve([]));
+  return _casesCache;
 }
 
-function saveCases(cases) {
-  localStorage.setItem(CASES_KEY, JSON.stringify(cases));
+async function saveCases(cases) {
+  // saveCases is now a no-op — each case is saved individually via _saveCase
 }
 
 function calcProgress(c) {
@@ -1029,7 +1124,7 @@ function renderActivity() {
   `).join('');
 }
 
-function renderCases() {
+async function renderCases() {
   const cases = getCases();
   const filter = currentFilter;
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1098,7 +1193,7 @@ function renderCases() {
   }).join('');
 }
 
-function render() {
+async function render() {
   renderStats();
   renderActivity();
   renderCases();
@@ -1140,18 +1235,17 @@ function selectNewMode(mode) {
   document.getElementById('createBtn').style.opacity = '1';
 }
 
-function createCase() {
+async function createCase() {
   if (!selectedNewMode) return;
   const id = 'case_' + Date.now();
-  const cases = getCases();
-  cases.unshift({
+  const caseData = {
     id,
     name: 'תיק חדש',
     mode: selectedNewMode,
     createdAt: new Date().toLocaleDateString('he-IL'),
     state: null
-  });
-  saveCases(cases);
+  };
+  await window._saveCase(caseData);
   closeModal('newCaseModal');
   window.location.href = `${FORM_URL}?case=${id}&mode=${selectedNewMode}`;
 }
@@ -1162,13 +1256,12 @@ function promptDelete(id, name) {
   openModal('deleteModal');
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (!deleteTargetId) return;
-  const cases = getCases().filter(c => c.id !== deleteTargetId);
-  saveCases(cases);
+  await window._deleteCase(deleteTargetId);
   deleteTargetId = null;
   closeModal('deleteModal');
-  render();
+  await render();
 }
 
 function exportCase(id) {
@@ -1251,7 +1344,7 @@ function escHtml(str) {
 // ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
-render();
+// render is called by Firebase auth state listener
 </script>
 </body>
 </html>
