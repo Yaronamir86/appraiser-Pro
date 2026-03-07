@@ -1,7 +1,7 @@
 {
   "name": "OMDAN",
   "short_name": "OMDAN",
-  "start_url": "/appraiser-Pro/dashboard.html",
+  "start_url": "/appraiser-Pro/index.html",
   "scope": "/appraiser-Pro/",
   "display": "standalone",
   "background_color": "#0b1220",
@@ -25,7 +25,7 @@
   "shortcuts": [
     {
       "name": "דשבורד",
-      "url": "/appraiser-Pro/dashboard.html"
+      "url": "/appraiser-Pro/index.html"
     },
     {
       "name": "תיק חדש",
