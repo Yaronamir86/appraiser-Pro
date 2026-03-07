@@ -1,0 +1,32 @@
+{
+  "id": "/appraiser-Pro/",
+  "name": "OMDAN",
+  "short_name": "OMDAN",
+  "description": "מערכת לשמאות רכוש",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/appraiser-Pro/",
+  "scope": "/appraiser-Pro/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2a44",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
