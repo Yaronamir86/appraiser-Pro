@@ -1402,5 +1402,12 @@ function escHtml(str) {
 // ══════════════════════════════════════════════════
 // render called by Firebase auth listener
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/appraiser-Pro/sw.js");
+  });
+}
+</script>
 </body>
 </html>
