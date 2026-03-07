@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>מערכת שמאות | טופס</title>
+<link rel="manifest" href="/appraiser-Pro/manifest.json">
+<link rel="icon" type="image/png" href="/appraiser-Pro/assets/omdan-favicon.png">
+<link rel="apple-touch-icon" href="/appraiser-Pro/assets/omdan-app-icon.png">
+
+<meta name="theme-color" content="#1f2a44">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -3132,6 +3139,13 @@ function attachListeners(n){/* no-op, inline handlers used */}
   }
 })();
 
+</script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/appraiser-Pro/sw.js");
+  });
+}
 </script>
 </body>
 </html>
