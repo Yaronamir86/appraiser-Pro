@@ -13,17 +13,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
+      "src": "/appraiser-Pro/assets/omdan-app-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/appraiser-Pro/assets/omdan-app-icon.png",
+      "src": "/appraiser-Pro/assets/omdan-app-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
