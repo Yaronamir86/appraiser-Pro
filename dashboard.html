@@ -1,0 +1,2595 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartVaad – דשבורד</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --navy:   #0f1923;
+  --navy2:  #131e2c;
+  --card:   #1a2840;
+  --card2:  #1f3050;
+  --card3:  #243660;
+  --accent: #00c896;
+  --accent2:#00a878;
+  --blue:   #4a9eff;
+  --red:    #ff4f5e;
+  --gold:   #f5a623;
+  --purple: #9b59ff;
+  --text:   #e8edf5;
+  --muted:  #7a90a8;
+  --border: rgba(255,255,255,0.07);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  direction: rtl;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT SHELL
+═══════════════════════════════════════════ */
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  grid-column: 1/-1;
+  background: rgba(15,25,35,.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  position: sticky; top:0; z-index:50;
+}
+
+.tb-logo { display:flex; align-items:center; gap:9px; margin-left:auto; text-decoration:none; }
+.tb-logo-icon { width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 18px rgba(0,200,150,.35); }
+.tb-logo-name { font-size:17px;font-weight:900;background:linear-gradient(135deg,var(--accent),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+
+.tb-building {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-size:13px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor:pointer;
+  max-width: 200px;
+}
+
+.tb-spacer { flex:1; }
+
+.tb-badge {
+  background: rgba(0,200,150,.1);
+  border: 1px solid rgba(0,200,150,.25);
+  color: var(--accent);
+  font-size:11px; font-weight:700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.tb-btn {
+  width:34px;height:34px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+  position:relative;
+  transition:all .15s;
+}
+.tb-btn:hover { background:var(--card2); }
+.tb-dot { position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--navy); }
+
+.tb-avatar {
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#000;
+  cursor:pointer;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--navy2);
+  border-left: 1px solid var(--border);
+  padding: 16px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section { padding: 0 12px; margin-bottom:24px; }
+.sidebar-section-label {
+  font-size:9px; font-weight:800; letter-spacing:1.8px;
+  color:var(--muted); text-transform:uppercase;
+  padding: 0 8px; margin-bottom:6px;
+}
+
+.nav-item {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 10px;
+  border-radius:9px;
+  cursor:pointer;
+  font-size:13px; font-weight:500;
+  color:var(--muted);
+  transition:all .15s;
+  margin-bottom:1px;
+  position:relative;
+  text-decoration:none;
+}
+.nav-item:hover { background:rgba(255,255,255,.04); color:var(--text); }
+.nav-item.active { background:rgba(0,200,150,.1); color:var(--accent); font-weight:700; }
+.nav-item.active::before {
+  content:''; position:absolute;
+  right:-12px; top:20%; bottom:20%;
+  width:3px; background:var(--accent); border-radius:2px;
+}
+
+.nav-icon { font-size:15px; flex-shrink:0; }
+.nav-badge { margin-right:auto; background:var(--red); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+.nav-badge-g { margin-right:auto; background:rgba(0,200,150,.18); color:var(--accent); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+.nav-badge-gold { margin-right:auto; background:rgba(245,166,35,.18); color:var(--gold); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+
+.sidebar-footer {
+  margin-top:auto;
+  padding:12px;
+}
+
+.premium-sidebar-card {
+  background: linear-gradient(135deg, rgba(0,200,150,.1), rgba(74,158,255,.1));
+  border: 1px solid rgba(0,200,150,.25);
+  border-radius:12px;
+  padding:14px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.premium-sidebar-card:hover { border-color:rgba(0,200,150,.5); }
+.psc-title { font-size:13px;font-weight:800;color:var(--accent);margin-bottom:4px; }
+.psc-sub   { font-size:11px;color:var(--muted); }
+.psc-price { font-size:18px;font-weight:900;color:var(--text);margin-top:8px; }
+
+/* ── MAIN ── */
+.main {
+  overflow-y: auto;
+  padding: 24px 28px;
+  background: var(--navy);
+}
+
+/* ═══════════════════════════════════════════
+   PAGES
+═══════════════════════════════════════════ */
+.page { display:none; animation:fadeIn .25s ease; }
+.page.active { display:block; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* PAGE HEADER */
+.ph { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+.ph-title { font-size:22px; font-weight:900; }
+.ph-sub   { font-size:13px; color:var(--muted); margin-top:3px; }
+
+/* CARDS GRID */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:22px; }
+
+.kpi-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  position:relative; overflow:hidden;
+  transition:all .2s; cursor:default;
+}
+.kpi-card:hover { transform:translateY(-2px); border-color:rgba(255,255,255,.12); }
+.kpi-card::after { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:var(--kpi-color,var(--accent)); }
+
+.kpi-icon { width:38px;height:38px;border-radius:9px;background:var(--kpi-bg,rgba(0,200,150,.1));display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px; }
+.kpi-val  { font-size:28px;font-weight:900; }
+.kpi-label{ font-size:12px;color:var(--muted);margin-top:2px; }
+.kpi-delta{ font-size:11px;font-weight:600;margin-top:6px; }
+.delta-up  { color:var(--accent); }
+.delta-down{ color:var(--red); }
+.delta-gold{ color:var(--gold); }
+
+/* TWO/THREE COL */
+.two-col   { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; }
+
+/* SECTION CARD */
+.sc {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px 20px;
+}
+
+.sc-title {
+  font-size:14px; font-weight:800;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
+}
+
+.sc-link { font-size:12px; color:var(--accent); cursor:pointer; font-weight:500; }
+
+/* TABLE */
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:right; padding:9px 12px; color:var(--muted); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.7px; border-bottom:1px solid var(--border); }
+td { padding:11px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,.015); }
+
+/* TAGS */
+.tag { display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700; }
+.tag-g    { background:rgba(0,200,150,.15);color:var(--accent); }
+.tag-r    { background:rgba(255,79,94,.15);color:var(--red); }
+.tag-gold { background:rgba(245,166,35,.15);color:var(--gold); }
+.tag-blue { background:rgba(74,158,255,.15);color:var(--blue); }
+.tag-gray { background:rgba(255,255,255,.06);color:var(--muted); }
+
+/* ACTIVITY */
+.act-item { display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--border); }
+.act-item:last-child { border-bottom:none; }
+.act-ico { width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0; }
+.act-body { flex:1; }
+.act-t    { font-size:13px;font-weight:600; }
+.act-s    { font-size:11px;color:var(--muted);margin-top:2px; }
+.act-time { font-size:11px;color:var(--muted);flex-shrink:0; }
+
+/* PROGRESS BAR */
+.prog-bar { background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;margin-top:6px; }
+.prog-fill{ height:100%;border-radius:4px; }
+
+/* DONUT SVG */
+.donut-row { display:flex;align-items:center;gap:20px; }
+.donut-wrap { position:relative;width:90px;height:90px;flex-shrink:0; }
+.donut-ctr  { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+.donut-num  { font-size:18px;font-weight:900; }
+.donut-lbl  { font-size:9px;color:var(--muted); }
+.legend { flex:1; }
+.leg-item { display:flex;align-items:center;gap:7px;margin-bottom:9px;font-size:12px; }
+.leg-dot  { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+.leg-lbl  { flex:1;color:var(--muted); }
+.leg-val  { font-weight:700; }
+
+/* BAR CHART */
+.bar-chart { display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:6px; }
+.bar-col   { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px; }
+.bar       { width:100%;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--accent),rgba(0,200,150,.4));min-height:4px;transition:height 1s ease; }
+.bar.dim   { background:rgba(255,255,255,.07); }
+.bar-m     { font-size:10px;color:var(--muted); }
+
+/* REQ CARDS */
+.req-card {
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+  cursor:pointer;transition:all .15s;margin-bottom:8px;
+}
+.req-card:hover { border-color:rgba(255,255,255,.12); }
+.req-urg  { width:3px;align-self:stretch;border-radius:2px;flex-shrink:0; }
+.req-body { flex:1; }
+.req-t    { font-size:13px;font-weight:700;margin-bottom:3px; }
+.req-meta { font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap; }
+
+/* PAYMENT ROWS */
+.pay-row { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border); }
+.pay-row:last-child { border-bottom:none; }
+.pay-av   { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0; }
+.pay-info { flex:1; }
+.pay-name { font-size:13px;font-weight:700; }
+.pay-apt  { font-size:11px;color:var(--muted); }
+.pay-amt  { font-size:15px;font-weight:900; }
+
+/* COMPOSE */
+.compose-box {
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:14px;
+  margin-bottom:14px;
+}
+.compose-ta {
+  width:100%;background:transparent;border:none;
+  color:var(--text);font-family:'Heebo',sans-serif;
+  font-size:14px;resize:none;outline:none;line-height:1.6;
+}
+.compose-footer { display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px; }
+.chip-row { display:flex;gap:6px;flex-wrap:wrap; }
+.chip {
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:var(--muted);font-size:12px;padding:5px 12px;border-radius:20px;
+  cursor:pointer;font-family:'Heebo',sans-serif;transition:all .15s;
+}
+.chip:hover,.chip.on { background:rgba(0,200,150,.1);border-color:rgba(0,200,150,.3);color:var(--accent); }
+
+/* FIN SUMMARY */
+.fin-cells { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px; }
+.fin-cell  { background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center; }
+.fin-val   { font-size:20px;font-weight:900; }
+.fin-lbl   { font-size:11px;color:var(--muted);margin-top:3px; }
+
+/* PREMIUM LOCK */
+.lock-block {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:22px;
+  background:rgba(0,0,0,.25);border:1px dashed rgba(245,166,35,.35);
+  border-radius:11px;cursor:pointer;transition:all .2s;margin-bottom:10px;
+  text-align:center;
+}
+.lock-block:hover { border-color:rgba(245,166,35,.7);background:rgba(245,166,35,.04); }
+.lock-ico { font-size:24px; }
+.lock-t   { font-size:13px;font-weight:800;color:var(--gold); }
+.lock-s   { font-size:12px;color:var(--muted); }
+
+/* PREMIUM BANNER */
+.prm-banner {
+  background:linear-gradient(135deg,rgba(0,200,150,.1),rgba(74,158,255,.1));
+  border:1px solid rgba(0,200,150,.28);
+  border-radius:14px;
+  padding:18px 22px;
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:22px;
+  cursor:pointer;transition:all .2s;
+}
+.prm-banner:hover { border-color:rgba(0,200,150,.5); }
+.prm-ico  { font-size:28px;flex-shrink:0; }
+.prm-body { flex:1; }
+.prm-t    { font-size:15px;font-weight:900;color:var(--accent);margin-bottom:4px; }
+.prm-s    { font-size:13px;color:var(--muted); }
+
+/* BUTTONS */
+.btn-primary {
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#000;
+  font-family:'Heebo',sans-serif;
+  font-size:14px;font-weight:800;
+  padding:10px 20px;border-radius:10px;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 2px 12px rgba(0,200,150,.25);
+  white-space:nowrap;
+}
+.btn-primary:hover { transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,200,150,.4); }
+.btn-primary:disabled { opacity:.5;pointer-events:none; }
+.btn-sm { font-size:12px;padding:7px 14px;border-radius:8px; }
+
+.btn-outline {
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--muted);
+  font-family:'Heebo',sans-serif;
+  font-size:13px;font-weight:600;
+  padding:8px 14px;border-radius:9px;
+  cursor:pointer;transition:all .15s;
+}
+.btn-outline:hover { border-color:rgba(255,255,255,.15);color:var(--text); }
+
+/* MODAL */
+.modal-ov {
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-ov.open { opacity:1;pointer-events:all; }
+
+.modal {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;padding:30px;
+  width:100%;max-width:440px;
+  transform:scale(.95) translateY(16px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-ov.open .modal { transform:scale(1) translateY(0); }
+
+.modal-t { font-size:19px;font-weight:900;margin-bottom:6px; }
+.modal-s { font-size:13px;color:var(--muted);margin-bottom:22px; }
+
+.fg { margin-bottom:14px; }
+.fl { display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px; }
+.fi {
+  width:100%;background:rgba(0,0,0,.3);
+  border:1px solid var(--border);color:var(--text);
+  font-family:'Heebo',sans-serif;font-size:14px;
+  padding:10px 13px;border-radius:9px;outline:none;
+  transition:border-color .15s;
+}
+.fi:focus { border-color:rgba(0,200,150,.45); }
+.fi::placeholder { color:var(--muted); }
+.fi-row { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+
+.modal-footer { display:flex;gap:8px;margin-top:20px; }
+.btn-cancel { flex:1;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Heebo',sans-serif;font-size:14px;font-weight:600;padding:11px;border-radius:9px;cursor:pointer; }
+.btn-ok     { flex:2;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#000;font-family:'Heebo',sans-serif;font-size:14px;font-weight:800;padding:11px;border-radius:9px;cursor:pointer;transition:all .2s; }
+.btn-ok:hover { box-shadow:0 0 18px rgba(0,200,150,.4); }
+.btn-ok.danger { background:linear-gradient(135deg,var(--red),#cc3040); color:#fff; }
+
+/* TOAST */
+.toast {
+  position:fixed;bottom:22px;left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--card);border:1px solid rgba(0,200,150,.3);
+  color:var(--text);font-size:13px;font-weight:700;
+  padding:11px 22px;border-radius:11px;z-index:999;
+  box-shadow:0 8px 28px rgba(0,0,0,.4);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+  max-width:340px;text-align:center;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* LOADING */
+.loader-full {
+  position:fixed;inset:0;z-index:300;
+  background:var(--navy);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  transition:opacity .3s;
+}
+.loader-full.gone { opacity:0;pointer-events:none; }
+.spinner { width:42px;height:42px;border:3px solid rgba(0,200,150,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* EMPTY STATE */
+.empty { text-align:center;padding:40px 20px;color:var(--muted); }
+.empty-ico { font-size:38px;margin-bottom:10px; }
+.empty-t   { font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px; }
+.empty-s   { font-size:13px; }
+
+.quick-actions { margin-bottom:22px; }
+.qa-title { font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px; }
+.qa-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+.qa-btn {
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:16px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:all .2s;
+  font-family:'Heebo',sans-serif; text-align:center;
+}
+.qa-btn:hover { background:var(--card3);border-color:rgba(0,200,150,.3);transform:translateY(-2px); }
+.qa-ico { font-size:22px;line-height:1; }
+.qa-lbl { font-size:11px;font-weight:700;color:var(--muted); }
+.qa-btn:hover .qa-lbl { color:var(--accent); }
+
+
+/* AUDIT LOG ENTRY */
+.audit-row { display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px; }
+.audit-row:last-child { border-bottom:none; }
+.audit-ico { width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0; }
+.audit-who { font-weight:700;color:var(--text); }
+.audit-what { color:var(--muted); }
+.audit-time { margin-right:auto;color:var(--muted);flex-shrink:0; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET (max 768px)
+═══════════════════════════════════════════ */
+@media (max-width:768px) {
+
+  /* Layout */
+  .shell { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .main { padding:14px 14px 90px; }
+
+  /* Topbar */
+  .topbar { padding:0 12px; gap:8px; }
+  .tb-logo-name { font-size:15px; }
+  #plan-badge { display:none; }
+  #building-select { max-width:140px; font-size:12px; padding:5px 8px; }
+
+  /* Page header */
+  .ph { flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .ph-title { font-size:19px; }
+  .ph-sub { font-size:12px; }
+
+  /* Quick actions */
+  .quick-actions { margin-bottom:16px; }
+  .qa-grid { grid-template-columns:repeat(3,1fr); gap:8px; }
+  .qa-btn { padding:12px 6px; border-radius:10px; }
+  .qa-ico { font-size:19px; }
+  .qa-lbl { font-size:10px; }
+
+  /* KPI grid — 2 col */
+  .kpi-grid { grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+  .kpi-card { padding:14px; }
+  .kpi-val { font-size:22px; }
+  .kpi-icon { width:32px; height:32px; font-size:15px; margin-bottom:8px; }
+
+  /* Two/three col — stack */
+  .two-col, .three-col { grid-template-columns:1fr; gap:12px; }
+
+  /* Finance summary cells — 3 stays but smaller */
+  .fin-cells { gap:8px; }
+  .fin-val { font-size:16px; }
+  .fin-cell { padding:10px 8px; }
+
+  /* Section cards */
+  .sc { padding:14px 16px; }
+  .sc-title { font-size:13px; margin-bottom:12px; }
+
+  /* Tables — horizontal scroll */
+  .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { min-width:480px; font-size:12px; }
+  th, td { padding:9px 10px; }
+
+  /* Modals — full width bottom sheet feel */
+  .modal-ov { align-items:flex-end; padding:0; }
+  .modal {
+    border-radius:20px 20px 0 0;
+    padding:24px 20px 36px;
+    max-width:100%;
+    width:100%;
+  }
+  .modal-ov.open .modal { transform:scale(1) translateY(0); }
+  .fi-row { grid-template-columns:1fr; }
+  .modal-footer { gap:6px; }
+
+  /* Messages compose */
+  .compose-footer { flex-direction:column; align-items:stretch; }
+  .compose-footer .btn-primary { text-align:center; }
+  .chip-row { flex-wrap:wrap; }
+
+  /* Premium banner — stack on mobile */
+  .prm-banner { flex-direction:column; align-items:flex-start; gap:10px; padding:14px 16px; }
+  .prm-ico { font-size:22px; }
+  .prm-t { font-size:14px; }
+  .prm-s { font-size:12px; }
+
+  /* Requests — stack columns */
+  #requests-open, #requests-done { margin-bottom:8px; }
+  .req-card { padding:10px 12px; }
+  .req-t { font-size:12px; }
+
+  /* Docs grid — 2 col */
+  .docs-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .doc-ico { font-size:26px; margin-bottom:8px; }
+  .doc-name { font-size:11px; }
+
+  /* Bulletin cards */
+  .bulletin-card { padding:12px; gap:10px; }
+  .bulletin-t { font-size:12px; }
+  .bulletin-meta { flex-wrap:wrap; gap:6px; }
+
+  /* Audit log */
+  .audit-item { font-size:11px; }
+  .audit-time { font-size:10px; }
+
+  /* Settings */
+  .settings-card { padding:16px; }
+  .fi-row { grid-template-columns:1fr; }
+
+  /* Toast — full width */
+  .toast { left:14px; right:14px; transform:translateY(70px); max-width:none; border-radius:12px; font-size:13px; }
+  .toast.show { transform:translateY(0); }
+  .toast { left:14px !important; transform:translateY(70px) !important; }
+  .toast.show { transform:translateY(0) !important; }
+
+  /* Activity feed */
+  .act-item { gap:8px; }
+  .act-ico { width:26px; height:26px; font-size:12px; }
+  .act-t { font-size:12px; }
+  .act-s { font-size:10px; }
+
+  /* Donut chart — center on mobile */
+  .donut-row { flex-direction:column; align-items:center; gap:12px; }
+  .legend { display:flex; gap:16px; }
+  .leg-item { margin-bottom:0; }
+
+  /* Bar chart */
+  .bar-chart { height:60px; }
+
+  /* Reports */
+  #report-ytd, #report-month { font-size:12px; }
+
+  /* Audit filter row */
+  #audit-filter { max-width:100%; width:100%; margin-top:8px; }
+  .sc-title { flex-wrap:wrap; }
+
+  /* Lock blocks — Pro features */
+  .lock-block { padding:14px; }
+  .lock-t { font-size:13px; }
+  .lock-s { font-size:11px; }
+
+  /* Pay rows */
+  .pay-name { font-size:12px; }
+  .pay-apt  { font-size:11px; }
+  .pay-amt  { font-size:13px; }
+
+  /* Public link box */
+  .public-link { flex-direction:column; gap:6px; padding:10px 12px; }
+
+  /* Settings cards */
+  .settings-card { padding:14px; }
+  .settings-lbl { font-size:12px; }
+
+  /* Invite link box */
+  #invite-link-box > div:first-of-type { flex-direction:column; align-items:flex-start; }
+
+  /* Buttons in page header — wrap on small screens */
+  .ph > div:last-child { flex-wrap:wrap; }
+  .btn-outline, .btn-primary { font-size:12px; padding:8px 14px; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — SMALL PHONE (max 400px)
+═══════════════════════════════════════════ */
+@media (max-width:400px) {
+  .main { padding:10px 10px 90px; }
+  .qa-grid { grid-template-columns:repeat(3,1fr); gap:5px; }
+  .qa-btn { padding:10px 4px; }
+  .qa-ico { font-size:16px; }
+  .kpi-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .kpi-val { font-size:20px; }
+  .docs-grid { grid-template-columns:repeat(2,1fr); }
+  .ph-title { font-size:17px; }
+  .fin-cells { grid-template-columns:1fr; }
+}
+
+/* QUICK ACTIONS */
+.quick-action {
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);font-family:'Heebo',sans-serif;
+  font-size:13px;font-weight:700;
+  padding:10px 16px;border-radius:10px;
+  cursor:pointer;transition:all .15s;
+}
+.quick-action:hover { background:var(--card2);border-color:rgba(0,200,150,.3);color:var(--accent); }
+.quick-action span:first-child { font-size:16px; }
+
+/* DIVIDER */
+.div { height:1px;background:var(--border);margin:18px 0; }
+
+/* SETTINGS PAGE */
+.settings-card { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px; }
+.settings-row { display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border); }
+.settings-row:last-child { border-bottom:none; }
+.settings-lbl { font-size:13px;font-weight:600; }
+.settings-sub { font-size:12px;color:var(--muted);margin-top:2px; }
+
+/* TOGGLE */
+.toggle { position:relative;width:42px;height:24px;flex-shrink:0; }
+.toggle input { opacity:0;width:0;height:0; }
+.toggle-slider {
+  position:absolute;inset:0;border-radius:12px;
+  background:rgba(255,255,255,.12);cursor:pointer;transition:.3s;
+}
+.toggle-slider::before {
+  content:'';position:absolute;left:3px;top:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:.3s;
+}
+.toggle input:checked + .toggle-slider { background:var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(18px); }
+
+/* PUBLIC PAGE TAG */
+.public-link {
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:11px 14px;display:flex;align-items:center;gap:10px;
+  font-size:13px;cursor:pointer;transition:all .15s;
+}
+.public-link:hover { border-color:rgba(0,200,150,.4); }
+
+/* DOCS GRID */
+.docs-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px; }
+.doc-card {
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;cursor:pointer;transition:all .15s;text-align:center;
+}
+.doc-card:hover { border-color:rgba(255,255,255,.14);transform:translateY(-2px); }
+.doc-ico  { font-size:32px;margin-bottom:10px; }
+.doc-name { font-size:12px;font-weight:700;margin-bottom:4px;word-break:break-word; }
+.doc-date { font-size:11px;color:var(--muted); }
+
+/* BULLETIN BOARD */
+.bulletin-card {
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.bulletin-av { width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--card3),var(--card));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0; }
+.bulletin-body { flex:1; }
+.bulletin-t { font-size:13px;font-weight:700;margin-bottom:3px; }
+.bulletin-s { font-size:12px;color:var(--muted); }
+.bulletin-meta { font-size:11px;color:var(--muted);margin-top:5px;display:flex;gap:10px; }
+</style>
+</head>
+<body>
+
+<!-- ── LOADER ── -->
+<div class="loader-full" id="loader">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:36px;height:36px;background:linear-gradient(135deg,#00c896,#4a9eff);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🏢</div>
+    <span style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#00c896,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SmartVaad</span>
+  </div>
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:#7a90a8">טוען את הבניין שלך...</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SHELL
+══════════════════════════════════════════ -->
+<div class="shell" id="shell" style="display:none">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <a class="tb-logo" href="index.html">
+      <div class="tb-logo-icon">🏢</div>
+      <div class="tb-logo-name">SmartVaad</div>
+    </a>
+
+    <select class="tb-building" id="building-select" onchange="switchBuilding(this.value)"></select>
+
+    <div class="tb-spacer"></div>
+
+    <span class="tb-badge" id="plan-badge">חינמי</span>
+
+    <button class="tb-btn" onclick="showToast('🔔 אין הודעות חדשות')">
+      🔔
+    </button>
+
+    <div class="tb-avatar" id="user-avatar" onclick="switchPage('settings')">?</div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">ניהול</div>
+      <div class="nav-item active" id="nav-overview" onclick="switchPage('overview')">
+        <span class="nav-icon">📊</span> סקירה כללית
+      </div>
+      <div class="nav-item" id="nav-tenants" onclick="switchPage('tenants')">
+        <span class="nav-icon">👥</span> דיירים
+        <span class="nav-badge-g" id="badge-tenants">0</span>
+      </div>
+      <div class="nav-item" id="nav-messages" onclick="switchPage('messages')">
+        <span class="nav-icon">💬</span> הודעות
+      </div>
+      <div class="nav-item" id="nav-requests" onclick="switchPage('requests')">
+        <span class="nav-icon">🔧</span> קריאות שירות
+        <span class="nav-badge" id="badge-requests" style="display:none">0</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">💎 פיננסי</div>
+      <div class="nav-item" id="nav-finance" onclick="switchPage('finance')">
+        <span class="nav-icon">💳</span> גביה ותשלומים
+        <span class="nav-badge" id="badge-debt" style="display:none">0</span>
+      </div>
+      <div class="nav-item" id="nav-reports" onclick="switchPage('reports')">
+        <span class="nav-icon">📈</span> דוחות כספיים
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">כלים</div>
+      <div class="nav-item" id="nav-docs" onclick="switchPage('docs')">
+        <span class="nav-icon">📄</span> מסמכים
+      </div>
+      <div class="nav-item" id="nav-bulletin" onclick="switchPage('bulletin')">
+        <span class="nav-icon">📌</span> לוח מודעות
+      </div>
+      <div class="nav-item" id="nav-audit" onclick="switchPage('audit')">
+        <span class="nav-icon">📋</span> יומן פעילות
+      </div>
+      <div class="nav-item" id="nav-settings" onclick="switchPage('settings')">
+        <span class="nav-icon">⚙️</span> הגדרות
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="premium-sidebar-card" id="premium-card" onclick="switchPage('finance')">
+        <div class="psc-title">💎 שדרג ל-Pro</div>
+        <div class="psc-sub">גביה אונליין, סליקה ודוחות</div>
+        <div class="psc-price">₪29 / חודש</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ OVERVIEW ══════════ -->
+    <div class="page active" id="page-overview">
+      <div class="ph">
+        <div>
+          <div class="ph-title" id="ov-greeting">שלום 👋</div>
+          <div class="ph-sub" id="ov-sub">טוען...</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-outline" id="seed-btn" onclick="seedDemoData()" title="מלא דאטה לדוגמה">🌱 טען דמו</button>
+          <button class="btn-primary btn-sm" onclick="openModal('modal-tenant')">+ הוסף דייר</button>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-actions" id="quick-actions">
+        <div class="qa-title">פעולות מהירות</div>
+        <div class="qa-grid">
+          <div class="qa-btn" onclick="openModal('modal-tenant')">
+            <div class="qa-ico">👤</div><div class="qa-lbl">הוסף דייר</div>
+          </div>
+          <div class="qa-btn" onclick="switchPage('messages');setTimeout(()=>document.getElementById('msg-text').focus(),200)">
+            <div class="qa-ico">💬</div><div class="qa-lbl">שלח הודעה</div>
+          </div>
+          <div class="qa-btn" onclick="openModal('modal-request')">
+            <div class="qa-ico">🔧</div><div class="qa-lbl">פתח קריאה</div>
+          </div>
+          <div class="qa-btn" onclick="openModal('modal-payment')">
+            <div class="qa-ico">💳</div><div class="qa-lbl">רשום תשלום</div>
+          </div>
+          <div class="qa-btn" onclick="openModal('modal-invite')">
+            <div class="qa-ico">📨</div><div class="qa-lbl">הזמן דייר</div>
+          </div>
+          <div class="qa-btn" onclick="openModal('modal-doc')">
+            <div class="qa-ico">📄</div><div class="qa-lbl">העלה מסמך</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card" style="--kpi-color:var(--accent);--kpi-bg:rgba(0,200,150,.1)">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-val" id="kpi-tenants">–</div>
+          <div class="kpi-label">דיירים</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--red);--kpi-bg:rgba(255,79,94,.1)">
+          <div class="kpi-icon">🔧</div>
+          <div class="kpi-val" id="kpi-requests">–</div>
+          <div class="kpi-label">קריאות פתוחות</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--gold);--kpi-bg:rgba(245,166,35,.1)">
+          <div class="kpi-icon">💳</div>
+          <div class="kpi-val" id="kpi-collected">₪0</div>
+          <div class="kpi-label">גביה החודש</div>
+          <div class="kpi-delta delta-gold" id="kpi-collected-label"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--red);--kpi-bg:rgba(255,79,94,.08)">
+          <div class="kpi-icon">⚠️</div>
+          <div class="kpi-val" id="kpi-debt" style="color:var(--red)">₪0</div>
+          <div class="kpi-label">חובות פתוחים</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Activity -->
+        <div class="sc">
+          <div class="sc-title">פעילות אחרונה <span class="sc-link" onclick="switchPage('messages')">הכל →</span></div>
+          <div id="ov-activity"><div class="empty"><div class="empty-ico">📭</div><div class="empty-t">אין פעילות עדיין</div></div></div>
+        </div>
+
+        <!-- Payment donut -->
+        <div class="sc">
+          <div class="sc-title">מצב גביה חודשית <span class="sc-link" onclick="switchPage('finance')">פרטים →</span></div>
+          <div class="donut-row">
+            <div class="donut-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="34" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="11"/>
+                <circle id="donut-paid-arc" cx="45" cy="45" r="34" fill="none" stroke="var(--accent)" stroke-width="11"
+                  stroke-dasharray="0 214" stroke-dashoffset="53.5" stroke-linecap="round"/>
+                <circle id="donut-debt-arc"  cx="45" cy="45" r="34" fill="none" stroke="var(--red)"    stroke-width="11"
+                  stroke-dasharray="0 214" stroke-dashoffset="53.5" stroke-linecap="round"/>
+              </svg>
+              <div class="donut-ctr">
+                <div class="donut-num" id="donut-pct">–%</div>
+                <div class="donut-lbl">שולמו</div>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div><div class="leg-lbl">שולמו</div><div class="leg-val" id="leg-paid">–</div></div>
+              <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div><div class="leg-lbl">חוב</div><div class="leg-val" style="color:var(--red)" id="leg-debt">–</div></div>
+              <div class="leg-item"><div class="leg-dot" style="background:var(--muted)"></div><div class="leg-lbl">ממתין</div><div class="leg-val" id="leg-pending">–</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Open requests preview -->
+      <div class="sc">
+        <div class="sc-title">קריאות פתוחות <span class="sc-link" onclick="switchPage('requests')">כל הקריאות →</span></div>
+        <div id="ov-requests"><div class="empty"><div class="empty-ico">✅</div><div class="empty-t">אין קריאות פתוחות</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══════════ TENANTS ══════════ -->
+    <div class="page" id="page-tenants">
+      <div class="ph">
+        <div>
+          <div class="ph-title">דיירים 👥</div>
+          <div class="ph-sub" id="tenants-sub">טוען...</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" onclick="openModal('modal-invite')">📨 הזמן דייר</button>
+          <button class="btn-primary btn-sm" onclick="openModal('modal-tenant')">+ הוסף ידנית</button>
+        </div>
+      </div>
+      <div class="sc">
+        <div class="sc-title">
+          <span>רשימת דיירים</span>
+          <input type="search" class="fi" style="max-width:200px;font-size:12px;padding:6px 10px" placeholder="🔍 חיפוש..." id="tenant-search" oninput="filterTenants(this.value)">
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>שם</th><th>דירה</th><th>טלפון</th><th>אימייל</th><th>סטטוס</th><th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="tenants-table-body"></tbody>
+          </table>
+        </div>
+        <div id="tenants-empty" class="empty" style="display:none">
+          <div class="empty-ico">👥</div>
+          <div class="empty-t">אין דיירים עדיין</div>
+          <div class="empty-s">לחץ "דייר חדש" להוספה</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ MESSAGES ══════════ -->
+    <div class="page" id="page-messages">
+      <div class="ph">
+        <div>
+          <div class="ph-title">הודעות 💬</div>
+          <div class="ph-sub">שלח הודעות לכל הדיירים או לקבוצה ספציפית</div>
+        </div>
+        <button class="btn-outline" onclick="switchPage('overview')">← חזרה לדשבורד</button>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="sc" style="margin-bottom:14px">
+            <div class="sc-title">✍️ הודעה חדשה</div>
+            <div class="compose-box">
+              <textarea class="compose-ta" id="msg-text" rows="5" placeholder="כתוב הודעה לדיירים..."></textarea>
+              <div class="compose-footer">
+                <div class="chip-row">
+                  <button class="chip on" id="chip-all"      onclick="setChip('all')">כל הדיירים</button>
+                  <button class="chip"    id="chip-debtors"  onclick="setChip('debtors')">חייבים בלבד</button>
+                  <button class="chip"    id="chip-specific" onclick="setChip('specific')">ספציפי</button>
+                </div>
+                <select class="fi" id="msg-specific-tenant" style="display:none;margin-top:8px;font-size:13px;padding:7px 12px">
+                  <option value="">בחר דייר...</option>
+                </select>
+                <button class="btn-primary btn-sm" onclick="sendMessage()">שלח 📤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-title">היסטוריית הודעות</div>
+          <div id="messages-list"><div class="empty"><div class="empty-ico">💬</div><div class="empty-t">אין הודעות עדיין</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ REQUESTS ══════════ -->
+    <div class="page" id="page-requests">
+      <div class="ph">
+        <div>
+          <div class="ph-title">קריאות שירות 🔧</div>
+          <div class="ph-sub" id="requests-sub">טוען...</div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="openModal('modal-request')">+ קריאה חדשה</button>
+      </div>
+      <div class="two-col">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">פתוחות</div>
+          <div id="requests-open"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">טופלו ✓</div>
+          <div id="requests-done"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ FINANCE ══════════ -->
+    <div class="page" id="page-finance">
+      <div class="ph">
+        <div>
+          <div class="ph-title">גביה ותשלומים 💳</div>
+          <div class="ph-sub" id="finance-sub">ניהול תשלומי ועד בית</div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="openModal('modal-payment')">+ רשום תשלום</button>
+      </div>
+
+      <div class="prm-banner" id="prm-banner" onclick="showToast('💎 בקרוב – חיוב אוטומטי בכרטיס אשראי!')">
+        <div class="prm-ico">💎</div>
+        <div class="prm-body">
+          <div class="prm-t">שדרג ל-SmartVaad Pro</div>
+          <div class="prm-s">גביה אוטומטית בכרטיס, תזכורות SMS ו-WhatsApp, דוחות PDF חודשיים</div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="event.stopPropagation();showToast('📞 נציג יחזור אליך בקרוב!')">₪29/חודש →</button>
+      </div>
+
+      <div class="fin-cells">
+        <div class="fin-cell"><div class="fin-val" style="color:var(--accent)" id="fin-collected">₪0</div><div class="fin-lbl">נגבה החודש</div></div>
+        <div class="fin-cell"><div class="fin-val" style="color:var(--red)" id="fin-debt">₪0</div><div class="fin-lbl">חובות פתוחים</div></div>
+        <div class="fin-cell"><div class="fin-val" id="fin-target">₪0</div><div class="fin-lbl">יעד חודשי</div></div>
+      </div>
+
+      <div class="two-col">
+        <!-- Debts -->
+        <div class="sc">
+          <div class="sc-title">חייבי ועד בית
+            <button class="btn-outline" style="font-size:11px;padding:5px 12px" onclick="sendDebtReminders()">📧 שלח תזכורת לכולם</button>
+          </div>
+          <div id="debt-list"><div class="empty"><div class="empty-ico">🎉</div><div class="empty-t">אין חובות פתוחים!</div></div></div>
+        </div>
+
+        <!-- Premium locked -->
+        <div class="sc">
+          <div class="sc-title">פיצ'רים Pro 💎</div>
+          <div class="lock-block" onclick="showToast('💎 זמין ב-Pro – ₪29/חודש')">
+            <div class="lock-ico">🔒</div>
+            <div class="lock-t">סליקת כרטיסי אשראי</div>
+            <div class="lock-s">הדיירים משלמים ישירות מהמערכת</div>
+          </div>
+          <div class="lock-block" onclick="showToast('💎 זמין ב-Pro – ₪29/חודש')">
+            <div class="lock-ico">🔒</div>
+            <div class="lock-t">תזכורות SMS אוטומטיות</div>
+            <div class="lock-s">חייבים מקבלים SMS ו-WhatsApp</div>
+          </div>
+          <div class="lock-block" onclick="showToast('💎 זמין ב-Pro – ₪29/חודש')">
+            <div class="lock-ico">🔒</div>
+            <div class="lock-t">דוח PDF חודשי אוטומטי</div>
+            <div class="lock-s">הכנסות, הוצאות, ויתרת קופה</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment history table -->
+      <div class="sc">
+        <div class="sc-title">היסטוריית תשלומים</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>דייר</th><th>דירה</th><th>חודש</th><th>סכום</th><th>סטטוס</th><th>תאריך</th></tr></thead>
+            <tbody id="payments-history"></tbody>
+          </table>
+        </div>
+        <div id="payments-empty" class="empty" style="display:none">
+          <div class="empty-ico">💳</div>
+          <div class="empty-t">אין תשלומים רשומים</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ REPORTS ══════════ -->
+    <div class="page" id="page-reports">
+      <div class="ph">
+        <div>
+          <div class="ph-title">דוחות כספיים 📈</div>
+          <div class="ph-sub">מעקב הכנסות והוצאות הבניין</div>
+        </div>
+      </div>
+      <div class="prm-banner" onclick="showToast('💎 שדרג ל-Pro לדוחות מלאים!')">
+        <div class="prm-ico">📊</div>
+        <div class="prm-body">
+          <div class="prm-t">דוחות אוטומטיים Pro</div>
+          <div class="prm-s">דוח PDF חודשי, גרף הכנסות, ניתוח חובות וייצוא לאקסל</div>
+        </div>
+        <button class="btn-primary btn-sm">₪29/חודש →</button>
+      </div>
+      <div class="sc">
+        <div class="sc-title">סיכום 6 חודשים אחרונים</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">גביה (₪)</div>
+        <div class="bar-chart" id="report-bars"></div>
+        <div style="display:flex;justify-content:space-between;padding:0 4px" id="report-months"></div>
+      </div>
+      <div class="two-col" style="margin-top:16px">
+        <div class="sc">
+          <div class="sc-title">השנה עד כה</div>
+          <div id="report-ytd"></div>
+        </div>
+        <div class="sc">
+          <div class="sc-title">החודש הנוכחי</div>
+          <div id="report-month"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ DOCS ══════════ -->
+    <div class="page" id="page-docs">
+      <div class="ph">
+        <div>
+          <div class="ph-title">מסמכים 📄</div>
+          <div class="ph-sub">מסמכי הבניין, פרוטוקולים, חוזים</div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="openModal('modal-doc')">+ הוסף מסמך</button>
+      </div>
+      <div class="docs-grid" id="docs-grid"></div>
+      <div id="docs-empty" class="empty" style="display:none">
+        <div class="empty-ico">📁</div>
+        <div class="empty-t">אין מסמכים עדיין</div>
+        <div class="empty-s">לחץ "הוסף מסמך" להוספה</div>
+      </div>
+    </div>
+
+    <!-- ══════════ BULLETIN ══════════ -->
+    <div class="page" id="page-bulletin">
+      <div class="ph">
+        <div>
+          <div class="ph-title">לוח מודעות 📌</div>
+          <div class="ph-sub">מודעות, מכירות, ושירותים בין דיירים</div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="openModal('modal-bulletin')">+ מודעה חדשה</button>
+      </div>
+      <div id="bulletin-list"><div class="empty"><div class="empty-ico">📌</div><div class="empty-t">לוח מודעות ריק</div><div class="empty-s">הוסף מודעה ראשונה!</div></div></div>
+    </div>
+
+    <!-- ══════════ AUDIT LOG ══════════ -->
+    <div class="page" id="page-audit">
+      <div class="ph">
+        <div>
+          <div class="ph-title">יומן פעילות 📋</div>
+          <div class="ph-sub">כל הפעולות שבוצעו בבניין</div>
+        </div>
+        <button class="btn-outline" onclick="exportAuditLog()">⬇️ ייצא CSV</button>
+      </div>
+      <div class="sc">
+        <div class="sc-title">
+          <span>פעולות אחרונות</span>
+          <select class="fi" style="max-width:140px;font-size:12px;padding:5px 10px" id="audit-filter" onchange="filterAudit(this.value)">
+            <option value="all">כל הפעולות</option>
+            <option value="tenant">דיירים</option>
+            <option value="payment">תשלומים</option>
+            <option value="message">הודעות</option>
+            <option value="request">קריאות</option>
+            <option value="doc">מסמכים</option>
+          </select>
+        </div>
+        <div id="audit-list">
+          <div class="empty"><div class="empty-ico">📋</div><div class="empty-t">אין פעילות עדיין</div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <div class="page" id="page-settings">
+      <div class="ph">
+        <div>
+          <div class="ph-title">הגדרות ⚙️</div>
+          <div class="ph-sub">ניהול פרופיל, הבניין, וחשבון</div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="sc-title" style="margin-bottom:14px">פרטי הבניין</div>
+        <div class="fg">
+          <label class="fl">שם / כתובת הבניין</label>
+          <input class="fi" id="settings-building-name" placeholder="רח' הרצל 10">
+        </div>
+        <div class="fi-row">
+          <div class="fg">
+            <label class="fl">דמי ועד חודשיים (₪)</label>
+            <input class="fi" id="settings-fee" type="number" placeholder="175">
+          </div>
+          <div class="fg">
+            <label class="fl">שם ועד הבית</label>
+            <input class="fi" id="settings-admin-name" placeholder="ישראל ישראלי">
+          </div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="saveBuildingSettings()">שמור שינויים</button>
+      </div>
+
+      <div class="settings-card">
+        <div class="sc-title" style="margin-bottom:14px">קישור ציבורי לבניין 🌐</div>
+        <div class="public-link" id="public-link-box" onclick="copyPublicLink()">
+          <span>🔗</span>
+          <span id="public-link-url" style="flex:1;color:var(--accent)">smartvaad.co.il/building/...</span>
+          <span style="font-size:11px;color:var(--muted)">לחץ להעתקה</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">דיירים יכולים לראות הודעות ותקנון דרך הקישור הזה — ללא כניסה</div>
+      </div>
+
+      <div class="settings-card">
+        <div class="sc-title" style="margin-bottom:14px">חשבון משתמש</div>
+        <div class="settings-row">
+          <div><div class="settings-lbl" id="settings-user-name">–</div><div class="settings-sub" id="settings-user-email">–</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn-outline" onclick="doLogout()">🚪 התנתקות</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /shell -->
+
+<!-- ════════════════════════════════════════
+     MODALS
+════════════════════════════════════════ -->
+
+<!-- ADD TENANT -->
+<div class="modal-ov" id="modal-tenant" onclick="closeModalOutside(event,'modal-tenant')">
+  <div class="modal">
+    <div class="modal-t">הוסף דייר חדש 👤</div>
+    <div class="modal-s">מלא את פרטי הדייר</div>
+    <div class="fi-row">
+      <div class="fg"><label class="fl">שם מלא *</label><input class="fi" id="tn-name" placeholder="ישראל ישראלי"></div>
+      <div class="fg"><label class="fl">דירה *</label><input class="fi" id="tn-apt" placeholder="דירה 5"></div>
+    </div>
+    <div class="fg"><label class="fl">טלפון</label><input class="fi" id="tn-phone" placeholder="050-0000000" type="tel"></div>
+    <div class="fg"><label class="fl">אימייל</label><input class="fi" id="tn-email" placeholder="email@gmail.com" type="email"></div>
+    <div class="fg"><label class="fl">הערות</label><input class="fi" id="tn-notes" placeholder="הערות כלשהן..."></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-tenant')">ביטול</button>
+      <button class="btn-ok" onclick="addTenant()">הוסף דייר ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD REQUEST -->
+<div class="modal-ov" id="modal-request" onclick="closeModalOutside(event,'modal-request')">
+  <div class="modal">
+    <div class="modal-t">קריאת שירות חדשה 🔧</div>
+    <div class="modal-s">תאר את הבעיה</div>
+    <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="rq-title" placeholder="לדוגמה: נזילה בגג"></div>
+    <div class="fg"><label class="fl">תיאור</label><textarea class="fi" id="rq-desc" rows="3" placeholder="פרט את הבעיה..."></textarea></div>
+    <div class="fi-row">
+      <div class="fg">
+        <label class="fl">דירה</label>
+        <input class="fi" id="rq-apt" placeholder="דירה 5">
+      </div>
+      <div class="fg">
+        <label class="fl">דחיפות</label>
+        <select class="fi" id="rq-urgency">
+          <option value="urgent">🔴 דחוף</option>
+          <option value="medium" selected>🟡 רגיל</option>
+          <option value="low">🔵 נמוך</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-request')">ביטול</button>
+      <button class="btn-ok" onclick="addRequest()">שלח קריאה ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PAYMENT -->
+<div class="modal-ov" id="modal-payment" onclick="closeModalOutside(event,'modal-payment')">
+  <div class="modal">
+    <div class="modal-t">רשום תשלום 💳</div>
+    <div class="modal-s">הוסף תשלום ועד בית</div>
+    <div class="fg">
+      <label class="fl">דייר *</label>
+      <select class="fi" id="pay-tenant"></select>
+    </div>
+    <div class="fi-row">
+      <div class="fg"><label class="fl">סכום (₪) *</label><input class="fi" id="pay-amount" type="number" placeholder="175"></div>
+      <div class="fg">
+        <label class="fl">סטטוס</label>
+        <select class="fi" id="pay-status">
+          <option value="paid">✅ שולם במלואו</option>
+          <option value="partial">⚠️ שולם חלקית</option>
+          <option value="debt">❌ חוב</option>
+        </select>
+      </div>
+    </div>
+    <div class="fi-row">
+      <div class="fg">
+        <label class="fl">חודש</label>
+        <select class="fi" id="pay-month">
+          <option value="1">ינואר</option><option value="2">פברואר</option><option value="3">מרץ</option>
+          <option value="4">אפריל</option><option value="5">מאי</option><option value="6">יוני</option>
+          <option value="7">יולי</option><option value="8">אוגוסט</option><option value="9">ספטמבר</option>
+          <option value="10">אוקטובר</option><option value="11">נובמבר</option><option value="12">דצמבר</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">שנה</label><input class="fi" id="pay-year" type="number" value="2025"></div>
+    </div>
+    <div class="fg"><label class="fl">הערה</label><input class="fi" id="pay-note" placeholder="הערה אופציונלית"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-payment')">ביטול</button>
+      <button class="btn-ok" onclick="addPayment()">שמור תשלום ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DOC -->
+<div class="modal-ov" id="modal-doc" onclick="closeModalOutside(event,'modal-doc')">
+  <div class="modal">
+    <div class="modal-t">הוסף מסמך 📄</div>
+    <div class="modal-s">הוסף מסמך לבניין (קישור לענן)</div>
+    <div class="fg"><label class="fl">שם המסמך *</label><input class="fi" id="doc-name" placeholder="פרוטוקול ינואר 2025"></div>
+    <div class="fg">
+      <label class="fl">סוג</label>
+      <select class="fi" id="doc-type">
+        <option>📋 פרוטוקול</option>
+        <option>📄 תקנון</option>
+        <option>📝 חוזה</option>
+        <option>🔍 בדיקה</option>
+        <option>💡 אחר</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">קישור לקובץ (Google Drive / Dropbox)</label><input class="fi" id="doc-url" placeholder="https://..."></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-doc')">ביטול</button>
+      <button class="btn-ok" onclick="addDoc()">הוסף מסמך ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BULLETIN -->
+<div class="modal-ov" id="modal-bulletin" onclick="closeModalOutside(event,'modal-bulletin')">
+  <div class="modal">
+    <div class="modal-t">מודעה חדשה 📌</div>
+    <div class="modal-s">הוסף מודעה ללוח</div>
+    <div class="fg">
+      <label class="fl">קטגוריה</label>
+      <select class="fi" id="bull-cat">
+        <option value="🛒">🛒 מכירה</option>
+        <option value="🔍">🔍 חיפוש</option>
+        <option value="🚗">🚗 חניה</option>
+        <option value="👶">👶 בייביסיטר</option>
+        <option value="📢">📢 כללי</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">כותרת *</label><input class="fi" id="bull-title" placeholder="מכירת אופניים"></div>
+    <div class="fg"><label class="fl">תיאור</label><textarea class="fi" id="bull-desc" rows="3" placeholder="פרטים נוספים..."></textarea></div>
+    <div class="fg"><label class="fl">פרטי קשר</label><input class="fi" id="bull-contact" placeholder="050-0000000"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-bulletin')">ביטול</button>
+      <button class="btn-ok" onclick="addBulletin()">פרסם מודעה ✓</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- NEW BUILDING MODAL -->
+<div class="modal-ov" id="modal-new-building" onclick="closeModalOutside(event,'modal-new-building')">
+  <div class="modal">
+    <div class="modal-t">פתח בניין חדש 🏢</div>
+    <div class="modal-s">נהל מספר בניינים מאותו חשבון</div>
+    <div class="fg"><label class="fl">שם / כתובת הבניין *</label><input class="fi" id="nb-name" placeholder="רח' הרצל 10, תל אביב"></div>
+    <div class="fg"><label class="fl">דמי ועד חודשיים (₪)</label><input class="fi" id="nb-fee" type="number" placeholder="175" value="175"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-new-building')">ביטול</button>
+      <button class="btn-ok" id="nb-submit" onclick="createNewBuilding()">פתח בניין ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE TENANT MODAL -->
+<div class="modal-ov" id="modal-invite" onclick="closeModalOutside(event,'modal-invite')">
+  <div class="modal">
+    <div class="modal-t">הזמן דייר 📨</div>
+    <div class="modal-s">שלח קישור הצטרפות לדייר</div>
+    <div class="fi-row">
+      <div class="fg"><label class="fl">שם הדייר</label><input class="fi" id="inv-name" placeholder="ישראל ישראלי"></div>
+      <div class="fg"><label class="fl">דירה *</label><input class="fi" id="inv-apt" placeholder="דירה 5"></div>
+    </div>
+    <div class="fg"><label class="fl">טלפון / אימייל (לידיעתך בלבד)</label><input class="fi" id="inv-contact" placeholder="050-0000000"></div>
+    <div id="invite-link-box" style="display:none;margin-top:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">קישור ההצטרפות</div>
+      <div style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.3);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="copyInviteLink()">
+        <span style="flex:1;font-size:13px;color:var(--accent);word-break:break-all" id="invite-link-text">–</span>
+        <span style="font-size:11px;color:var(--muted);white-space:nowrap">📋 העתק</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">⏱ תוקף: 7 ימים · שימוש חד-פעמי</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-invite')">סגור</button>
+      <button class="btn-ok" id="inv-submit" onclick="createInvite()">צור קישור 🔗</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toast-text">–</span></div>
+
+<!-- Firebase + Config -->
+<script src="js/firebase-config.js"></script>
+<script>
+// ════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════
+let currentUser    = null;
+let currentBuilding = null;  // { id, ...data }
+let tenants  = [];
+let payments = [];
+let msgTarget = 'all';
+
+const MONTHS_HE = ['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const MONTHS_SHORT = ['','ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
+
+// ════════════════════════════════════════════════════
+//  AUTH GATE
+// ════════════════════════════════════════════════════
+auth.onAuthStateChanged(async user => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  currentUser = user;
+  await loadBuilding();
+  document.getElementById('loader').classList.add('gone');
+  document.getElementById('shell').style.display = 'grid';
+  setupRealtimeListeners();
+  renderOverview();
+  renderSettings();
+});
+
+// ════════════════════════════════════════════════════
+//  LOAD BUILDING
+// ════════════════════════════════════════════════════
+async function loadBuilding() {
+  // Try 1
+  let snap = await db.collection('buildings').where('adminUid','==',currentUser.uid).get();
+  // Race condition after registration — wait and retry
+  if (snap.empty) {
+    await new Promise(r => setTimeout(r, 2000));
+    snap = await db.collection('buildings').where('adminUid','==',currentUser.uid).get();
+  }
+  // Still empty — create default building (avoid redirect loop)
+  if (snap.empty) {
+    const ref = await db.collection('buildings').add({
+      name: 'הבניין שלי', address: 'הבניין שלי',
+      adminUid: currentUser.uid,
+      adminName: currentUser.displayName || currentUser.email,
+      isPremium: false, monthlyFee: 175,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await ref.collection('members').doc(currentUser.uid).set({
+      role: 'admin', joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    snap = await db.collection('buildings').where('adminUid','==',currentUser.uid).get();
+  }
+  populateBuildingSelector(snap);
+}
+
+function populateBuildingSelector(snap) {
+  const sel = document.getElementById('building-select');
+  sel.innerHTML = '';
+  snap.forEach(doc => {
+    const opt = document.createElement('option');
+    opt.value = doc.id;
+    opt.textContent = doc.data().name;
+    sel.appendChild(opt);
+  });
+  const addOpt = document.createElement('option');
+  addOpt.value = '__new__';
+  addOpt.textContent = '+ פתח בניין חדש';
+  sel.appendChild(addOpt);
+  const firstDoc = snap.docs[0];
+  currentBuilding = { id: firstDoc.id, ...firstDoc.data() };
+  sel.value = currentBuilding.id;
+}
+
+async function switchBuilding(bid) {
+  if (bid === '__new__') {
+    openModal('modal-new-building');
+    // Revert select to current building
+    document.getElementById('building-select').value = currentBuilding.id;
+    return;
+  }
+  const doc = await db.collection('buildings').doc(bid).get();
+  if (!doc.exists) return;
+  currentBuilding = { id: doc.id, ...doc.data() };
+  tenants = []; payments = [];
+  setupRealtimeListeners();
+  renderOverview();
+  renderSettings();
+}
+
+// ─── CREATE NEW BUILDING ───────────────────────────
+async function createNewBuilding() {
+  const name = document.getElementById('nb-name').value.trim();
+  const fee  = parseFloat(document.getElementById('nb-fee').value) || 175;
+  if (!name) return showToast('⚠️ שם הבניין חובה');
+  const btn = document.getElementById('nb-submit');
+  btn.disabled = true; btn.textContent = 'יוצר...';
+  try {
+    const ref = await db.collection('buildings').add({
+      name, address: name,
+      adminUid: currentUser.uid,
+      adminName: currentUser.displayName || currentUser.email,
+      isPremium: false, monthlyFee: fee,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await ref.collection('members').doc(currentUser.uid).set({
+      role: 'admin', joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-new-building');
+    document.getElementById('nb-name').value = '';
+    // Reload selector and switch to new building
+    const snap = await db.collection('buildings').where('adminUid','==',currentUser.uid).get();
+    populateBuildingSelector(snap);
+    await switchBuilding(ref.id);
+    document.getElementById('building-select').value = ref.id;
+    showToast('🏢 בניין "' + name + '" נפתח בהצלחה!');
+  } catch(e) {
+    showToast('❌ ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'פתח בניין ✓';
+}
+
+// ════════════════════════════════════════════════════
+//  REALTIME LISTENERS
+// ════════════════════════════════════════════════════
+let unsubFns = [];
+function setupRealtimeListeners() {
+  unsubFns.forEach(fn => fn());
+  unsubFns = [];
+  const bid = currentBuilding.id;
+
+  // Tenants
+  unsubFns.push(
+    db.collection(`buildings/${bid}/tenants`).orderBy('createdAt').onSnapshot(snap => {
+      tenants = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateBadge('badge-tenants', tenants.length);
+      renderTenantsTable();
+      renderOverview();
+      renderPaymentModal();
+    })
+  );
+
+  // Payments
+  unsubFns.push(
+    db.collection(`buildings/${bid}/payments`).orderBy('createdAt','desc').onSnapshot(snap => {
+      payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderFinance();
+      renderReports();
+      renderOverviewFinance();
+    })
+  );
+
+  // Requests
+  unsubFns.push(
+    db.collection(`buildings/${bid}/requests`).orderBy('createdAt','desc').onSnapshot(snap => {
+      const reqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const open = reqs.filter(r => r.status !== 'done').length;
+      const badgeEl = document.getElementById('badge-requests');
+      if (open > 0) { badgeEl.textContent = open; badgeEl.style.display = ''; }
+      else badgeEl.style.display = 'none';
+      document.getElementById('kpi-requests').textContent = open;
+      renderRequests(reqs);
+      renderOvRequests(reqs.filter(r => r.status !== 'done').slice(0,3));
+    })
+  );
+
+  // Messages
+  unsubFns.push(
+    db.collection(`buildings/${bid}/messages`).orderBy('sentAt','desc').onSnapshot(snap => {
+      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderMessages(msgs);
+    })
+  );
+
+  // Docs
+  unsubFns.push(
+    db.collection(`buildings/${bid}/documents`).orderBy('uploadedAt','desc').onSnapshot(snap => {
+      renderDocs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    })
+  );
+
+  // Bulletin
+  unsubFns.push(
+    db.collection(`buildings/${bid}/bulletin`).orderBy('createdAt','desc').onSnapshot(snap => {
+      renderBulletin(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    })
+  );
+
+  // Activity feed — real-time
+  unsubFns.push(
+    db.collection(`buildings/${bid}/activity`).orderBy('at','desc').limit(8).onSnapshot(snap => {
+      renderActivityFeed(snap.docs.map(d => d.data()));
+    })
+  );
+}
+
+// ════════════════════════════════════════════════════
+//  OVERVIEW
+// ════════════════════════════════════════════════════
+function renderOverview() {
+  if (!currentBuilding) return;
+  const name = currentUser.displayName || currentUser.email;
+  document.getElementById('ov-greeting').textContent = 'שלום, ' + name.split(' ')[0] + ' 👋';
+  document.getElementById('ov-sub').textContent = currentBuilding.name + ' · עדכון: ' + timeNow();
+  document.getElementById('kpi-tenants').textContent = tenants.length;
+  document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+}
+
+function renderOverviewFinance() {
+  const now   = new Date();
+  const m     = now.getMonth() + 1;
+  const y     = now.getFullYear();
+  const monthly = payments.filter(p => p.month==m && p.year==y);
+  const collected = monthly.filter(p => p.status==='paid').reduce((s,p) => s+(p.amount||0), 0);
+  const debtPays  = payments.filter(p => p.status==='debt');
+  const totalDebt = debtPays.reduce((s,p) => s+(p.amount||0), 0);
+  const target    = (currentBuilding.monthlyFee || 0) * tenants.length;
+
+  document.getElementById('kpi-collected').textContent = '₪' + collected.toLocaleString();
+  document.getElementById('kpi-debt').textContent      = '₪' + totalDebt.toLocaleString();
+  document.getElementById('kpi-collected-label').textContent = 'מתוך ₪' + target.toLocaleString() + ' יעד';
+
+  // Donut
+  const paid    = tenants.filter(t => monthly.find(p => p.tenantId===t.id && p.status==='paid')).length;
+  const debt    = tenants.filter(t => monthly.find(p => p.tenantId===t.id && p.status==='debt')).length;
+  const pending = tenants.length - paid - debt;
+  const total   = tenants.length || 1;
+  const circ    = 2 * Math.PI * 34; // r=34
+  const paidDA  = (paid/total) * circ;
+  const debtDA  = (debt/total) * circ;
+  document.getElementById('donut-paid-arc').setAttribute('stroke-dasharray', paidDA + ' ' + (circ - paidDA));
+  document.getElementById('donut-debt-arc').setAttribute('stroke-dasharray', debtDA + ' ' + (circ - debtDA));
+  document.getElementById('donut-debt-arc').setAttribute('stroke-dashoffset', 53.5 - paidDA);
+  document.getElementById('donut-pct').textContent = total > 0 ? Math.round(paid/total*100) + '%' : '–%';
+  document.getElementById('leg-paid').textContent    = paid;
+  document.getElementById('leg-debt').textContent    = debt;
+  document.getElementById('leg-pending').textContent = pending;
+
+  updateBadge('badge-debt', debt > 0 ? debt : null);
+}
+
+function renderOvRequests(reqs) {
+  const el = document.getElementById('ov-requests');
+  if (!reqs.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">✅</div><div class="empty-t">אין קריאות פתוחות</div></div>'; return; }
+  el.innerHTML = reqs.map(r => reqCardHTML(r)).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  TENANTS
+// ════════════════════════════════════════════════════
+function renderTenantsTable(filter='') {
+  const body = document.getElementById('tenants-table-body');
+  const list = filter ? tenants.filter(t =>
+    t.name.includes(filter) || (t.apartment||'').includes(filter) || (t.phone||'').includes(filter)
+  ) : tenants;
+
+  document.getElementById('tenants-sub').textContent = tenants.length + ' דיירים';
+  document.getElementById('tenants-empty').style.display = list.length ? 'none' : 'block';
+
+  const now = new Date(); const m = now.getMonth()+1; const y = now.getFullYear();
+
+  body.innerHTML = list.map(t => {
+    const hasPaid = payments.find(p => p.tenantId===t.id && p.month==m && p.year==y && p.status==='paid');
+    const hasDebt = payments.find(p => p.tenantId===t.id && p.status==='debt');
+    const tag = hasPaid ? '<span class="tag tag-g">שולם ✓</span>' :
+                hasDebt  ? `<span class="tag tag-r">חוב ₪${hasDebt.amount}</span>` :
+                           '<span class="tag tag-gray">לא שולם</span>';
+    return `<tr>
+      <td><strong>${t.name}</strong></td>
+      <td>${t.apartment||'–'}</td>
+      <td>${t.phone||'–'}</td>
+      <td>${t.email||'–'}</td>
+      <td>${tag}</td>
+      <td>
+        <span style="color:var(--accent);cursor:pointer;font-size:12px;margin-left:10px"
+          onclick="sendReminderTo('${t.id}','${t.name}')">📧</span>
+        <span style="color:var(--red);cursor:pointer;font-size:12px"
+          onclick="deleteTenant('${t.id}','${t.name}')">🗑</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTenants(val) { renderTenantsTable(val); }
+
+async function addTenant() {
+  const name = v('tn-name'); const apt = v('tn-apt');
+  if (!name || !apt) return showToast('⚠️ שם ודירה הם שדות חובה');
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/tenants`).add({
+      name, apartment: apt, phone: v('tn-phone'), email: v('tn-email'), notes: v('tn-notes'),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-tenant');
+    clearFields(['tn-name','tn-apt','tn-phone','tn-email','tn-notes']);
+    showToast('✅ דייר ' + name + ' נוסף בהצלחה!');
+    logActivity('👤', 'דייר חדש נוסף', name + ' – ' + apt, 'tenant');
+  } catch(e) { showToast('❌ שגיאה: ' + e.message); }
+}
+
+async function deleteTenant(id, name) {
+  if (!confirm('למחוק את ' + name + '?')) return;
+  await db.collection(`buildings/${currentBuilding.id}/tenants`).doc(id).delete();
+  showToast('🗑 ' + name + ' הוסר מהרשימה');
+  logActivity('🗑', 'דייר הוסר', name, 'tenant');
+}
+
+async function sendReminderTo(id, name) {
+  showToast('📧 תזכורת נשלחה ל' + name);
+  logActivity('📧', 'תזכורת נשלחה', name);
+}
+
+// ════════════════════════════════════════════════════
+//  MESSAGES
+// ════════════════════════════════════════════════════
+function setChip(type) {
+  msgTarget = type;
+  ['all','debtors','specific'].forEach(t => {
+    document.getElementById('chip-'+t).classList.toggle('on', t===type);
+  });
+  // הצג/הסתר בחירת דייר ספציפי
+  const sel = document.getElementById('msg-specific-tenant');
+  if (type === 'specific') {
+    sel.style.display = 'block';
+    sel.innerHTML = '<option value="">בחר דייר...</option>' +
+      tenants.map(t => `<option value="${t.id}">${t.name} – ${t.apartment}</option>`).join('');
+  } else {
+    sel.style.display = 'none';
+  }
+}
+
+async function sendMessage() {
+  const text = document.getElementById('msg-text').value.trim();
+  if (!text) return showToast('⚠️ כתוב הודעה לפני שליחה');
+
+  let targetTenantId = null;
+  let targetTenantName = '';
+  if (msgTarget === 'specific') {
+    targetTenantId = document.getElementById('msg-specific-tenant').value;
+    if (!targetTenantId) return showToast('⚠️ בחר דייר ספציפי');
+    const t = tenants.find(t => t.id === targetTenantId);
+    targetTenantName = t ? t.name : '';
+  }
+
+  const count = msgTarget==='all' ? tenants.length :
+                msgTarget==='debtors' ? getDebtors().length : 1;
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/messages`).add({
+      content: text, type: msgTarget,
+      targetTenantId: targetTenantId || null,
+      sentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      openedBy: []
+    });
+    document.getElementById('msg-text').value = '';
+    document.getElementById('msg-specific-tenant').style.display = 'none';
+    setChip('all');
+    const label = msgTarget==='all' ? 'כל הדיירים' :
+                  msgTarget==='debtors' ? 'חייבים' :
+                  targetTenantName;
+    showToast('✅ הודעה נשלחה ל' + (msgTarget==='specific' ? targetTenantName : count + ' דיירים') + '!');
+    logActivity('💬', 'הודעה נשלחה', 'אל: ' + label, 'message');
+  } catch(e) { showToast('❌ ' + e.message); }
+}
+
+function renderMessages(msgs) {
+  const el = document.getElementById('messages-list');
+  if (!msgs.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">💬</div><div class="empty-t">אין הודעות</div></div>'; return; }
+  el.innerHTML = msgs.slice(0,10).map(m => {
+    const opened = (m.openedBy||[]).length;
+    const total  = m.type==='all' ? tenants.length : m.type==='debtors' ? getDebtors().length : 1;
+    const pct    = total ? Math.round(opened/total*100) : 0;
+    const typeLabel = m.type==='all'?'כל הדיירים':m.type==='debtors'?'חייבים':'ספציפי';
+    return `
+    <div class="act-item">
+      <div class="act-ico" style="background:rgba(0,200,150,.1)">💬</div>
+      <div class="act-body">
+        <div class="act-t">${m.content.substring(0,60)}${m.content.length>60?'...':''}</div>
+        <div class="act-s">${typeLabel} · ${opened}/${total} נפתחו</div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:var(--accent)"></div></div>
+      </div>
+      <div class="act-time">${relTime(m.sentAt)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  REQUESTS
+// ════════════════════════════════════════════════════
+async function addRequest() {
+  const title = v('rq-title');
+  if (!title) return showToast('⚠️ כותרת הקריאה חובה');
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/requests`).add({
+      title, description: v('rq-desc'), apartment: v('rq-apt'),
+      urgency: document.getElementById('rq-urgency').value,
+      status: 'open',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-request');
+    clearFields(['rq-title','rq-desc','rq-apt']);
+    showToast('✅ קריאת שירות נפתחה');
+    logActivity('🔧', 'קריאת שירות חדשה', title);
+  } catch(e) { showToast('❌ ' + e.message); }
+}
+
+function renderRequests(reqs) {
+  const open = document.getElementById('requests-open');
+  const done = document.getElementById('requests-done');
+  const sub  = document.getElementById('requests-sub');
+  const openR = reqs.filter(r => r.status!=='done');
+  const doneR = reqs.filter(r => r.status==='done');
+  sub.textContent = openR.length + ' פתוחות · ' + doneR.length + ' טופלו החודש';
+
+  open.innerHTML = openR.length ? openR.map(r => reqCardHTML(r, true)).join('') :
+    '<div class="empty"><div class="empty-ico">✅</div><div class="empty-t">אין קריאות פתוחות</div></div>';
+  done.innerHTML = doneR.length ? doneR.slice(0,5).map(r => reqCardHTML(r)).join('') :
+    '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">אין קריאות שטופלו</div></div>';
+}
+
+function reqCardHTML(r, interactive=false) {
+  const colors  = { urgent:'var(--red)', medium:'var(--gold)', low:'var(--blue)' };
+  const labels  = { urgent:'דחוף 🔴', medium:'רגיל 🟡', low:'נמוך 🔵' };
+  const statTag = r.status==='done' ? '<span class="tag tag-g">טופל ✓</span>' :
+                  r.status==='in_progress' ? '<span class="tag tag-gold">בטיפול</span>' :
+                  `<span class="tag tag-r">${labels[r.urgency]||'פתוח'}</span>`;
+  const actions = interactive ? `
+    <div style="margin-top:8px;display:flex;gap:6px">
+      <button class="btn-outline" style="font-size:11px;padding:4px 10px" onclick="markRequest('${r.id}','in_progress')">בטיפול</button>
+      <button class="btn-outline" style="font-size:11px;padding:4px 10px;color:var(--accent)" onclick="markRequest('${r.id}','done')">טופל ✓</button>
+    </div>` : '';
+  return `
+  <div class="req-card" style="opacity:${r.status==='done'?.6:1}">
+    <div class="req-urg" style="background:${colors[r.urgency]||'var(--muted)'}"></div>
+    <div class="req-body">
+      <div class="req-t">${r.title}</div>
+      <div class="req-meta">
+        ${r.apartment?'<span>'+r.apartment+'</span>':''}
+        <span>${relTime(r.createdAt)}</span>
+      </div>
+      ${r.description ? `<div style="font-size:12px;color:var(--muted);margin-top:3px">${r.description}</div>` : ''}
+      ${actions}
+    </div>
+    <div>${statTag}</div>
+  </div>`;
+}
+
+async function markRequest(id, status) {
+  await db.collection(`buildings/${currentBuilding.id}/requests`).doc(id).update({ status });
+  const label = status==='done' ? 'טופלה' : 'בטיפול';
+  showToast(status==='done' ? '✅ קריאה סומנה כטופלה' : '🔄 קריאה בטיפול');
+  logActivity('🔧', 'קריאת שירות עודכנה', 'סטטוס: ' + label, 'request');
+}
+
+// ════════════════════════════════════════════════════
+//  FINANCE
+// ════════════════════════════════════════════════════
+function renderPaymentModal() {
+  const sel = document.getElementById('pay-tenant');
+  if (!sel) return;
+  sel.innerHTML = tenants.map(t => `<option value="${t.id}">${t.name} – ${t.apartment}</option>`).join('');
+  const now = new Date();
+  document.getElementById('pay-month').value = now.getMonth()+1;
+  document.getElementById('pay-year').value  = now.getFullYear();
+  const fee = currentBuilding.monthlyFee || 175;
+  document.getElementById('pay-amount').value = fee;
+}
+
+async function addPayment() {
+  const tenantId = document.getElementById('pay-tenant').value;
+  const amount   = parseFloat(document.getElementById('pay-amount').value);
+  const status   = document.getElementById('pay-status').value;
+  const month    = parseInt(document.getElementById('pay-month').value);
+  const year     = parseInt(document.getElementById('pay-year').value);
+  if (!tenantId || !amount) return showToast('⚠️ מלא דייר וסכום');
+  const tenant = tenants.find(t => t.id===tenantId);
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/payments`).add({
+      tenantId, tenantName: tenant.name, apartment: tenant.apartment,
+      amount, status, month, year,
+      notes: v('pay-note'),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-payment');
+    showToast('✅ תשלום נרשם בהצלחה');
+    logActivity('💰', 'תשלום נרשם', tenant.name + ' – ₪' + amount);
+  } catch(e) { showToast('❌ ' + e.message); }
+}
+
+function renderFinance() {
+  const now = new Date(); const m = now.getMonth()+1; const y = now.getFullYear();
+  const monthly  = payments.filter(p => p.month==m && p.year==y);
+  const collected= monthly.filter(p=>p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+  const debtList = payments.filter(p=>p.status==='debt');
+  const totalDebt= debtList.reduce((s,p)=>s+(p.amount||0),0);
+  const target   = (currentBuilding.monthlyFee||0) * tenants.length;
+
+  document.getElementById('fin-collected').textContent = '₪' + collected.toLocaleString();
+  document.getElementById('fin-debt').textContent      = '₪' + totalDebt.toLocaleString();
+  document.getElementById('fin-target').textContent    = '₪' + target.toLocaleString();
+
+  // Debt list
+  const debtEl = document.getElementById('debt-list');
+  if (!debtList.length) {
+    debtEl.innerHTML = '<div class="empty"><div class="empty-ico">🎉</div><div class="empty-t">אין חובות פתוחים!</div></div>';
+  } else {
+    debtEl.innerHTML = debtList.map(p => `
+    <div class="pay-row">
+      <div class="pay-av" style="background:rgba(255,79,94,.12);color:var(--red)">${(p.tenantName||'?').slice(0,2)}</div>
+      <div class="pay-info"><div class="pay-name">${p.tenantName}</div><div class="pay-apt">${p.apartment||''} · ${MONTHS_HE[p.month]||''} ${p.year||''}</div></div>
+      <div class="pay-amt" style="color:var(--red)">₪${(p.amount||0).toLocaleString()}</div>
+    </div>`).join('');
+  }
+
+  // History table
+  const histEl = document.getElementById('payments-history');
+  document.getElementById('payments-empty').style.display = payments.length ? 'none' : 'block';
+  histEl.innerHTML = payments.slice(0,20).map(p => {
+    const statTag = p.status==='paid'? '<span class="tag tag-g">שולם ✓</span>':
+                    p.status==='partial'? '<span class="tag tag-gold">חלקי</span>':
+                    '<span class="tag tag-r">חוב</span>';
+    return `<tr><td><strong>${p.tenantName}</strong></td><td>${p.apartment||'–'}</td><td>${MONTHS_HE[p.month]||''} ${p.year||''}</td><td>₪${(p.amount||0).toLocaleString()}</td><td>${statTag}</td><td>${relTime(p.createdAt)}</td></tr>`;
+  }).join('');
+}
+
+function sendDebtReminders() {
+  const n = getDebtors().length;
+  if (!n) return showToast('🎉 אין חייבים לשליחה');
+  showToast('📧 תזכורות נשלחו ל-' + n + ' חייבים!');
+  logActivity('📧', 'תזכורות חוב נשלחו', n + ' דיירים');
+}
+
+function getDebtors() { return payments.filter(p => p.status==='debt'); }
+
+// ════════════════════════════════════════════════════
+//  REPORTS
+// ════════════════════════════════════════════════════
+function renderReports() {
+  const now = new Date();
+  const months = [];
+  for (let i=5; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    months.push({ m: d.getMonth()+1, y: d.getFullYear(), label: MONTHS_SHORT[d.getMonth()+1] });
+  }
+
+  const maxVal = Math.max(...months.map(mo =>
+    payments.filter(p=>p.month==mo.m&&p.year==mo.y&&p.status==='paid').reduce((s,p)=>s+(p.amount||0),0)
+  ), 1);
+
+  const barsEl = document.getElementById('report-bars');
+  const mthsEl = document.getElementById('report-months');
+
+  barsEl.innerHTML = months.map((mo,i) => {
+    const val = payments.filter(p=>p.month==mo.m&&p.year==mo.y&&p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+    const h   = Math.round((val/maxVal)*75) + 5;
+    const isCurrent = i===5;
+    return `<div class="bar-col"><div class="bar${isCurrent?'':' dim'}" style="height:${h}px" title="₪${val}"></div></div>`;
+  }).join('');
+
+  mthsEl.innerHTML = months.map(mo => `<span style="font-size:10px;color:var(--muted)">${mo.label}</span>`).join('');
+
+  // YTD
+  const ytd = payments.filter(p=>p.year===now.getFullYear()&&p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+  const ytdDebt = payments.filter(p=>p.year===now.getFullYear()&&p.status==='debt').reduce((s,p)=>s+(p.amount||0),0);
+  document.getElementById('report-ytd').innerHTML = `
+    <div class="pay-row"><div class="pay-info"><div class="pay-name">סה"כ נגבה</div></div><div class="pay-amt" style="color:var(--accent)">₪${ytd.toLocaleString()}</div></div>
+    <div class="pay-row"><div class="pay-info"><div class="pay-name">סה"כ חובות</div></div><div class="pay-amt" style="color:var(--red)">₪${ytdDebt.toLocaleString()}</div></div>
+  `;
+
+  // Current month
+  const mPaid = payments.filter(p=>p.month==now.getMonth()+1&&p.year===now.getFullYear()&&p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+  const mTarget= (currentBuilding.monthlyFee||0)*tenants.length;
+  const mPct  = mTarget ? Math.round(mPaid/mTarget*100) : 0;
+  document.getElementById('report-month').innerHTML = `
+    <div class="pay-row"><div class="pay-info"><div class="pay-name">נגבה החודש</div></div><div class="pay-amt" style="color:var(--accent)">₪${mPaid.toLocaleString()}</div></div>
+    <div class="pay-row"><div class="pay-info"><div class="pay-name">יעד</div></div><div class="pay-amt">₪${mTarget.toLocaleString()}</div></div>
+    <div style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px"><span>התקדמות</span><span>${mPct}%</span></div>
+      <div class="prog-bar" style="height:8px"><div class="prog-fill" style="width:${mPct}%;background:var(--accent)"></div></div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════
+//  DOCS
+// ════════════════════════════════════════════════════
+const DOC_ICONS = { '📋 פרוטוקול':'📋','📄 תקנון':'📄','📝 חוזה':'📝','🔍 בדיקה':'🔍','💡 אחר':'💡' };
+
+async function addDoc() {
+  const name = v('doc-name');
+  if (!name) return showToast('⚠️ שם מסמך חובה');
+  await db.collection(`buildings/${currentBuilding.id}/documents`).add({
+    name, type: document.getElementById('doc-type').value,
+    url: v('doc-url'), uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  closeModal('modal-doc');
+  clearFields(['doc-name','doc-url']);
+  showToast('✅ מסמך נוסף');
+  logActivity('📄', 'מסמך נוסף', name, 'doc');
+}
+
+function renderDocs(docs) {
+  const grid = document.getElementById('docs-grid');
+  document.getElementById('docs-empty').style.display = docs.length ? 'none' : 'block';
+  grid.innerHTML = docs.map(d => {
+    const ico = DOC_ICONS[d.type] || '📄';
+    return `<div class="doc-card" onclick="${d.url?`window.open('${d.url}','_blank')`:`showToast('⚠️ אין קישור לקובץ')`}">
+      <div class="doc-ico">${ico}</div>
+      <div class="doc-name">${d.name}</div>
+      <div class="doc-date">${relTime(d.uploadedAt)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  BULLETIN
+// ════════════════════════════════════════════════════
+async function addBulletin() {
+  const title = v('bull-title');
+  if (!title) return showToast('⚠️ כותרת חובה');
+  await db.collection(`buildings/${currentBuilding.id}/bulletin`).add({
+    category: document.getElementById('bull-cat').value,
+    title, description: v('bull-desc'), contact: v('bull-contact'),
+    author: currentUser.displayName || currentUser.email,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  closeModal('modal-bulletin');
+  clearFields(['bull-title','bull-desc','bull-contact']);
+  showToast('✅ מודעה פורסמה');
+  logActivity('📌', 'מודעה פורסמה', title, 'bulletin');
+}
+
+function renderBulletin(items) {
+  const el = document.getElementById('bulletin-list');
+  if (!items.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">📌</div><div class="empty-t">לוח מודעות ריק</div><div class="empty-s">הוסף מודעה ראשונה!</div></div>'; return; }
+  el.innerHTML = items.map(b => `
+  <div class="bulletin-card">
+    <div class="bulletin-av">${b.category||'📢'}</div>
+    <div class="bulletin-body">
+      <div class="bulletin-t">${b.title}</div>
+      ${b.description?`<div class="bulletin-s">${b.description}</div>`:''}
+      <div class="bulletin-meta">
+        ${b.contact?`<span>📞 ${b.contact}</span>`:''}
+        <span>✍️ ${b.author||'דייר'}</span>
+        <span>${relTime(b.createdAt)}</span>
+      </div>
+    </div>
+    <span style="color:var(--red);cursor:pointer;font-size:14px;flex-shrink:0;align-self:flex-start;padding:4px"
+      onclick="deleteBulletin('${b.id}','${b.title.replace(/'/g,'')}')">🗑</span>
+  </div>`).join('');
+}
+
+async function deleteBulletin(id, title) {
+  if (!confirm('למחוק את המודעה "' + title + '"?')) return;
+  await db.collection(`buildings/${currentBuilding.id}/bulletin`).doc(id).delete();
+  showToast('🗑 מודעה נמחקה');
+  logActivity('🗑', 'מודעה נמחקה', title, 'bulletin');
+}
+
+// ════════════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════════════
+function renderSettings() {
+  if (!currentBuilding) return;
+  document.getElementById('settings-building-name').value = currentBuilding.name || '';
+  document.getElementById('settings-fee').value          = currentBuilding.monthlyFee || 175;
+  document.getElementById('settings-admin-name').value   = currentBuilding.adminName || currentUser.displayName || '';
+  document.getElementById('settings-user-name').textContent  = currentUser.displayName || 'משתמש';
+  document.getElementById('settings-user-email').textContent = currentUser.email || '';
+  const slug = (currentBuilding.name||'building').replace(/\s+/g,'-').toLowerCase();
+  document.getElementById('public-link-url').textContent = 'smartvaad.co.il/building/' + slug;
+}
+
+async function saveBuildingSettings() {
+  const name = document.getElementById('settings-building-name').value.trim();
+  const fee  = parseFloat(document.getElementById('settings-fee').value);
+  const admin= document.getElementById('settings-admin-name').value.trim();
+  if (!name) return showToast('⚠️ שם הבניין חובה');
+  await db.collection('buildings').doc(currentBuilding.id).update({ name, monthlyFee: fee, adminName: admin });
+  currentBuilding.name = name; currentBuilding.monthlyFee = fee;
+  document.getElementById('building-select').querySelector(`option[value="${currentBuilding.id}"]`).textContent = name;
+  showToast('✅ הגדרות נשמרו');
+  logActivity('⚙️', 'הגדרות בניין עודכנו', name, 'settings');
+}
+
+function copyPublicLink() {
+  const url = document.getElementById('public-link-url').textContent;
+  navigator.clipboard.writeText('https://' + url).catch(() => {});
+  showToast('📋 קישור הועתק!');
+}
+
+// ─── INVITE SYSTEM ────────────────────────────────
+let lastInviteLink = '';
+
+async function createInvite() {
+  const apt  = document.getElementById('inv-apt').value.trim();
+  const name = document.getElementById('inv-name').value.trim();
+  if (!apt) return showToast('⚠️ מספר דירה חובה');
+  const btn = document.getElementById('inv-submit');
+  btn.disabled = true; btn.textContent = 'יוצר...';
+  try {
+    // Generate unique token
+    const token = Math.random().toString(36).substr(2,9) + Date.now().toString(36);
+    const expires = new Date(); expires.setDate(expires.getDate() + 7);
+    await db.collection('invites').doc(token).set({
+      buildingId:   currentBuilding.id,
+      buildingName: currentBuilding.name,
+      apartment:    apt,
+      tenantName:   name,
+      contact:      document.getElementById('inv-contact').value.trim(),
+      createdBy:    currentUser.uid,
+      expiresAt:    firebase.firestore.Timestamp.fromDate(expires),
+      used:         false,
+      createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Build invite URL
+    const base = window.location.origin + window.location.pathname.replace('dashboard.html','');
+    lastInviteLink = base + 'join.html?token=' + token;
+    document.getElementById('invite-link-text').textContent = lastInviteLink;
+    document.getElementById('invite-link-box').style.display = 'block';
+    document.getElementById('inv-submit').style.display = 'none';
+    showToast('✅ קישור הצטרפות נוצר!');
+  } catch(e) { showToast('❌ ' + e.message); }
+  btn.disabled = false;
+}
+
+function copyInviteLink() {
+  navigator.clipboard.writeText(lastInviteLink).catch(()=>{});
+  showToast('📋 קישור הועתק!');
+}
+
+function resetInviteModal() {
+  document.getElementById('invite-link-box').style.display = 'none';
+  document.getElementById('inv-submit').style.display = '';
+  document.getElementById('inv-name').value = '';
+  document.getElementById('inv-apt').value  = '';
+  document.getElementById('inv-contact').value = '';
+}
+
+async function doLogout() {
+  await auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ════════════════════════════════════════════════════
+//  ACTIVITY LOG — real-time listener
+// ════════════════════════════════════════════════════
+async function logActivity(icon, title, subtitle) {
+  await db.collection(`buildings/${currentBuilding.id}/activity`).add({
+    icon, title, subtitle,
+    actor: currentUser.displayName || currentUser.email,
+    at: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  // listener in setupRealtimeListeners will auto-update the feed
+}
+
+function renderActivityFeed(acts) {
+  const el = document.getElementById('ov-activity');
+  if (!acts.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">אין פעילות עדיין</div><div class="empty-s">הוסף דייר, שלח הודעה, או פתח קריאת שירות</div></div>';
+    return;
+  }
+  el.innerHTML = acts.map(a => {
+    const bgMap = {
+      '👤':'rgba(74,158,255,.1)','💬':'rgba(0,200,150,.1)','🔧':'rgba(255,79,94,.1)',
+      '💰':'rgba(245,166,35,.1)','📧':'rgba(0,200,150,.1)','📄':'rgba(74,158,255,.1)',
+      '📌':'rgba(155,89,255,.1)','🏢':'rgba(0,200,150,.1)'
+    };
+    const bg = bgMap[a.icon] || 'rgba(255,255,255,.06)';
+    return `
+    <div class="act-item">
+      <div class="act-ico" style="background:${bg}">${a.icon}</div>
+      <div class="act-body">
+        <div class="act-t">${a.title}</div>
+        <div class="act-s">${a.subtitle||''}${a.actor?' · '+a.actor:''}</div>
+      </div>
+      <div class="act-time">${relTime(a.at)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SEED DEMO DATA ───────────────────────────────
+async function seedDemoData() {
+  if (!confirm('טוען דאטה לדמו — זה יוסיף דיירים, תשלומים, וקריאות לדוגמה. להמשיך?')) return;
+  const btn = document.getElementById('seed-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ טוען...'; }
+  const bid = currentBuilding.id;
+  const batch = db.batch();
+  const now = firebase.firestore.FieldValue.serverTimestamp();
+  const m = new Date().getMonth()+1; const y = new Date().getFullYear();
+
+  // Demo tenants
+  const demoTenants = [
+    { name:'מרים לוי',      apartment:'דירה 1', phone:'050-1111111', email:'miriam@demo.com' },
+    { name:'יוסי כהן',      apartment:'דירה 2', phone:'052-2222222', email:'yossi@demo.com' },
+    { name:'שרה ברון',      apartment:'דירה 3', phone:'054-3333333', email:'sara@demo.com' },
+    { name:'אמיר בן דוד',   apartment:'דירה 4', phone:'053-4444444', email:'amir@demo.com' },
+    { name:'רחל שפירא',     apartment:'דירה 5', phone:'050-5555555', email:'rachel@demo.com' },
+    { name:'דן אברהם',      apartment:'דירה 6', phone:'058-6666666', email:'dan@demo.com' },
+    { name:'נועה כץ',       apartment:'דירה 7', phone:'050-7777777', email:'noa@demo.com' },
+    { name:'ירון מזרחי',    apartment:'דירה 8', phone:'052-8888888', email:'yaron@demo.com' },
+  ];
+  const tRefs = demoTenants.map(() => db.collection(`buildings/${bid}/tenants`).doc());
+  demoTenants.forEach((t,i) => batch.set(tRefs[i], {...t, createdAt: now}));
+
+  // Demo payments
+  const payStatuses = ['paid','paid','paid','paid','paid','debt','debt','partial'];
+  demoTenants.forEach((t,i) => {
+    const ref = db.collection(`buildings/${bid}/payments`).doc();
+    batch.set(ref, {
+      tenantId: tRefs[i].id, tenantName: t.name, apartment: t.apartment,
+      amount: currentBuilding.monthlyFee || 175,
+      status: payStatuses[i], month: m, year: y, createdAt: now
+    });
+  });
+
+  // Demo requests
+  const demoReqs = [
+    { title:'נזילה בצנרת', description:'דיווח על נזילה קטנה בקיר המטבח', apartment:'דירה 3', urgency:'urgent',  status:'open' },
+    { title:'נורה שרופה בחניון', description:'', apartment:'חניון', urgency:'medium', status:'in_progress' },
+    { title:'דלת כניסה לא נסגרת', description:'הדלת לא נועלת כמו שצריך', apartment:'כניסה', urgency:'low', status:'open' },
+    { title:'חשמל בחדר מדרגות', description:'', apartment:'קומה 2', urgency:'medium', status:'done' },
+  ];
+  demoReqs.forEach(r => {
+    const ref = db.collection(`buildings/${bid}/requests`).doc();
+    batch.set(ref, {...r, createdAt: now});
+  });
+
+  // Demo messages
+  const demoMsgs = [
+    { content:'שימו לב – ניקיון חדר המדרגות יתקיים ביום שלישי הקרוב בשעה 18:00.', type:'all', sentAt: now },
+    { content:'תזכורת לדיירים שטרם שילמו את ועד הבית לחודש הנוכחי.', type:'debtors', sentAt: now },
+  ];
+  demoMsgs.forEach(msg => {
+    const ref = db.collection(`buildings/${bid}/messages`).doc();
+    batch.set(ref, {...msg, openedBy:[]});
+  });
+
+  // Demo documents
+  const demoDocs = [
+    { name:'פרוטוקול ישיבה – ינואר 2025', type:'📋 פרוטוקול', url:'', uploadedAt: now },
+    { name:'תקנון הבניין', type:'📄 תקנון', url:'', uploadedAt: now },
+    { name:'חוזה ניקיון 2025', type:'📝 חוזה', url:'', uploadedAt: now },
+  ];
+  demoDocs.forEach(d => {
+    const ref = db.collection(`buildings/${bid}/documents`).doc();
+    batch.set(ref, d);
+  });
+
+  // Demo activity
+  const demoActs = [
+    { icon:'💬', title:'הודעה נשלחה לכל הדיירים', subtitle:'ניקיון חדר מדרגות', actor:'מנהל', at: now },
+    { icon:'👤', title:'דייר חדש נוסף', subtitle:'ירון מזרחי – דירה 8', actor:'מנהל', at: now },
+    { icon:'💰', title:'תשלום התקבל', subtitle:'מרים לוי – ₪175', actor:'מנהל', at: now },
+    { icon:'🔧', title:'קריאת שירות נפתחה', subtitle:'נזילה בצנרת – דירה 3', actor:'מנהל', at: now },
+  ];
+  demoActs.forEach(a => {
+    const ref = db.collection(`buildings/${bid}/activity`).doc();
+    batch.set(ref, a);
+  });
+
+  try {
+    await batch.commit();
+    btn.textContent = '✅ הדאטה נטען!';
+    setTimeout(() => { btn.disabled=false; btn.textContent='🎭 טען דאטה לדמו'; }, 3000);
+    showToast('🎉 דאטה לדמו נטען בהצלחה!');
+  } catch(e) {
+    btn.disabled=false; btn.textContent='🎭 טען דאטה לדמו';
+    showToast('❌ ' + e.message);
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const nav = document.getElementById('nav-'+name);
+  if (nav) nav.classList.add('active');
+
+  if (name==='finance') renderPaymentModal();
+  if (name==='reports') renderReports();
+}
+
+// ════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════
+function openModal(id) {
+  if (id==='modal-payment') renderPaymentModal();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModalOutside(e,id) { if (e.target.id===id) closeModal(id); }
+
+// ════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  document.getElementById('toast-text').textContent = msg;
+  document.getElementById('toast').classList.add('show');
+  toastTimer = setTimeout(() => document.getElementById('toast').classList.remove('show'), 3200);
+}
+
+// ════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════
+function v(id) { return (document.getElementById(id).value||'').trim(); }
+
+// ════════════════════════════════════════════════════
+//  AUDIT TRAIL
+// ════════════════════════════════════════════════════
+async function auditLog(icon, bgColor, who, action, detail) {
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/audit`).add({
+      icon, bgColor, who, action, detail,
+      uid: currentUser.uid,
+      at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { /* non-critical */ }
+}
+
+// Update logActivity to also write to audit
+const _origLogActivity = logActivity;
+async function logActivity(icon, title, subtitle) {
+  await _origLogActivity(icon, title, subtitle);
+  await auditLog(icon, 'rgba(0,200,150,.1)',
+    currentUser.displayName || currentUser.email,
+    title, subtitle);
+}
+
+// ════════════════════════════════════════════════════
+//  DEMO DATA LOADER
+// ════════════════════════════════════════════════════
+async function loadDemoData() {
+  const btn = document.getElementById('qa-demo');
+  if (!confirm('טוען נתוני דמו לבניין זה — פעולה זו תוסיף דיירים, תשלומים, הודעות וקריאות לדוגמה. להמשיך?')) return;
+  btn.style.opacity = '0.5';
+  btn.style.pointerEvents = 'none';
+  showToast('⏳ טוען נתוני דמו...');
+  const bid = currentBuilding.id;
+  const now = new Date();
+  const m = now.getMonth()+1;
+  const y = now.getFullYear();
+
+  try {
+    const batch = db.batch();
+
+    // Demo tenants
+    const demoTenants = [
+      { name:'מרים לוי',    apartment:'דירה 1', phone:'050-1111111', email:'miriam@demo.com' },
+      { name:'יוסי כהן',    apartment:'דירה 2', phone:'052-2222222', email:'yossi@demo.com' },
+      { name:'שרה גולדברג', apartment:'דירה 3', phone:'054-3333333', email:'sara@demo.com' },
+      { name:'אמיר בן דוד', apartment:'דירה 4', phone:'053-4444444', email:'amir@demo.com' },
+      { name:'רחל שפירא',   apartment:'דירה 5', phone:'058-5555555', email:'rachel@demo.com' },
+      { name:'דן אברהם',    apartment:'דירה 6', phone:'050-6666666', email:'dan@demo.com' },
+      { name:'נועה ישראלי', apartment:'דירה 7', phone:'052-7777777', email:'noa@demo.com' },
+      { name:'גיל סופר',    apartment:'דירה 8', phone:'054-8888888', email:'gil@demo.com' },
+    ];
+
+    const tenantRefs = [];
+    for (const t of demoTenants) {
+      const ref = db.collection(`buildings/${bid}/tenants`).doc();
+      batch.set(ref, { ...t, isDemo: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      tenantRefs.push({ ref, ...t });
+    }
+
+    // Demo payments — mix of paid/debt
+    const payStatuses = ['paid','paid','paid','paid','paid','debt','debt','partial'];
+    for (let i=0; i<tenantRefs.length; i++) {
+      const pRef = db.collection(`buildings/${bid}/payments`).doc();
+      batch.set(pRef, {
+        tenantId: tenantRefs[i].ref.id,
+        tenantName: tenantRefs[i].name,
+        apartment: tenantRefs[i].apartment,
+        amount: currentBuilding.monthlyFee || 175,
+        status: payStatuses[i],
+        month: m, year: y,
+        isDemo: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    // Demo messages
+    const msgs = [
+      { content: 'תזכורת — ישיבת ועד בית תתקיים ביום ג׳ הקרוב בשעה 19:00 בלובי הבניין. נא להגיע.', type:'all' },
+      { content: 'תזכורת — תשלום ועד הבית לחודש ' + ['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'][m] + ' עדיין ממתין לתשלום.', type:'debtors' },
+      { content: 'הניקיון השבועי בחדר המדרגות יתקיים מחר בשעה 10:00. אנא הרחיקו חפצים מהמסדרון.', type:'all' },
+    ];
+    for (const msg of msgs) {
+      const mRef = db.collection(`buildings/${bid}/messages`).doc();
+      batch.set(mRef, { ...msg, isDemo: true, openedBy:[], sentAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+
+    // Demo service requests
+    const reqs = [
+      { title:'נזילה בגג מעל דירה 3', description:'מים נוטפים מהתקרה אחרי הגשם האחרון', apartment:'דירה 3', urgency:'urgent', status:'open' },
+      { title:'נורה שרופה בחניון',     description:'הנורה ליד חנייה 5 שרופה כבר שבוע', apartment:'חניון',  urgency:'medium', status:'in_progress' },
+      { title:'דלת כניסה לא נסגרת',  description:'הדלת הראשית לא ננעלת כראוי',        apartment:'כניסה',   urgency:'medium', status:'open' },
+      { title:'עיכוב הרמת המעלית',    description:'המעלית לוקחת זמן רב לעלות לקומה 4', apartment:'מעלית',   urgency:'low',    status:'done' },
+    ];
+    for (const req of reqs) {
+      const rRef = db.collection(`buildings/${bid}/requests`).doc();
+      batch.set(rRef, { ...req, isDemo: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+
+    // Demo documents
+    const docs = [
+      { name:'פרוטוקול ישיבת ועד — ' + y, type:'📋 פרוטוקול', url:'' },
+      { name:'תקנון הבניין',               type:'📄 תקנון',    url:'' },
+      { name:'חוזה חברת ניקיון 2025',      type:'📝 חוזה',     url:'' },
+    ];
+    for (const doc of docs) {
+      const dRef = db.collection(`buildings/${bid}/documents`).doc();
+      batch.set(dRef, { ...doc, isDemo: true, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+
+    await batch.commit();
+
+    // Update building name for demo
+    await db.collection('buildings').doc(bid).update({
+      name: 'בניין לדוגמה — רח׳ הרצל 15',
+      monthlyFee: 175
+    });
+
+    showToast('✅ נתוני דמו נטענו! רפרש את הדף לצפייה מלאה.');
+    if (btn) { btn.textContent = '✅ נטען!'; }
+
+  } catch(e) {
+    showToast('❌ שגיאה: ' + e.message);
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+  }
+}
+
+function clearFields(ids) { ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; }); }
+function updateBadge(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val && val > 0) { el.textContent = val; el.style.display = ''; }
+  else el.style.display = 'none';
+}
+function timeNow() {
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+function relTime(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff/60000);
+  if (mins < 1)  return 'עכשיו';
+  if (mins < 60) return 'לפני ' + mins + ' דק\'';
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24)  return 'לפני ' + hrs + ' ש\'';
+  const days = Math.floor(hrs/24);
+  if (days < 7)  return 'לפני ' + days + ' ימים';
+  return d.toLocaleDateString('he-IL');
+}
+
+// ════════════════════════════════════════════════════
+//  BILLING / PRO LOGIC
+// ════════════════════════════════════════════════════
+function isPro() { return currentBuilding && currentBuilding.isPremium === true; }
+
+function applyProGating() {
+  const badge = document.getElementById('plan-badge');
+  if (badge) {
+    badge.textContent    = isPro() ? '💎 Pro' : 'חינמי';
+    badge.style.background  = isPro() ? 'rgba(245,166,35,.15)' : 'rgba(0,200,150,.1)';
+    badge.style.borderColor = isPro() ? 'rgba(245,166,35,.3)'  : 'rgba(0,200,150,.25)';
+    badge.style.color       = isPro() ? 'var(--gold)'          : 'var(--accent)';
+  }
+  const prmBanner = document.getElementById('prm-banner');
+  if (prmBanner) prmBanner.style.display = isPro() ? 'none' : 'flex';
+  const proCard = document.getElementById('premium-card');
+  if (proCard) proCard.style.display = isPro() ? 'none' : 'block';
+}
+
+// ════════════════════════════════════════════════════
+//  AUDIT LOG
+// ════════════════════════════════════════════════════
+let allAuditLogs = [];
+
+function setupAuditListener() {
+  const bid = currentBuilding.id;
+  db.collection(`buildings/${bid}/activity`)
+    .orderBy('at','desc').limit(100)
+    .onSnapshot(snap => {
+      allAuditLogs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAuditList(allAuditLogs);
+      renderActivityFeed(allAuditLogs.slice(0, 5));
+    }, err => console.warn('audit:', err.message));
+}
+
+function renderAuditList(logs) {
+  const el = document.getElementById('audit-list');
+  if (!el) return;
+  if (!logs.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">אין פעילות עדיין</div></div>';
+    return;
+  }
+  el.innerHTML = logs.map(a => `
+  <div class="audit-item">
+    <span style="font-size:15px">${a.icon||'📌'}</span>
+    <div style="flex:1">
+      <span class="audit-who">${a.title}</span>
+      <span class="audit-what"> — ${a.subtitle||''}</span>
+      ${a.by ? '<span style="color:var(--muted);font-size:11px"> · ' + a.by + '</span>' : ''}
+    </div>
+    <span class="audit-time">${relTime(a.at)}</span>
+  </div>`).join('');
+}
+
+function renderActivityFeed(logs) {
+  const el = document.getElementById('ov-activity');
+  if (!el) return;
+  if (!logs.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-t">אין פעילות עדיין</div></div>';
+    return;
+  }
+  el.innerHTML = logs.map(a => `
+  <div class="act-item">
+    <div class="act-ico" style="background:rgba(0,200,150,.1)">${a.icon||'📌'}</div>
+    <div class="act-body"><div class="act-t">${a.title}</div><div class="act-s">${a.subtitle||''}</div></div>
+    <div class="act-time">${relTime(a.at)}</div>
+  </div>`).join('');
+}
+
+function filterAudit(type) {
+  if (type === 'all') { renderAuditList(allAuditLogs); return; }
+  const typeMap = { tenant:'👤', payment:'💰', message:'💬', request:'🔧', doc:'📄' };
+  const ico = typeMap[type];
+  renderAuditList(allAuditLogs.filter(a => a.icon === ico));
+}
+
+function exportAuditLog() {
+  if (!allAuditLogs.length) { showToast('⚠️ אין נתונים לייצוא'); return; }
+  const rows = [['פעולה','פרטים','בוצע על ידי','זמן']];
+  allAuditLogs.forEach(a => {
+    const t = a.at ? (a.at.toDate ? a.at.toDate() : new Date(a.at)).toLocaleString('he-IL') : '';
+    rows.push([a.title, a.subtitle||'', a.by||'', t]);
+  });
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'smartvaad-audit.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📊 CSV יוצא!');
+}
+
+// ════════════════════════════════════════════════════
+//  ENHANCED logActivity
+// ════════════════════════════════════════════════════
+async function logActivity(icon, title, subtitle, type) {
+  try {
+    await db.collection(`buildings/${currentBuilding.id}/activity`).add({
+      icon, title, subtitle: subtitle||'',
+      type: type||'general',
+      by: currentUser.displayName || currentUser.email || 'משתמש',
+      at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('logActivity:', e.message); }
+}
+
+// ════════════════════════════════════════════════════
+//  PATCH auth listener to add audit + billing
+// ════════════════════════════════════════════════════
+// Override the existing auth listener after it runs
+const _origAuthLoad = loadBuilding;
+// After shell shows, setup audit and pro gating
+const _origSetupListeners = setupRealtimeListeners;
+function setupRealtimeListeners() {
+  _origSetupListeners();
+  setupAuditListener();
+  applyProGating();
+}
+</script>
+</body>
+</html>
