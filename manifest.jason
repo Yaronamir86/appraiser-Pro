@@ -5,12 +5,16 @@
   "description": "מערכת לשמאות רכוש",
   "lang": "he",
   "dir": "rtl",
+
   "start_url": "/appraiser-Pro/dashboard.html",
   "scope": "/appraiser-Pro/",
+
   "display": "standalone",
+  "orientation": "portrait",
+
   "background_color": "#0b1220",
   "theme_color": "#1f2a44",
-  "orientation": "portrait",
+
   "icons": [
     {
       "src": "/appraiser-Pro/assets/omdan-app-icon-192.png",
