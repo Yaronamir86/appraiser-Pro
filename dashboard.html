@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartVaad – דשבורד</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="manifest" href="/appraiser-Pro/manifest.json">
+<link rel="icon" type="image/png" href="/appraiser-Pro/assets/omdan-favicon.png">
+<link rel="apple-touch-icon" href="/appraiser-Pro/assets/omdan-app-icon.png">
+
+<meta name="theme-color" content="#1f2a44">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -2589,6 +2596,13 @@ function setupRealtimeListeners() {
   _origSetupListeners();
   setupAuditListener();
   applyProGating();
+}
+</script>
+   <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/appraiser-Pro/sw.js");
+  });
 }
 </script>
 </body>
