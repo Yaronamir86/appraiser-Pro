@@ -2799,7 +2799,6 @@ async function renderCaseList(){
         <div class="cm-case-meta">${c.mode==='private'?'פרטי':c.mode==='insurance'?'ביטוח':'מס רכוש'} · ${c.createdAt||''} · ${c.id===currentCaseId?'✅ פעיל':''}</div>
       </div>
       <div class="cm-case-actions">
-        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();exportCase('${c.id}')">⬇</button>
         <button class="btn btn-ghost btn-xs" style="color:var(--red);" onclick="event.stopPropagation();deleteCase('${c.id}')">✕</button>
       </div>
     </div>`).join('');
@@ -2844,39 +2843,7 @@ async function deleteCase(id){
   _casesCache = _casesCache.filter(c=>c.id!==id);
   if(id===currentCaseId) currentCaseId=null;
   renderCaseList();
-}
-function exportCurrentCase(){
-  const cases = getCases();
-  const c = currentCaseId ? cases.find(x=>x.id===currentCaseId) : null;
-  const data = c ? c : {state:STATE, mode, exportedAt:new Date().toISOString()};
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`appraisal_${(c?.name||'draft').replace(/\s/g,'_')}.json`;a.click();
-}
-function exportCase(id){
-  const c = getCases().find(x=>x.id===id);
-  if(!c) return;
-  const blob = new Blob([JSON.stringify(c,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`appraisal_${(c.name||'case').replace(/\s/g,'_')}.json`;a.click();
-}
-function importCase(input){
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      const data = JSON.parse(e.target.result);
-      const cases = getCases();
-      const imported = {id:'case_'+Date.now(), name:data.name||'מיובא', mode:data.mode||'insurance', createdAt:new Date().toLocaleDateString('he-IL'), state:data.state||data};
-      cases.unshift(imported);
-      saveCases(cases);
-      alert('התיק יובא בהצלחה! לחץ עליו לטעינה.');
-      renderCaseList();
-    }catch(ex){ alert('שגיאה בקובץ JSON'); }
-  };
-  reader.readAsText(file);
-}
-
-// ══════════════════════════════════════════════════
+}// ══════════════════════════════════════════════════
 // PHOTO HELPERS
 // ══════════════════════════════════════════════════
 function loadPhoto(input, target){
