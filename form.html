@@ -265,7 +265,7 @@ textarea{resize:vertical;min-height:80px;}
 
   /* BOQ table — horizontal scroll */
   .boq-section{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .boq-table{min-width:560px;}
+  .boq-table{min-width:720px;}  /* 9 cols in insurance mode */
   .boq-table th,
   .boq-table td{padding:6px 7px;font-size:11px;}
   .boq-input.num{width:60px;}
@@ -1539,7 +1539,13 @@ function renderCard(n){
   else if(n===4) html += renderCard4();
   else if(n===5) html += renderCard5();
   else if(n===6) html += renderCard6();
-  else if(n===7) html += renderCard7();
+  else if(n===7) {
+    // Auto-run BOQ engine if BOQ is empty but findings exist
+    const boqEmpty = !STATE.boq.structItems?.length && !STATE.boq.contentsItems?.length && !STATE.boq.serviceItems?.length;
+    const hasFindings = STATE.findings.areas?.length > 0 || STATE.event.eventType;
+    if(boqEmpty && hasFindings) runBOQEngine();
+    html += renderCard7();
+  }
   else if(n===8) html += renderCard8();
   else if(n===9) html += renderCard9();
   html += `</div>`;
@@ -3601,6 +3607,27 @@ function addBOQItem(section){
   const newId = prefix+(items.length+1);
   items.push({id:newId,desc:'',unit:"קומפ'",qty:'1',price:'',claim:'',zeroPrice:false});
   renderCard(7);
+}
+function updateBOQSummary(){
+  const boq = STATE.boq;
+  const structTotal = calcSectionTotal(boq.structItems);
+  const contTotal   = calcSectionTotal(boq.contentsItems);
+  const servTotal   = calcSectionTotal(boq.serviceItems);
+  const grand = structTotal + contTotal + servTotal;
+  const shiput = Math.round(grand*0.67);
+  const deduct = parseCurrency(STATE.insurance.deductStruct)||0;
+  const setEl = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  setEl('sumStruct', structTotal>0?'₪'+fmtNum(structTotal):'—');
+  setEl('sumCont',   contTotal>0?'₪'+fmtNum(contTotal):'—');
+  setEl('sumServ',   servTotal>0?'₪'+fmtNum(servTotal):'—');
+  setEl('sumGrand',  grand>0?'₪'+fmtNum(grand):'—');
+  setEl('sumShiput', shiput>0?'₪'+fmtNum(shiput):'—');
+  // Update claim sum
+  if(typeof mode !== 'undefined' && mode === 'insurance'){
+    const totalClaim = [...(boq.structItems||[]),...(boq.contentsItems||[]),...(boq.serviceItems||[])]
+      .reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+    setEl('sumClaim', totalClaim>0?'₪'+fmtNum(totalClaim):'—');
+  }
 }
 function updateBOQItem(section, id, field, val){
   const item = (STATE.boq[section]||[]).find(i=>String(i.id)===String(id));
