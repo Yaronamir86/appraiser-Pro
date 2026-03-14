@@ -38,16 +38,13 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 <div class="card">
 
   <div class="logo-row">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="52" height="52">
-      <rect width="64" height="64" rx="16" fill="#f59e0b"/>
-      <text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text>
-    </svg>
+    <img src="assets/omdan-logo.png" alt="OMDAN" style="height:52px;width:auto;">
     <div style="text-align:right;">
-      <div style="font-size:19px;font-weight:900;color:#fff;">מערכת שמאות מקצועית</div>
-      <div style="font-size:12px;color:#f59e0b;font-weight:700;">כלי עבודה לשמאי רכוש עצמאי</div>
+      <div style="font-size:19px;font-weight:900;color:#fff;">OMDAN</div>
+      <div style="font-size:12px;color:#f59e0b;font-weight:700;">מערכת שמאות מקצועית</div>
     </div>
   </div>
-  <div class="subtitle">050-3292066 &nbsp;|&nbsp; <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="651c04170a0b04080c175d53250208040c094b060a08">[email&#160;protected]</a></div>
+  <div class="subtitle">מערכת ניהול תיקי שמאות לשמאי רכוש</div>
 
   <div style="text-align:center;margin-bottom:28px;">
     <span class="trial-badge">✅ ניסיון חינמי 14 יום — ללא כרטיס אשראי</span>
@@ -112,7 +109,7 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
   <div class="login-link">כבר יש לך חשבון? <a href="index.html">כניסה למערכת</a></div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+<script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -216,4 +213,12 @@ function checkPW(v){
   if(/[A-Za-z]/.test(v))s++;
   if(/[^A-Za-z0-9]/.test(v))s++;
   const c=['#ef4444','#f59e0b','#3b82f6','#10b981'];
-  const l=['חלשה','בינונית'
+  const l=['חלשה','בינונית','טובה','חזקה'];
+  fill.style.width=((s/4)*100)+'%';
+  fill.style.background=c[s-1]||'#ef4444';
+  hint.textContent=l[s-1]||'';
+  hint.style.color=c[s-1]||'#6b7280';
+}
+</script>
+</body>
+</html>

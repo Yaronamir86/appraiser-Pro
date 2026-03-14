@@ -860,21 +860,16 @@ window.doForgotPassword = async () => {
 <header>
   <div class="header-inner">
     <div class="logo" style="display:flex;align-items:center;gap:10px;">
-  <div id="headerLogo" style="width:36px;height:36px;border-radius:10px;background:#f59e0b;color:#0f1117;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">YA</div>
-  <div style="line-height:1.2;">
-    <div id="headerName" style="font-size:15px;font-weight:800;color:#fff;">OMDAN</div>
-    <div id="headerTitle" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.04em;">מקצועית</div>
-  </div>
-</div>
-      <div>
-        <span class="logo-text">מערכת שמאות</span>
-        <span class="logo-sub">Professional Appraisal System</span>
+      <img src="assets/omdan-logo.png" alt="OMDAN" style="height:36px;width:auto;" id="headerLogoImg">
+      <div style="line-height:1.2;">
+        <div id="headerName" style="font-size:15px;font-weight:800;color:#fff;">OMDAN</div>
+        <div id="headerTitle" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.04em;">מערכת שמאות מקצועית</div>
       </div>
+    </div>
     </div>
     <div class="header-actions">
       <span class="badge-new"><span class="pulse"></span> מערכת פעילה</span>
       <a href="settings.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">⚙️ הגדרות</a>
-      <button class="btn btn-ghost btn-sm" onclick="exportAll()">📤 ייצוא הכל</button>
       <button class="btn btn-primary" onclick="openNewCase()">+ תיק חדש</button>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:#f87171;" title="התנתקות">🚪 התנתקות</button>
     </div>
@@ -954,8 +949,6 @@ window.doForgotPassword = async () => {
         <div class="widget-title">⚡ פעולות מהירות</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openNewCase()">➕ פתח תיק חדש</button>
-          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="importAll()">📥 ייבוא מ-JSON</button>
-          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="exportAll()">📤 ייצוא כל התיקים</button>
         </div>
       </div>
 
@@ -1033,14 +1026,15 @@ const CASES_KEY = 'appraisal_cases';
 function updateHeaderProfile(p){
   if(!p) return;
   // Update logo
-  const logoEl = document.getElementById('headerLogo');
-  if(logoEl){
+  const logoImg = document.getElementById('headerLogoImg');
+  if(logoImg){
     if(p.logoMode==='upload' && p.logoImageUrl){
-      logoEl.innerHTML = `<img src="${p.logoImageUrl}" style="width:36px;height:36px;border-radius:10px;object-fit:cover;">`;
-    } else {
-      const init=p.logoInitials||'YA', bg=p.logoColor||'#f59e0b', fg=p.logoTextColor||'#0f1117';
-      logoEl.style.background=bg; logoEl.style.color=fg; logoEl.textContent=init;
+      logoImg.src = p.logoImageUrl;
+      logoImg.style.borderRadius='10px';
+      logoImg.style.objectFit='cover';
+      logoImg.style.height='36px';
     }
+    // else keep default omdan-logo.png
   }
   // Update name
   const nameEl = document.getElementById('headerName');

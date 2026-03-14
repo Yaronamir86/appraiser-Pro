@@ -1553,8 +1553,8 @@ function renderCard(n){
   const idx = cards.indexOf(n);
   const isLast = idx === cards.length-1;
   html += `<div class="card-nav">
-    <button class="btn btn-secondary" onclick="prevCard()" ${idx===0?'disabled style="opacity:.4"':''}>← הקודם</button>
-    <button class="btn btn-primary" onclick="nextCard()">${isLast ? '📄 צור דוח' : 'הבא →'}</button>
+    <button class="btn btn-primary" onclick="nextCard()">${isLast ? '📄 צור דוח' : 'הבא ←'}</button>
+    <button class="btn btn-secondary" onclick="prevCard()" ${idx===0?'disabled style="opacity:.4"':''}>→ הקודם</button>
   </div>`;
   main.innerHTML = html;
   attachListeners(n);
