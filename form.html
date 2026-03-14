@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>מערכת שמאות | טופס</title>
+<title>OMDAN | מערכת שמאות מקצועית</title>
 <link rel="manifest" href="/appraiser-Pro/manifest.json">
 <link rel="icon" type="image/png" href="/appraiser-Pro/assets/omdan-favicon.png">
 <link rel="apple-touch-icon" href="/appraiser-Pro/assets/omdan-app-icon.png">
-
 <meta name="theme-color" content="#1f2a44">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -135,7 +134,7 @@ textarea{resize:vertical;min-height:80px;}
 
 /* ── TOP BAR ── */
 #topbar{position:sticky;top:0;z-index:100;background:rgba(15,23,42,.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .tb-left{display:flex;align-items:center;gap:12px;}
 .tb-logo{font-size:20px;}
 .tb-name{font-size:15px;font-weight:800;color:var(--text);}
@@ -143,18 +142,19 @@ textarea{resize:vertical;min-height:80px;}
 .tb-right{display:flex;gap:8px;}
 
 /* ── SIDEBAR ── */
-#layout{display:flex;min-height:calc(100vh - 51px);justify-content:flex-end;}
-#sidebar{width:180px;background:rgba(15,23,42,.8);border-left:1px solid var(--border);padding:12px 8px;flex-shrink:0;position:sticky;top:51px;height:calc(100vh - 51px);overflow-y:auto;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:11px;cursor:pointer;margin-bottom:3px;transition:all .18s;border-right:3px solid transparent;}
+#layout{display:flex;min-height:calc(100vh - 51px);}
+#sidebar{width:160px;background:rgba(15,23,42,.85);border-left:1px solid var(--border);padding:10px 6px;flex-shrink:0;position:sticky;top:51px;height:calc(100vh - 51px);overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;cursor:pointer;margin-bottom:3px;transition:all .18s;border-right:3px solid transparent;}
 .nav-item:hover{background:var(--primary2);}
 .nav-item.active{background:rgba(245,158,11,.08);border-right-color:var(--accent);}
-.nav-item .ni{font-size:16px;}
-.nav-item .nt{font-size:12px;font-weight:700;}.nav-item.active .nt{color:var(--accent);}
-.nav-item .ns{font-size:10px;color:var(--subtle);}
+.nav-item .ni{font-size:15px;}
+.nav-item .nt{font-size:11px;font-weight:700;line-height:1.3;}.nav-item.active .nt{color:var(--accent);}
+.nav-item .ns{font-size:9px;color:var(--subtle);}
 
 /* ── MAIN ── */
-#main{flex:1;padding:24px 36px;overflow-y:auto;max-width:960px;}
+#main{flex:1;padding:24px 32px;overflow-y:auto;}
 #main .page-title{font-size:22px;font-weight:900;margin-bottom:4px;}
+.card-container{max-width:900px;}
 #main .page-sub{font-size:13px;color:var(--subtle);margin-bottom:22px;}
 .card-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap;}
 .card-nav .btn{min-width:110px;justify-content:center;}
@@ -412,77 +412,6 @@ body.field-mode #main{padding:12px;}
 .gen-item-cb{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:12px;background:var(--primary2);}
 .gen-item-cb input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);}
 .gen-item-cb.checked{border-color:var(--accent);background:rgba(245,158,11,.08);}
-
-/* ── MOBILE BOTTOM NAV ── */
-@media (max-width: 768px) {
-  .tb-right { display: none !important; }
-  .tb-left { gap: 6px; }
-  #topbar { padding: 8px 12px; }
-  #layout { flex-direction: column; padding-bottom: 80px; }
-  #sidebar { width: 100%; height: auto; position: relative; top: 0;
-             border-left: none; border-bottom: 1px solid rgba(255,255,255,.08);
-             display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; }
-  .nav-item { flex: 0 0 auto; padding: 7px 10px; }
-  .nav-item .nt { font-size: 11px; }
-  .nav-item .ns { display: none; }
-  #form-content { padding: 16px 12px 0; }
-
-  .ap-form-nav {
-    display: block;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(15,23,42,0.97);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(20px);
-    z-index: 200;
-    padding: 6px 0 env(safe-area-inset-bottom, 6px);
-  }
-  .ap-form-nav-items {
-    display: flex; justify-content: space-around; align-items: center;
-  }
-  .ap-form-btn {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 8px; min-width: 52px; cursor: pointer;
-    border: none; background: none; color: inherit;
-    font-family: 'Heebo', sans-serif;
-    border-radius: 10px; transition: all .15s;
-    text-decoration: none;
-  }
-  .ap-form-btn .ap-ico { font-size: 20px; color: #6b7280; transition: color .15s; }
-  .ap-form-btn .ap-lbl { font-size: 10px; color: #6b7280; font-weight: 600; }
-  .ap-form-btn.gold .ap-ico,
-  .ap-form-btn.gold .ap-lbl { color: #f59e0b; }
-  .ap-form-btn.green .ap-ico,
-  .ap-form-btn.green .ap-lbl { color: #10b981; }
-  .ap-form-btn:active { background: rgba(255,255,255,.06); }
-
-  .ap-form-more-overlay { display: none; position: fixed; inset: 0; z-index: 198; }
-  .ap-form-more-overlay.open { display: block; }
-  .ap-form-more-panel {
-    display: none; position: fixed;
-    bottom: 68px; left: 0; right: 0;
-    background: #0d1117;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px 20px 0 0;
-    padding: 16px 20px; z-index: 199;
-    animation: apFormSlideUp .2s ease;
-  }
-  .ap-form-more-panel.open { display: block; }
-  @keyframes apFormSlideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-  .ap-form-more-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-  .ap-form-more-item {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    padding: 12px 6px; background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px; cursor: pointer; transition: all .15s;
-    font-size: 11px; color: #6b7280; font-family: 'Heebo', sans-serif;
-  }
-  .ap-form-more-item span:first-child { font-size: 22px; }
-  .ap-form-more-item:active { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); }
-}
-@media (min-width: 769px) {
-  .ap-form-nav, .ap-form-more-panel, .ap-form-more-overlay { display: none !important; }
-}
 </style>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -530,6 +459,49 @@ onAuthStateChanged(_auth, async user => {
         APPRAISER.signatureUrl  = prof.signature   || null;
       }
     } catch(e){ console.warn('profile load error', e); }
+
+    // ── Billing / Trial Check ──
+    try {
+      const billingDoc = await getDoc(doc(_db, 'billing', user.uid));
+      if(billingDoc.exists()){
+        const billing = billingDoc.data();
+        const now = new Date();
+        let hasAccess = false;
+        let daysLeft = 0;
+        window._billing = billing;
+
+        if(billing.plan === 'trial'){
+          const trialEnd = new Date(billing.trialEnd);
+          hasAccess = now < trialEnd;
+          daysLeft = Math.max(0, Math.ceil((trialEnd - now)/(1000*60*60*24)));
+        } else if(billing.plan === 'pro' || billing.plan === 'annual'){
+          const subEnd = new Date(billing.subscriptionEnd);
+          hasAccess = now < subEnd;
+          daysLeft = Math.max(0, Math.ceil((subEnd - now)/(1000*60*60*24)));
+        }
+
+        if(!hasAccess){
+          // Show upgrade screen
+          showUpgradeScreen(billing.plan === 'trial' ? 'trial_expired' : 'subscription_expired');
+        } else if(billing.plan === 'trial' && daysLeft <= 3){
+          // Show trial warning banner
+          showTrialBanner(daysLeft);
+        }
+      } else {
+        // New user — create trial record
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + 14);
+        const newBilling = {
+          uid: user.uid, email: user.email, plan: 'trial',
+          products: ['appraiser-pro'], trialEnd: trialEnd.toISOString(),
+          subscriptionEnd: null, stripeCustomerId: null,
+          createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+        };
+        await setDoc(doc(_db, 'billing', user.uid), newBilling);
+        window._billing = newBilling;
+      }
+    } catch(e){ console.warn('billing check error', e); }
+
   } else {
     if(ls) ls.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -602,9 +574,11 @@ window.doForgotPassword = async () => {
 <!-- ══════ LOGIN SCREEN ══════ -->
 <div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:none;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
   <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
-    <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56"><rect width="64" height="64" rx="16" fill="#f59e0b"/><text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#fff;">ירון אמיר</div><div style="font-size:12px;color:#f59e0b;font-weight:700;">שמאי רכוש</div></div></div>
-    <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+      <img src="assets/omdan-logo.png" alt="OMDAN" style="height:56px;object-fit:contain;margin-bottom:8px;" onerror="this.style.display='none';document.getElementById('omdan-fallback').style.display='block'">
+      <div id="omdan-fallback" style="display:none;font-size:28px;font-weight:900;color:#f59e0b;letter-spacing:2px;">OMDAN</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;">מערכת שמאות מקצועית</div>
+    </div>
     <div style="margin-bottom:14px;text-align:right;">
       <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
       <input id="loginUser" type="text" placeholder="your@email.com" type="email" autocomplete="email"
@@ -632,7 +606,7 @@ window.doForgotPassword = async () => {
 <div id="landing" class="hidden">
   <a href="index.html" style="position:absolute;top:20px;right:20px;color:var(--muted);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.04);transition:all .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">← דשבורד</a>
   <div style="font-size:48px;margin-bottom:12px;">⚖️</div>
-  <h1 class="land-title">מערכת שמאות מקצועית</h1>
+  <div style="display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><img src="assets/omdan-logo.png" alt="OMDAN" style="height:44px;object-fit:contain;" onerror="this.outerHTML='<span style=\"font-size:28px;font-weight:900;color:#f59e0b;letter-spacing:2px;\">OMDAN</span>'"></div><h1 class="land-title">מערכת שמאות מקצועית</h1>
   <p class="land-sub">בחר את סוג השומה להתחיל</p>
   <div class="mode-grid">
     <div class="mode-card pm" onclick="selectMode('private')">
@@ -678,7 +652,7 @@ window.doForgotPassword = async () => {
     <div class="tb-left">
       <a href="index.html" class="btn btn-ghost btn-sm" style="gap:5px;text-decoration:none;" title="חזרה לדשבורד">← דשבורד</a>
       <span class="tb-logo" style="margin-right:6px;">⚖️</span>
-      <span class="tb-name">מערכת שמאות</span>
+      <span class="tb-name">OMDAN</span>
       <span class="tb-mode" id="tbModeLabel"></span>
     </div>
     <div class="tb-right" style="gap:6px;">
@@ -762,6 +736,336 @@ window.doForgotPassword = async () => {
 // ══════════════════════════════════════════════════
 let mode = null;
 
+const BOQ_LIBRARY = [
+  {ch:1,code:"1.01",title:"פירוק ריצוף קיים",unit:"מר",dt:"water_leak|sewage_leak|flood|subfloor_moisture",stage:"access",kw:"פירוק,ריצוף,מרצפות"},
+  {ch:1,code:"1.02",title:"פירוק חיפוי קיר",unit:"מר",dt:"water_leak|rain_penetration|waterproofing_failure",stage:"access",kw:"פירוק,חיפוי,קרמיקה"},
+  {ch:1,code:"1.03",title:"פירוק פנלים",unit:"מא",dt:"water_leak|flood|parquet_damage",stage:"access",kw:"פנלים,פירוק"},
+  {ch:1,code:"1.04",title:"פתיחת קיר בלוקים לצורך איתור או תיקון",unit:"מר",dt:"water_leak|sewage_leak",stage:"access",kw:"פתיחת קיר,בלוקים,איתור"},
+  {ch:1,code:"1.05",title:"פתיחת קיר גבס",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"access",kw:"גבס,פתיחה"},
+  {ch:1,code:"1.06",title:"פירוק תקרת גבס",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"access",kw:"תקרה,גבס,פירוק"},
+  {ch:1,code:"1.07",title:"פירוק ארונות או נגרות לצורך גישה",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון,נגרות,פירוק"},
+  {ch:1,code:"1.08",title:"פירוק משטח שיש או אבן",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"שיש,אבן,פירוק"},
+  {ch:1,code:"1.09",title:"פירוק חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage|rain_penetration",stage:"access",kw:"חלון,פירוק"},
+  {ch:1,code:"1.10",title:"פירוק ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה,פירוק"},
+  {ch:1,code:"1.11",title:"פירוק מסגרות אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration|burglary_theft_damage",stage:"access",kw:"אלומיניום,מסגרת,פירוק"},
+  {ch:1,code:"1.12",title:"פירוק תריס גלילה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"תריס,גלילה,פירוק"},
+  {ch:1,code:"1.13",title:"פירוק כלים סניטריים",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה,כיור,פירוק"},
+  {ch:1,code:"1.14",title:"פירוק מקלחון",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"מקלחון,פירוק"},
+  {ch:1,code:"1.15",title:"פירוק אמבטיה",unit:"יח'",dt:"water_leak",stage:"access",kw:"אמבטיה,פירוק"},
+  {ch:1,code:"1.16",title:"פירוק אסלה תלויה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה תלויה,פירוק"},
+  {ch:1,code:"1.17",title:"פירוק כיור תלוי",unit:"יח'",dt:"water_leak",stage:"access",kw:"כיור,תלוי,פירוק"},
+  {ch:1,code:"1.18",title:"פירוק משקוף פגום",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage",stage:"access",kw:"משקוף,פירוק"},
+  {ch:1,code:"1.19",title:"פירוק דלת פנים או חוץ",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage",stage:"access",kw:"דלת,פירוק"},
+  {ch:1,code:"1.20",title:"פירוק ריצוף פרקט קיים",unit:"מר",dt:"parquet_damage|flood",stage:"access",kw:"פרקט,פירוק"},
+  {ch:1,code:"1.21",title:"פירוק פרופיל אלומיניום",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"פרופיל,אלומיניום"},
+  {ch:1,code:"1.22",title:"פירוק זכוכית פגומה",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"זכוכית,פירוק"},
+  {ch:1,code:"1.23",title:"פירוק אדן חלון",unit:"מא",dt:"rain_penetration|combined_damage",stage:"access",kw:"אדן חלון,פירוק"},
+  {ch:1,code:"1.24",title:"פירוק סורג",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"access",kw:"סורג,פירוק"},
+  {ch:1,code:"1.25",title:"פינוי פסולת בניין",unit:"קומפ'",dt:"water_leak|sewage_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,פינוי,בניין"},
+  {ch:1,code:"1.26",title:"העמסת פסולת למכולה",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"פסולת,מכולה,העמסה"},
+  {ch:1,code:"1.27",title:"השכרת מכולה",unit:"יום",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,השכרה"},
+  {ch:1,code:"1.28",title:"הובלת מכולה לאתר מאושר",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,הובלה,אתר"},
+  {ch:1,code:"1.29",title:"אגרות הטמנה וטיפול באתר מאושר",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"הטמנה,אגרה,פינוי"},
+  {ch:1,code:"1.30",title:"פינוי רכיבים פגומים לאתר מורשה",unit:"קומפ'",dt:"fire_smoke_damage|burglary_theft_damage|combined_damage",stage:"ancillary",kw:"פינוי,מורשה,רכיבים"},
+  {ch:2,code:"2.01",title:"החלפת קטע צנרת מים",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"צנרת,מים,החלפה"},
+  {ch:2,code:"2.02",title:"תיקון נקודת נזילה בצנרת",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נזילה,צנרת,תיקון"},
+  {ch:2,code:"2.03",title:"החלפת מחברי צנרת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מחבר,צנרת"},
+  {ch:2,code:"2.04",title:"החלפת ברזי ניתוק",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז ניתוק,החלפה"},
+  {ch:2,code:"2.05",title:"החלפת סיפון",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"סיפון,כיור"},
+  {ch:2,code:"2.06",title:"החלפת ברז מטבח",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מטבח"},
+  {ch:2,code:"2.07",title:"החלפת ברז מקלחת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מקלחת"},
+  {ch:2,code:"2.08",title:"פירוק והרכבת אסלה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אסלה,פירוק,הרכבה"},
+  {ch:2,code:"2.09",title:"פירוק והרכבת כיור",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"כיור,פירוק,הרכבה"},
+  {ch:2,code:"2.10",title:"החלפת קו ביוב",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"ביוב,קו,החלפה"},
+  {ch:2,code:"2.11",title:"פתיחת סתימה בקו ביוב",unit:"קומפ'",dt:"sewage_leak",stage:"directRepair",kw:"סתימה,ביוב"},
+  {ch:2,code:"2.12",title:"התקנת נקודת מים חדשה",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נקודת מים,התקנה"},
+  {ch:2,code:"2.13",title:"החלפת צנרת דלוחין",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"דלוחין,צנרת"},
+  {ch:2,code:"2.14",title:"החלפת אביזרי אינסטלציה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אביזרים,אינסטלציה"},
+  {ch:2,code:"2.15",title:"החלפת מכל הדחה",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מכל הדחה,אסלה"},
+  {ch:2,code:"2.16",title:"פירוק והרכבת מקלחון לצורך עבודות",unit:"יח'",dt:"water_leak",stage:"access",kw:"מקלחון,פירוק,הרכבה"},
+  {ch:2,code:"2.17",title:"פירוק והרכבת אמבטיה או אגנית",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אמבטיה,אגנית"},
+  {ch:2,code:"2.18",title:"החלפת קופסת ביקורת",unit:"יח'",dt:"sewage_leak",stage:"directRepair",kw:"קופסת ביקורת,ביוב"},
+  {ch:2,code:"2.19",title:"תיקון קו ניקוז",unit:"מא",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"ניקוז,תיקון"},
+  {ch:2,code:"2.20",title:"החלפת סעפת או מחלק מים",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"סעפת,מחלק מים"},
+  {ch:2,code:"2.21",title:"החלפת ניאגרה סמויה",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ניאגרה סמויה"},
+  {ch:2,code:"2.22",title:"החלפת ברז פרח",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז פרח"},
+  {ch:2,code:"2.23",title:"החלפת אינטרפוץ",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אינטרפוץ"},
+  {ch:2,code:"2.24",title:"החלפת ראש מקלחת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ראש מקלחת"},
+  {ch:2,code:"2.25",title:"תיקון חיבורי גיבריט",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"גיבריט,חיבורים"},
+  {ch:2,code:"2.26",title:"החלפת קטע צינור SP",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"SP,צינור"},
+  {ch:2,code:"2.27",title:"החלפת קטע צינור PEX",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"PEX,צינור"},
+  {ch:2,code:"2.28",title:"החלפת קטע צינור מתכת",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"צינור מתכת"},
+  {ch:2,code:"2.29",title:"החלפת מחסום רצפה",unit:"יח'",dt:"sewage_leak|water_leak",stage:"directRepair",kw:"מחסום רצפה"},
+  {ch:2,code:"2.30",title:"פירוק והרכבת דוד חשמל לצורך עבודות",unit:"יח'",dt:"water_leak|combined_damage",stage:"access",kw:"דוד,פירוק,הרכבה"},
+  {ch:3,code:"3.01",title:"בדיקת לחות בקירות או רצפה",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture|ongoing_dampness",stage:"inspection",kw:"לחות,בדיקה,רטיבות"},
+  {ch:3,code:"3.02",title:"בדיקת מצלמה תרמית",unit:"קומפ'",dt:"water_leak|rain_penetration",stage:"inspection",kw:"מצלמה תרמית,איתור"},
+  {ch:3,code:"3.03",title:"איתור נזילה באמצעות ציוד אקוסטי",unit:"קומפ'",dt:"water_leak",stage:"inspection",kw:"אקוסטי,איתור,נזילה"},
+  {ch:3,code:"3.04",title:"איתור נזילה מתקדם",unit:"קומפ'",dt:"water_leak|sewage_leak",stage:"inspection",kw:"איתור מתקדם"},
+  {ch:3,code:"3.05",title:"הצבת ציוד ייבוש תת רצפתי",unit:"יום",dt:"subfloor_moisture|flood",stage:"ancillary",kw:"ייבוש תת רצפתי"},
+  {ch:3,code:"3.06",title:"הצבת מפוחי ייבוש",unit:"יום",dt:"water_leak|flood",stage:"ancillary",kw:"מפוחים,ייבוש"},
+  {ch:3,code:"3.07",title:"הצבת סופחי לחות",unit:"יום",dt:"water_leak|flood|ongoing_dampness",stage:"ancillary",kw:"סופח לחות,ייבוש"},
+  {ch:3,code:"3.08",title:"ניטור רטיבות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"ניטור,ייבוש,רטיבות"},
+  {ch:3,code:"3.09",title:"ביקורות תקופתיות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood",stage:"inspection",kw:"ביקורת,ייבוש"},
+  {ch:3,code:"3.10",title:"פירוק ציוד ייבוש",unit:"קומפ'",dt:"water_leak|flood",stage:"ancillary",kw:"פירוק ציוד,ייבוש"},
+  {ch:3,code:"3.11",title:"דוח מדידות ייבוש",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"דוח,מדידה,ייבוש"},
+  {ch:3,code:"3.12",title:"בדיקות משלימות לאחר סיום ייבוש",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"בדיקות משלימות"},
+  {ch:3,code:"3.13",title:"בדיקת מד לחות לפרקט",unit:"קומפ'",dt:"parquet_damage|flood",stage:"inspection",kw:"מד לחות,פרקט"},
+  {ch:3,code:"3.14",title:"איתור רטיבות תת רצפתית",unit:"קומפ'",dt:"subfloor_moisture|flood",stage:"inspection",kw:"רטיבות תת רצפתית"},
+  {ch:3,code:"3.15",title:"בדיקת מקור חדירת גשם",unit:"קומפ'",dt:"rain_penetration|waterproofing_failure",stage:"inspection",kw:"חדירת גשם"},
+  {ch:3,code:"3.16",title:"בדיקת קונדנסציה",unit:"קומפ'",dt:"condensation",stage:"inspection",kw:"קונדנסציה,עיבוי"},
+  {ch:3,code:"3.17",title:"בדיקת עשן וריח לאחר שריפה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"inspection",kw:"עשן,ריח"},
+  {ch:3,code:"3.18",title:"בדיקת בטיחות חשמל לאחר רטיבות",unit:"קומפ'",dt:"electrical_water_damage",stage:"inspection",kw:"חשמל,רטיבות,בטיחות"},
+  {ch:4,code:"4.01",title:"סגירת פתחים בקיר בלוקים",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"סגירת פתחים,בלוקים"},
+  {ch:4,code:"4.02",title:"סגירת קיר גבס",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"קיר גבס,סגירה"},
+  {ch:4,code:"4.03",title:"תיקוני בטון",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בטון,תיקון"},
+  {ch:4,code:"4.04",title:"יציקת בטון מקומית",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"יציקה,בטון"},
+  {ch:4,code:"4.05",title:"תיקון סדקים בקיר",unit:"מא",dt:"rain_penetration|ongoing_dampness|waterproofing_failure",stage:"restoration",kw:"סדקים,קיר"},
+  {ch:4,code:"4.06",title:"בניית קיר בלוקים חדש",unit:"מר",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"קיר חדש,בלוקים"},
+  {ch:4,code:"4.07",title:"תיקון תקרה פגומה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה,תיקון"},
+  {ch:4,code:"4.08",title:"השלמת תשתית לאחר פירוק",unit:"מר",dt:"water_leak|sewage_leak|combined_damage",stage:"restoration",kw:"תשתית,השלמה"},
+  {ch:4,code:"4.09",title:"תיקון נישות או פתחים",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"נישה,פתחים"},
+  {ch:4,code:"4.10",title:"עבודות הכנה לפני גמר",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"ancillary",kw:"הכנה,גמר"},
+  {ch:4,code:"4.11",title:"בניית מחיצת גבס חדשה",unit:"מר",dt:"combined_damage",stage:"restoration",kw:"מחיצת גבס"},
+  {ch:4,code:"4.12",title:"תיקון חגורת בטון מקומית",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"חגורת בטון"},
+  {ch:4,code:"4.13",title:"מילוי תעלות בקיר לאחר צנרת",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"מילוי תעלות"},
+  {ch:4,code:"4.14",title:"יישור קיר לאחר סגירה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"יישור קיר"},
+  {ch:4,code:"4.15",title:"תיקון פינת קיר",unit:"יח'",dt:"combined_damage|water_leak",stage:"restoration",kw:"פינת קיר"},
+  {ch:4,code:"4.16",title:"בניית אדן פנימי",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"אדן פנימי"},
+  {ch:4,code:"4.17",title:"יציקת מצע לריצוף חוזר",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"מצע,ריצוף"},
+  {ch:4,code:"4.18",title:"שיקום קיר לאחר פריצה",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"קיר,פריצה"},
+  {ch:5,code:"5.01",title:"אספקה והתקנת ריצוף קרמיקה כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"ריצוף,קרמיקה,רובה"},
+  {ch:5,code:"5.02",title:"אספקה והתקנת ריצוף גרניט פורצלן כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"גרניט פורצלן,ריצוף,רובה"},
+  {ch:5,code:"5.03",title:"אספקה והתקנת חיפוי קיר קרמיקה כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"חיפוי,קרמיקה,רובה"},
+  {ch:5,code:"5.04",title:"אספקה והתקנת חיפוי קיר גרניט פורצלן כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"חיפוי,גרניט פורצלן,רובה"},
+  {ch:5,code:"5.05",title:"התאמות וחיתוכים לאריחים סביב אביזרים צנרת ופינות",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"חיתוך אריחים,התאמות"},
+  {ch:5,code:"5.06",title:"התקנת פנלים תואמים לריצוף",unit:"מא",dt:"water_leak|flood|subfloor_moisture",stage:"restoration",kw:"פנלים,ריצוף"},
+  {ch:5,code:"5.07",title:"השלמת ריצוף מקומית לאחר פתיחת תוואי",unit:"מר",dt:"water_leak",stage:"restoration",kw:"השלמת ריצוף,תוואי"},
+  {ch:5,code:"5.08",title:"פירוק פרקט קיים",unit:"מר",dt:"parquet_damage|flood",stage:"access",kw:"פירוק פרקט"},
+  {ch:5,code:"5.09",title:"אספקה והתקנת פרקט למינציה",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"פרקט למינציה"},
+  {ch:5,code:"5.10",title:"אספקה והתקנת פרקט פולימרי SPC",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"SPC,פרקט פולימרי"},
+  {ch:5,code:"5.11",title:"אספקה והתקנת פרקט עץ רב שכבתי",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ רב שכבתי"},
+  {ch:5,code:"5.12",title:"אספקה והתקנת פרקט עץ טבעי",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ טבעי"},
+  {ch:5,code:"5.13",title:"התקנת ספוג או תשתית לפרקט",unit:"מר",dt:"parquet_damage|flood",stage:"restoration",kw:"תשתית לפרקט,ספוג"},
+  {ch:5,code:"5.14",title:"התקנת פנלים תואמים לפרקט",unit:"מא",dt:"parquet_damage|flood",stage:"restoration",kw:"פנלים,פרקט"},
+  {ch:5,code:"5.15",title:"התאמות וחיתוכים בפרקט סביב משקופים וקירות",unit:"מא",dt:"parquet_damage",stage:"restoration",kw:"חיתוכים,פרקט,משקופים"},
+  {ch:5,code:"5.16",title:"פירוק והתקנה מחדש של פרקט קיים ככל שניתן",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פירוק והתקנה מחדש,פרקט"},
+  {ch:5,code:"5.17",title:"החלפת לוחות פרקט פגומים באופן נקודתי",unit:"יח'",dt:"parquet_damage|flood",stage:"restoration",kw:"לוחות פרקט,החלפה"},
+  {ch:5,code:"5.18",title:"השלמת חיפוי נקודתית",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"השלמת חיפוי"},
+  {ch:5,code:"5.19",title:"פירוק והחזרת פנלים",unit:"מא",dt:"water_leak|flood|parquet_damage",stage:"restoration",kw:"פנלים,החזרה"},
+  {ch:5,code:"5.20",title:"התאמת גוון או סוג ריצוף קיים",unit:"מר",dt:"water_leak|subfloor_moisture",stage:"restoration",kw:"גוון,ריצוף,התאמה"},
+  {ch:5,code:"5.21",title:"ריצוף מוזאיקה כולל רובה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"מוזאיקה,ריצוף"},
+  {ch:5,code:"5.22",title:"ריצוף דמוי פרקט כולל רובה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"דמוי פרקט"},
+  {ch:5,code:"5.23",title:"חיפוי פסיפס כולל מילוי מישקים",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"פסיפס,חיפוי"},
+  {ch:5,code:"5.24",title:"אספקה והתקנת אריחי שיש",unit:"מר",dt:"combined_damage",stage:"restoration",kw:"אריחי שיש"},
+  {ch:5,code:"5.25",title:"רובה אפוקסית לחיפוי או ריצוף",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה אפוקסית"},
+  {ch:5,code:"5.26",title:"פירוק רובה פגומה והחלפתה",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה,החלפה"},
+  {ch:5,code:"5.27",title:"יישור תשתית לריצוף",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"יישור תשתית"},
+  {ch:5,code:"5.28",title:"הדבקת אריחים חוזרת",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"הדבקה,אריחים"},
+  {ch:5,code:"5.29",title:"השלמת פנלים חסרים",unit:"מא",dt:"water_leak|flood",stage:"restoration",kw:"פנלים חסרים"},
+  {ch:5,code:"5.30",title:"מעבר פרופיל בין פרקט לריצוף",unit:"מא",dt:"parquet_damage|combined_damage",stage:"restoration",kw:"פרופיל מעבר"},
+  {ch:5,code:"5.31",title:"פירוק שטיח מקיר לקיר",unit:"מר",dt:"flood|combined_damage",stage:"access",kw:"שטיח,פירוק"},
+  {ch:5,code:"5.32",title:"אספקה והתקנת שטיח מקיר לקיר",unit:"מר",dt:"combined_damage|flood",stage:"restoration",kw:"שטיח,התקנה"},
+  {ch:5,code:"5.33",title:"ייבוש והחזרת שטיח קיים",unit:"מר",dt:"flood",stage:"restoration",kw:"שטיח,ייבוש"},
+  {ch:5,code:"5.34",title:"חידוש ספי דלת לאחר ריצוף",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"סף דלת,ריצוף"},
+  {ch:6,code:"6.01",title:"תיקוני טיח",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"טיח,תיקון"},
+  {ch:6,code:"6.02",title:"טיח שחור",unit:"מר",dt:"water_leak",stage:"restoration",kw:"טיח שחור"},
+  {ch:6,code:"6.03",title:"טיח לבן",unit:"מר",dt:"water_leak",stage:"restoration",kw:"טיח לבן"},
+  {ch:6,code:"6.04",title:"עבודות שפכטל",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"שפכטל"},
+  {ch:6,code:"6.05",title:"צביעה מקומית",unit:"מר",dt:"water_leak|flood|ongoing_dampness",stage:"restoration",kw:"צביעה מקומית"},
+  {ch:6,code:"6.06",title:"צביעה מלאה",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"צביעה מלאה"},
+  {ch:6,code:"6.07",title:"צבע נגד עובש",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,צבע"},
+  {ch:6,code:"6.08",title:"צבע אקרילי לקירות",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"צבע אקרילי"},
+  {ch:6,code:"6.09",title:"פריימר או יסוד לפני צביעה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"פריימר,יסוד"},
+  {ch:6,code:"6.10",title:"טיפול בקילופי צבע",unit:"מר",dt:"water_leak|fire_smoke_damage|ongoing_dampness",stage:"restoration",kw:"קילופי צבע"},
+  {ch:6,code:"6.11",title:"תיקון תקרות לאחר רטיבות",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"תקרה,רטיבות"},
+  {ch:6,code:"6.12",title:"צביעת תקרה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"צביעת תקרה"},
+  {ch:6,code:"6.13",title:"צביעת משקופים או דלתות",unit:"מא",dt:"burglary_theft_damage|fire_smoke_damage",stage:"restoration",kw:"צביעת משקופים,דלת"},
+  {ch:6,code:"6.14",title:"צבע חוסם כתמים",unit:"מר",dt:"water_leak|fire_smoke_damage|sewage_leak",stage:"restoration",kw:"חוסם כתמים"},
+  {ch:6,code:"6.15",title:"תיקון שפכטל מלא בקיר",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"שפכטל מלא"},
+  {ch:6,code:"6.16",title:"יישום בונדרול",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בונדרול"},
+  {ch:6,code:"6.17",title:"צביעת קיר חוץ",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"קיר חוץ"},
+  {ch:6,code:"6.18",title:"צבע אלסטי לקיר חוץ",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"צבע אלסטי"},
+  {ch:6,code:"6.19",title:"טיפול בעובש ופטריות לפני צבע",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,פטריות"},
+  {ch:6,code:"6.20",title:"הסרת פיח מקירות לפני צבע",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קיר"},
+  {ch:6,code:"6.21",title:"צביעת חדר מלא לאחר נזק",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"חדר מלא,צבע"},
+  {ch:6,code:"6.22",title:"גמר חלק לקיר לאחר תיקון",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"גמר חלק"},
+  {ch:6,code:"6.23",title:"תיקון צבע בתקרה אקוסטית",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה אקוסטית"},
+  {ch:6,code:"6.24",title:"צביעת סורג או מסגרת מתכת",unit:"מא",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג,מתכת"},
+  {ch:7,code:"7.01",title:"פירוק והרכבת ארון מטבח",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון מטבח,פירוק,הרכבה"},
+  {ch:7,code:"7.02",title:"תיקון ארון מטבח",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"ארון מטבח,תיקון"},
+  {ch:7,code:"7.03",title:"החלפת תחתית ארון",unit:"יח'",dt:"water_leak|flood|carpentry_damage",stage:"restoration",kw:"תחתית ארון,החלפה"},
+  {ch:7,code:"7.04",title:"החלפת צירים בארון",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"צירים,ארון"},
+  {ch:7,code:"7.05",title:"החלפת מסילות למגירות",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מסילות,מגירות"},
+  {ch:7,code:"7.06",title:"תיקון דלתות ארון",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"דלתות ארון,תיקון"},
+  {ch:7,code:"7.07",title:"החלפת חלקי נגרות פגומים",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"חלקי נגרות,פגומים"},
+  {ch:7,code:"7.08",title:"פירוק והרכבת ארון אמבטיה",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון אמבטיה"},
+  {ch:7,code:"7.09",title:"החלפת חזיתות",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"חזיתות,ארון"},
+  {ch:7,code:"7.10",title:"החלפת מדפים",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מדפים,החלפה"},
+  {ch:7,code:"7.11",title:"התאמות נגרות סביב צנרת או קירות",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"התאמות נגרות"},
+  {ch:7,code:"7.12",title:"החלפת סוקל",unit:"מא",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"סוקל,נגרות"},
+  {ch:7,code:"7.13",title:"תיקון נזקי נפיחות או רטיבות בנגרות",unit:"יח'",dt:"water_leak|ongoing_dampness|flood",stage:"restoration",kw:"נפיחות,רטיבות,נגרות"},
+  {ch:7,code:"7.14",title:"החלפת משטחי MDF או סנדוויץ'",unit:"מר",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"MDF,סנדוויץ"},
+  {ch:7,code:"7.15",title:"החלפת דלת פנים מעץ",unit:"יח'",dt:"fire_smoke_damage|burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"דלת פנים,עץ"},
+  {ch:7,code:"7.16",title:"החלפת משקוף עץ",unit:"יח'",dt:"burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"משקוף עץ"},
+  {ch:7,code:"7.17",title:"תיקון מזנון או נגרות סלון",unit:"יח'",dt:"carpentry_damage|combined_damage",stage:"restoration",kw:"מזנון"},
+  {ch:7,code:"7.18",title:"שיקום ארון קיר",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"ארון קיר"},
+  {ch:7,code:"7.19",title:"החלפת גב ארון",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"גב ארון"},
+  {ch:7,code:"7.20",title:"החלפת ידיות ופרזול נגרות",unit:"יח'",dt:"carpentry_damage|burglary_theft_damage",stage:"restoration",kw:"ידיות,פרזול"},
+  {ch:7,code:"7.21",title:"ייבוש ושיקום ארון קיים",unit:"יח'",dt:"water_leak|flood",stage:"restoration",kw:"ייבוש ארון"},
+  {ch:7,code:"7.22",title:"התאמת נגרות לאחר החלפת שיש",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"נגרות,שיש"},
+  {ch:8,code:"8.01",title:"תיקון תריס גלילה ידני",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס ידני"},
+  {ch:8,code:"8.02",title:"תיקון תריס גלילה חשמלי",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס חשמלי"},
+  {ch:8,code:"8.03",title:"החלפת מנוע תריס חשמלי",unit:"יח'",dt:"aluminum_damage",stage:"directRepair",kw:"מנוע תריס"},
+  {ch:8,code:"8.04",title:"החלפת שלבי תריס",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"שלבי תריס"},
+  {ch:8,code:"8.05",title:"החלפת רצועת תריס",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"רצועת תריס"},
+  {ch:8,code:"8.06",title:"תיקון מסילות תריס",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"מסילות תריס"},
+  {ch:8,code:"8.07",title:"פירוק והרכבת חלון אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"access",kw:"חלון אלומיניום"},
+  {ch:8,code:"8.08",title:"פירוק והרכבת ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה"},
+  {ch:8,code:"8.09",title:"תיקון מסגרת אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"restoration",kw:"מסגרת אלומיניום"},
+  {ch:8,code:"8.10",title:"החלפת גלגלים לחלון הזזה",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"גלגלים,חלון הזזה"},
+  {ch:8,code:"8.11",title:"תיקון נעילת חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"נעילה,חלון"},
+  {ch:8,code:"8.12",title:"החלפת זכוכית לחלון",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
+  {ch:8,code:"8.13",title:"החלפת זכוכית לוויטרינה",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
+  {ch:8,code:"8.14",title:"התקנת רשת לחלון",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"רשת,חלון"},
+  {ch:8,code:"8.15",title:"תיקון תריס ונציאני או פנימי",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"תריס ונציאני"},
+  {ch:8,code:"8.16",title:"תיקון פרופיל אלומיניום",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"פרופיל אלומיניום"},
+  {ch:8,code:"8.17",title:"החלפת ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת ויטרינה"},
+  {ch:8,code:"8.18",title:"החלפת חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
+  {ch:8,code:"8.19",title:"תיקון אטמי אלומיניום",unit:"מא",dt:"rain_penetration|condensation|aluminum_damage",stage:"directRepair",kw:"אטמים,אלומיניום"},
+  {ch:8,code:"8.20",title:"תיקון מסגרת או כנף שנפגעה בפריצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת,כנף,פריצה"},
+  {ch:8,code:"8.21",title:"החלפת ארגז תריס",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ארגז תריס"},
+  {ch:8,code:"8.22",title:"החלפת מסילה לתריס גלילה",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"מסילה לתריס"},
+  {ch:8,code:"8.23",title:"החלפת נעילת ויטרינה",unit:"יח'",dt:"burglary_theft_damage|aluminum_damage",stage:"restoration",kw:"נעילת ויטרינה"},
+  {ch:8,code:"8.24",title:"התקנת זכוכית מחוסמת",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"זכוכית מחוסמת"},
+  {ch:8,code:"8.25",title:"החלפת ידית חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ידית חלון"},
+  {ch:8,code:"8.26",title:"כיוון כנף חלון או דלת הזזה",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"כיוון כנף"},
+  {ch:8,code:"8.27",title:"איטום היקפי לחלון או ויטרינה",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"directRepair",kw:"איטום היקפי"},
+  {ch:8,code:"8.28",title:"החלפת סורג אלומיניום או מתכת",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג"},
+  {ch:9,code:"9.01",title:"פירוק משטח שיש",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"פירוק שיש"},
+  {ch:9,code:"9.02",title:"התקנת משטח שיש חדש",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"restoration",kw:"משטח שיש חדש"},
+  {ch:9,code:"9.03",title:"התאמת שיש לכיור",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"שיש,כיור"},
+  {ch:9,code:"9.04",title:"חיתוך שיש",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"חיתוך שיש"},
+  {ch:9,code:"9.05",title:"תיקון סדקים בשיש",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"סדקים,שיש"},
+  {ch:9,code:"9.06",title:"פירוק והחזרת שיש קיים",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"החזרת שיש"},
+  {ch:9,code:"9.07",title:"התקנת קנטים או גמרי שיש",unit:"מא",dt:"combined_damage|water_leak",stage:"restoration",kw:"קנטים,שיש"},
+  {ch:9,code:"9.08",title:"התאמות שיש סביב קיר או נגרות",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"התאמות שיש"},
+  {ch:9,code:"9.09",title:"החלפת אדן חלון מאבן או שיש",unit:"מא",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"אדן חלון,שיש"},
+  {ch:9,code:"9.10",title:"החלפת סף שיש לדלת",unit:"יח'",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"סף שיש"},
+  {ch:9,code:"9.11",title:"ליטוש שיש מקומי",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"ליטוש שיש"},
+  {ch:9,code:"9.12",title:"הדבקת חלק שיש שנשבר",unit:"יח'",dt:"combined_damage",stage:"restoration",kw:"הדבקת שיש"},
+  {ch:9,code:"9.13",title:"החלפת שיש באמבטיה",unit:"מא",dt:"water_leak|combined_damage",stage:"restoration",kw:"שיש אמבטיה"},
+  {ch:9,code:"9.14",title:"החלפת חיפוי אבן",unit:"מר",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"חיפוי אבן"},
+  {ch:9,code:"9.15",title:"פירוק אבן קופינג או אדן חוץ",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"access",kw:"קופינג,אדן חוץ"},
+  {ch:10,code:"10.01",title:"פירוק והרכבת גוף תאורה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"גוף תאורה,פירוק,הרכבה"},
+  {ch:10,code:"10.02",title:"החלפת גוף תאורה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"החלפת גוף תאורה"},
+  {ch:10,code:"10.03",title:"החלפת מפסק חשמל",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"מפסק חשמל"},
+  {ch:10,code:"10.04",title:"החלפת שקע חשמל",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"שקע חשמל"},
+  {ch:10,code:"10.05",title:"תיקון חיווט מקומי",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"directRepair",kw:"חיווט,תיקון"},
+  {ch:10,code:"10.06",title:"התקנת נקודת חשמל",unit:"נק'",dt:"combined_damage|electrical_water_damage",stage:"restoration",kw:"נקודת חשמל"},
+  {ch:10,code:"10.07",title:"החלפת קופסת חשמל פגומה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"קופסת חשמל"},
+  {ch:10,code:"10.08",title:"בדיקת תקינות חשמל לאחר נזק",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת חשמל"},
+  {ch:10,code:"10.09",title:"החלפת אביזר חשמל שנפגע",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"אביזר חשמל"},
+  {ch:10,code:"10.10",title:"החלפת קטע כבל שנפגע",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"כבל,החלפה"},
+  {ch:10,code:"10.11",title:"עבודות חשמל נלוות לתריס חשמלי",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"ancillary",kw:"תריס חשמלי,חשמל"},
+  {ch:10,code:"10.12",title:"החלפת לוחון חשמל מקומי",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"לוחון חשמל"},
+  {ch:10,code:"10.13",title:"החלפת מפסק פחת",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"מפסק פחת"},
+  {ch:10,code:"10.14",title:"ייבוש ושיקום נקודת חשמל",unit:"יח'",dt:"electrical_water_damage",stage:"restoration",kw:"ייבוש נקודת חשמל"},
+  {ch:10,code:"10.15",title:"פירוק והרכבת מאוורר תקרה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"מאוורר תקרה"},
+  {ch:10,code:"10.16",title:"החלפת גלאי עשן",unit:"יח'",dt:"fire_smoke_damage|combined_damage",stage:"restoration",kw:"גלאי עשן"},
+  {ch:10,code:"10.17",title:"החלפת פס לד או תאורת נסתרת",unit:"מא",dt:"electrical_water_damage|combined_damage",stage:"restoration",kw:"פס לד"},
+  {ch:10,code:"10.18",title:"בדיקת בידוד למעגל חשמלי",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת בידוד"},
+  {ch:11,code:"11.01",title:"פינוי פסולת בניין",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,בניין"},
+  {ch:11,code:"11.02",title:"ניקיון לאחר עבודות",unit:"קומפ'",dt:"water_leak|flood|combined_damage",stage:"cleaning",kw:"ניקיון לאחר עבודות"},
+  {ch:11,code:"11.03",title:"פינוי אריזות וחומרים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"אריזות,חומרים"},
+  {ch:11,code:"11.04",title:"ניקוי יסודי לאחר שיקום",unit:"קומפ'",dt:"sewage_leak|fire_smoke_damage|flood",stage:"cleaning",kw:"ניקוי יסודי"},
+  {ch:11,code:"11.05",title:"עבודות הגנה או כיסוי לפני ביצוע",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנה,כיסוי"},
+  {ch:11,code:"11.06",title:"הובלות קטנות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הובלות קטנות"},
+  {ch:11,code:"11.07",title:"פירוק והחזרת ציוד או ריהוט לצורך ביצוע",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"ריהוט,פירוק,החזרה"},
+  {ch:11,code:"11.08",title:"עבודות תיאום מיוחדות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"תיאום מיוחד"},
+  {ch:11,code:"11.09",title:"חיטוי וניקוי לאחר ביוב",unit:"קומפ'",dt:"sewage_leak",stage:"cleaning",kw:"חיטוי,ביוב"},
+  {ch:11,code:"11.10",title:"ניקוי חלונות לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"חלונות,ניקיון"},
+  {ch:11,code:"11.11",title:"פוליש לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"פוליש"},
+  {ch:11,code:"11.12",title:"פינוי תכולה זמני לצורך שיקום",unit:"קומפ'",dt:"flood|fire_smoke_damage|combined_damage",stage:"ancillary",kw:"תכולה זמנית"},
+  {ch:11,code:"11.13",title:"כיסוי והגנת ריהוט",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנת ריהוט"},
+  {ch:11,code:"11.14",title:"שאיבת מים ראשונית",unit:"קומפ'",dt:"flood|water_leak",stage:"ancillary",kw:"שאיבת מים"},
+  {ch:12,code:"12.01",title:"ניקוי פיח מקירות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קירות"},
+  {ch:12,code:"12.02",title:"ניקוי פיח מתקרות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,תקרה"},
+  {ch:12,code:"12.03",title:"ניקוי פיח ממשטחים",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,משטחים"},
+  {ch:12,code:"12.04",title:"ניקוי ריח עשן באמצעים ייעודיים",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"ריח עשן,ניקוי"},
+  {ch:12,code:"12.05",title:"ניקוי מערכות אוורור או פתחים",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"אוורור,פתחים"},
+  {ch:12,code:"12.06",title:"קילוף צבע פגום",unit:"מר",dt:"fire_smoke_damage",stage:"access",kw:"קילוף צבע"},
+  {ch:12,code:"12.07",title:"תיקוני טיח לאחר חום או פיח",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"טיח,חום,פיח"},
+  {ch:12,code:"12.08",title:"פריימר חוסם פיח",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"פריימר,פיח"},
+  {ch:12,code:"12.09",title:"צביעה מלאה לאחר נזקי אש או עשן",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"צביעה,אש,עשן"},
+  {ch:12,code:"12.10",title:"צבע או חומר חוסם ריחות עשן",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"חוסם ריחות"},
+  {ch:12,code:"12.11",title:"פירוק נגרות שנפגעה משריפה",unit:"יח'",dt:"fire_smoke_damage",stage:"access",kw:"נגרות,שריפה"},
+  {ch:12,code:"12.12",title:"החלפת דלתות או ארונות שנפגעו",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"דלתות,ארונות"},
+  {ch:12,code:"12.13",title:"החלפת חיווט או אביזרי חשמל שנפגעו",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"חיווט,אביזרי חשמל"},
+  {ch:12,code:"12.14",title:"פינוי פסולת שריפה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"פסולת שריפה"},
+  {ch:12,code:"12.15",title:"פינוי תכולה פגומה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"תכולה,פינוי"},
+  {ch:12,code:"12.16",title:"ניקוי תקרת אקוסטית מפיח",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"תקרה אקוסטית,פיח"},
+  {ch:12,code:"12.17",title:"החלפת לוחות תקרה שנפגעו מאש",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"לוחות תקרה"},
+  {ch:12,code:"12.18",title:"ניקוי מסגרות אלומיניום מפיח",unit:"מא",dt:"fire_smoke_damage",stage:"cleaning",kw:"אלומיניום,פיח"},
+  {ch:13,code:"13.01",title:"החלפת דלת כניסה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת כניסה"},
+  {ch:13,code:"13.02",title:"תיקון דלת כניסה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון דלת כניסה"},
+  {ch:13,code:"13.03",title:"החלפת משקוף",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת משקוף"},
+  {ch:13,code:"13.04",title:"תיקון משקוף",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון משקוף"},
+  {ch:13,code:"13.05",title:"החלפת מנעול",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול,החלפה"},
+  {ch:13,code:"13.06",title:"החלפת צילינדר",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"צילינדר,החלפה"},
+  {ch:13,code:"13.07",title:"התקנת מנעול חדש",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול חדש,מיגון"},
+  {ch:13,code:"13.08",title:"החלפת זכוכית לחלון",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
+  {ch:13,code:"13.09",title:"תיקון חלון אלומיניום",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"חלון אלומיניום,תיקון"},
+  {ch:13,code:"13.10",title:"תיקון מסגרת חלון",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת חלון"},
+  {ch:13,code:"13.11",title:"החלפת חלון",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
+  {ch:13,code:"13.12",title:"תיקון תריס גלילה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תריס גלילה"},
+  {ch:13,code:"13.13",title:"החלפת שלבי תריס",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"שלבי תריס"},
+  {ch:13,code:"13.14",title:"תיקון מסילות תריס",unit:"מא",dt:"burglary_theft_damage",stage:"restoration",kw:"מסילות תריס"},
+  {ch:13,code:"13.15",title:"החלפת זכוכית ויטרינה",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
+  {ch:13,code:"13.16",title:"תיקון מסגרת ויטרינה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת ויטרינה"},
+  {ch:13,code:"13.17",title:"התקנת פרזול משלים",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"פרזול"},
+  {ch:13,code:"13.18",title:"תיקון דלת פנים או חוץ שנפרצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת שנפרצה"},
+  {ch:14,code:"14.01",title:"סעיף מותנה בכפוף לחשיפה",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"מותנה,חשיפה"},
+  {ch:14,code:"14.02",title:"סעיף מותנה ככל שיתגלה נזק נוסף",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"נזק נוסף,מותנה"},
+  {ch:14,code:"14.03",title:"עבודה מיוחדת לפי תנאי אתר",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"תנאי אתר,עבודה מיוחדת"},
+  {ch:14,code:"14.04",title:"עבודה בגישה מוגבלת",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"גישה מוגבלת"},
+  {ch:14,code:"14.05",title:"תוספת בגין פירוק והרכבה מורכבים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"פירוק מורכב,הרכבה מורכבת"},
+  {ch:14,code:"14.06",title:"התאמות מיוחדות לעבודות משולבות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודות משולבות,התאמות"},
+  {ch:14,code:"14.07",title:"סעיף כללי שאינו משויך לפרק אחר",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"סעיף כללי"},
+  {ch:14,code:"14.08",title:"תוספת עבור עבודה דחופה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודה דחופה"},
+  {ch:14,code:"14.09",title:"תוספת עבור עבודה בשעות חריגות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"שעות חריגות"},
+  {ch:14,code:"14.10",title:"תוספת עבור נגישות מורכבת או פירוק מיוחד",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"נגישות מורכבת"},
+];
+
+const BOQ_CHAPTER_TITLES = {
+  '1':'עבודות פירוק, הריסה ופינוי',
+  '2':'עבודות אינסטלציה',
+  '3':'עבודות איתור וייבוש',
+  '4':'עבודות בנייה, תיקונים וסגירת פתחים',
+  '5':'עבודות ריצוף, חיפוי ופרקט',
+  '6':'עבודות טיח, שפכטל וצבע',
+  '7':'עבודות נגרות',
+  '8':'עבודות אלומיניום, זכוכית ותריסים',
+  '9':'עבודות שיש ואבן',
+  '10':'עבודות חשמל משלימות',
+  '11':'ניקיון, פינוי סופי ועבודות נלוות',
+  '12':'עבודות ניקוי ושיקום נזקי אש ועשן',
+  '13':'עבודות פריצה, גניבה, דלתות ומיגון',
+  '14':'סעיפים מיוחדים / מותנים / כלליים'
+};
+const BOQ_CH_SECTION = {
+  '1':'structItems','2':'structItems','3':'structItems',
+  '4':'structItems','5':'structItems','6':'structItems',
+  '7':'contentsItems','8':'structItems','9':'structItems',
+  '10':'structItems','11':'serviceItems','12':'serviceItems',
+  '13':'structItems','14':'serviceItems'
+};
+const BOQ_DT_MAP = {
+  water:['water_leak','sewage_leak','flood','subfloor_moisture','rain_penetration',
+         'waterproofing_failure','ongoing_dampness','condensation','parquet_damage'],
+  fire: ['fire_smoke_damage','combined_damage','electrical_water_damage'],
+  burglary:['burglary_theft_damage']
+};
+
 // APPRAISER profile — loaded from Firestore after login
 let APPRAISER = {
   nameHe:'', nameEn:'', title:'שמאי רכוש',
@@ -800,7 +1104,7 @@ let currentCaseId = null;
 let STATE = {
   base:{fullName:'',idNum:'',phone:'',email:'',eventDate:'',visitDate:'',city:'',street:'',streetNum:'',apartment:''},
   property:{type:'apartment',usage:'residential',sqm:'',floor:'',yearBuilt:'',material:'',preCondition:''},
-  insurance:{company:'',policyNum:'',claimNum:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extWaterPipe:false,extNaturalDisaster:false,extBurglary:false,extTerror:false,lastDocDate:''},
+  insurance:{company:'',policyNum:'',claimNum:'',eventReportDate:'',appointmentDate:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extNaturalDisaster:false,extTerror:false,lastDocDate:''},
   event:{eventType:'',eventSubType:'',plumberType:'',requestedBy:'',requesterName:'',visitPurpose:[],policeReport:'',policeNum:'',professionals:[],profDetails:{},appraiserDeclaration:''},
   circ:{infoSource:'',infoName:'',discDate:'',discTime:'',wasOccupied:'',immediateAction:'',ongoingDmg:'',pastEvent:'',waterOrigin:'',waterDuration:'',wallOpened:'',prevRepair:'',prevRepairDate:'',prevRepairBy:'',prevRepairReason:'',recentPlumber:'',recentPlumberDate:'',recentPlumberReason:'',fireLocation:'',fireType:'',fireDept:'',burglaryMethod:'',stolenItems:'',alarmExists:'',camerasExist:'',extraNotes:'',circumOverride:''},
   findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:''},
@@ -876,6 +1180,16 @@ const WATER_SIGNS = {
     {id:'w_smell',l:'ריח טחב'}
   ]
 };
+
+// Which WATER_SIGNS categories apply to which room types
+// key = category name, value = array of room IDs that should show it (empty = all rooms)
+const WATER_SIGNS_ROOM_FILTER = {
+  'חדרים רטובים': ['bath','toilet','service','bath_biz'],
+  'מטבח ונגרות':  ['kitchen','ind_kitchen'],
+  'משקופים':       ['living','bedroom','kids','hall','office','lobby','sales'],
+  // all others (קירות ותקרות, ריצוף ותשתיות, חשמל, עובש ולחות) = no filter = show everywhere
+};
+
 const FIRE_SIGNS = {
   'נזקי שריפה ועשן כלליים':[
     {id:'f_soot',l:'נזקי פיח'},{id:'f_smoke',l:'נזקי עשן'},
@@ -1134,7 +1448,7 @@ function selectMode(m){
   STATE = {
     base:{fullName:'',idNum:'',phone:'',email:'',eventDate:'',visitDate:'',city:'',street:'',streetNum:'',apartment:''},
     property:{type:'apartment',usage:'residential',sqm:'',floor:'',yearBuilt:'',material:'',preCondition:''},
-    insurance:{company:'',policyNum:'',claimNum:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extWaterPipe:false,extNaturalDisaster:false,extBurglary:false,extTerror:false,lastDocDate:''},
+    insurance:{company:'',policyNum:'',claimNum:'',eventReportDate:'',appointmentDate:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extNaturalDisaster:false,extTerror:false,lastDocDate:''},
     event:{eventType:'',eventSubType:'',plumberType:'',requestedBy:'',requesterName:'',visitPurpose:[],policeReport:'',policeNum:'',professionals:[],profDetails:{},appraiserDeclaration:''},
     circ:{infoSource:'',infoName:'',discDate:'',discTime:'',wasOccupied:'',immediateAction:'',ongoingDmg:'',pastEvent:'',waterOrigin:'',waterDuration:'',wallOpened:'',prevRepair:'',prevRepairDate:'',prevRepairBy:'',prevRepairReason:'',recentPlumber:'',recentPlumberDate:'',recentPlumberReason:'',fireLocation:'',fireType:'',fireDept:'',burglaryMethod:'',stolenItems:'',alarmExists:'',camerasExist:'',extraNotes:'',circumOverride:''},
     findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:''},
@@ -1217,8 +1531,8 @@ function renderCard(n){
     9:{title:'תמונות',icon:'📷',sub:'תיעוד ביקור וממצאים'}
   };
   const d = cardDefs[n];
-  let html = `<h2 class="page-title">${d.icon} ${d.title}</h2><p class="page-sub">${d.sub}</p>`;
-  html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">`;
+  let html = `<div style="max-width:860px;"><h2 class="page-title">${d.icon} ${d.title}</h2><p class="page-sub">${d.sub}</p></div>`;
+  html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:860px;">`;
   if(n===1) html += renderCard1();
   else if(n===2) html += renderCard2();
   else if(n===3) html += renderCard3();
@@ -1284,7 +1598,7 @@ function renderCard2(){
       <select onchange="STATE.property.material=this.value">
         <option value="" ${!p.material?'selected':''}>—</option>
         <option value="concrete" ${p.material==='concrete'?'selected':''}>בטון</option>
-        <option value="blocks" ${p.material==='blocks'?'selected':''}>בלוקים</option>
+        <option value="blocks" ${p.material==='blocks'?'selected':''}>בנייה קונבנציונלית (בלוקים ובטון)</option>
         <option value="prefab" ${p.material==='prefab'?'selected':''}>פל-קל</option>
         <option value="wood" ${p.material==='wood'?'selected':''}>עץ</option>
         <option value="steel" ${p.material==='steel'?'selected':''}>פלדה</option>
@@ -1336,7 +1650,9 @@ function renderCard3(){
       </select>
     </div>
     ${isIns?`<div class="field"><label class="label">מספר פוליסה *</label><input type="text" value="${esc(ins.policyNum)}" oninput="STATE.insurance.policyNum=this.value"></div>
-    <div class="field"><label class="label">מספר תביעה *</label><input type="text" value="${esc(ins.claimNum)}" oninput="STATE.insurance.claimNum=this.value"></div>`:''}
+    <div class="field"><label class="label">מספר תביעה *</label><input type="text" value="${esc(ins.claimNum)}" oninput="STATE.insurance.claimNum=this.value"></div>
+    <div class="field"><label class="label">📅 תאריך קבלת הודעת האירוע ע"י חברת הביטוח</label><input type="date" value="${esc(ins.eventReportDate||'')}" oninput="STATE.insurance.eventReportDate=this.value" title="מתי חברת הביטוח קיבלה הודעה מהמבוטח"></div>
+    <div class="field"><label class="label">📅 תאריך מינוי השמאי</label><input type="date" value="${esc(ins.appointmentDate||'')}" oninput="STATE.insurance.appointmentDate=this.value"></div>`:''}
     <div class="divider span2"></div>
     <div class="span2">
       <div class="label" style="color:var(--accent);font-size:12px;margin-bottom:8px;">📋 סוג כיסוי</div>
@@ -1347,9 +1663,7 @@ function renderCard3(){
     <div class="span2" style="margin-top:10px;">
       <div class="label" style="font-size:11px;color:var(--muted);margin-bottom:8px;">הרחבות בפוליסה</div>
       <div class="flex flex-wrap gap8">
-        <button class="chip ${ins.extWaterPipe?'checked':''}" onclick="STATE.insurance.extWaterPipe=!STATE.insurance.extWaterPipe;this.classList.toggle('checked')">🔧 צנרת פנים</button>
         <button class="chip ${ins.extNaturalDisaster?'checked':''}" onclick="STATE.insurance.extNaturalDisaster=!STATE.insurance.extNaturalDisaster;this.classList.toggle('checked')">🌪️ נזקי טבע</button>
-        <button class="chip ${ins.extBurglary?'checked':''}" onclick="STATE.insurance.extBurglary=!STATE.insurance.extBurglary;this.classList.toggle('checked')">🚪 פריצה</button>
         <button class="chip ${ins.extTerror?'checked':''}" onclick="STATE.insurance.extTerror=!STATE.insurance.extTerror;this.classList.toggle('checked')">🏛️ מלחמה/טרור</button>
         <button class="chip ${ins.thirdParty?'checked':''}" onclick="STATE.insurance.thirdParty=!STATE.insurance.thirdParty;this.classList.toggle('checked')">צד ג'</button>
         <button class="chip ${ins.lossOfProfits?'checked':''}" onclick="STATE.insurance.lossOfProfits=!STATE.insurance.lossOfProfits;this.classList.toggle('checked')">אובדן רווחים</button>
@@ -1662,7 +1976,13 @@ function renderCard6(){
           ${[{v:'none',l:'אין פגיעה'},{v:'light',l:'קלה'},{v:'medium',l:'בינונית'},{v:'severe',l:'משמעותית'}].map(o=>`<button class="pill ${area.severity===o.v?'active':''}" onclick="setAreaField('${area.id}','severity','${o.v}');refreshPills('sev_${area.id}','${o.v}')">${o.l}</button>`).join('')}
         </div></div>`;
 
+    const areaRoomKey = area.id.replace(/_\d+$/, '');
     Object.entries(signsMap).forEach(([catName, signs])=>{
+      // Filter: skip categories that don't apply to this room type
+      if(signsMap === WATER_SIGNS && WATER_SIGNS_ROOM_FILTER[catName]){
+        const allowed = WATER_SIGNS_ROOM_FILTER[catName];
+        if(!allowed.includes(areaRoomKey)) return;
+      }
       html += `<div class="sign-group"><div class="sign-group-label">${catName}</div><div>`;
       signs.forEach(s=>{
         const on = (area.signs||[]).includes(s.id);
@@ -1672,8 +1992,7 @@ function renderCard6(){
     });
 
     // Room-specific damage items
-    const roomKey = area.id.replace(/_\d+$/, ''); // strip _1, _2 suffix
-    const mappedKey = ROOM_ITEM_MAP[roomKey];
+    const mappedKey = ROOM_ITEM_MAP[areaRoomKey];
     const roomItems = mappedKey ? ROOM_ITEMS[mappedKey] : null;
     if(roomItems){
       const allRoomSigns = [...(roomItems.struct||[]),...(roomItems.cont||[])];
@@ -1765,6 +2084,7 @@ function renderCard7(){
 
   let html = `<div class="flex flex-wrap gap12 mb16 items-center">
     <button class="btn btn-primary" onclick="runBOQEngine()">⚡ ייצר כתב כמויות אוטומטי</button>
+    <button class="btn btn-secondary" onclick="openBOQLibrary()" style="display:flex;align-items:center;gap:6px;">📚 ספרייה (297)</button>
     <button class="chip ${boq.vat?'checked':''}" onclick="STATE.boq.vat=!STATE.boq.vat;renderCard(7)">מע"מ 18%</button>`;
   if(mode==='insurance'){
     html += `<button class="chip ${boq.hasClaim?'checked':''}" onclick="STATE.boq.hasClaim=!STATE.boq.hasClaim;renderCard(7)">תביעת שמאי פרטי</button>`;
@@ -1795,40 +2115,70 @@ function renderCard7(){
     <div class="field mt8"><label class="label" style="font-size:11px;">הערה לסעיפים כלליים</label><input type="text" value="${esc(boq.genNote||'')}" oninput="STATE.boq.genNote=this.value" placeholder="הערה חופשית..."></div>
   </div>`;
 
+  // ── Arrangement plumber warning ──
+  if(mode==='insurance' && STATE.insurance.arrangementPlumber){
+    const pricedPipeRepair = (STATE.boq.structItems||[]).filter(i=>
+      !i.zeroPrice && parseFloat(i.price)>0 &&
+      (i.desc.includes('צנרת')||i.desc.includes('שרברב')||i.desc.includes('צינור')||i.desc.includes('תיקון מקור'))
+    );
+    if(pricedPipeRepair.length>0){
+      html += `<div class="note" style="background:rgba(239,68,68,.1);border-color:var(--red);color:#FCA5A5;margin-bottom:12px;">
+        ⚠️ <strong>שרברב הסדר מסומן בפוליסה</strong> — נמצאו ${pricedPipeRepair.length} סעיפי תיקון צנרת עם תמחור. 
+        סעיפים אלו מטופלים ישירות ע"י חברת הביטוח ואינם נכללים בשיפוי. 
+        סמן אותם כ"₪0" או מחק מכתב הכמויות.
+      </div>`;
+    }
+  }
   html += renderBOQSection('structItems','פרק א׳ – עבודות מבנה','var(--blue)');
   html += renderBOQSection('contentsItems','פרק ב׳ – עבודות תכולה ונגרות','var(--green)');
   html += renderBOQSection('serviceItems',"פרק ג׳ – שירותים ותוספות",'var(--purple)');
 
   html += `<div class="boq-total-box">
     <div class="label mb12" style="color:var(--accent)">סיכום כתב כמויות</div>
+    ${mode==='insurance'?`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;font-size:11px;">
+      <div style="padding:7px 10px;background:rgba(59,130,246,.08);text-align:center;font-weight:700;color:var(--blue);border-bottom:1px solid var(--border);">כינון</div>
+      <div style="padding:7px 10px;background:rgba(16,185,129,.08);text-align:center;font-weight:700;color:var(--green);border-bottom:1px solid var(--border);border-inline:1px solid var(--border);">שיפוי ×0.67</div>
+      <div style="padding:7px 10px;background:rgba(252,211,77,.08);text-align:center;font-weight:700;color:#FCD34D;border-bottom:1px solid var(--border);">תביעה</div>
+      <div style="padding:8px 10px;text-align:center;font-weight:800;color:var(--blue);font-size:14px;" id="sumGrand">₪${fmtNum(grand)}</div>
+      <div style="padding:8px 10px;text-align:center;font-weight:800;color:var(--green);font-size:14px;border-inline:1px solid var(--border);" id="sumShiput">₪${fmtNum(shiput)}</div>
+      <div style="padding:8px 10px;text-align:center;font-weight:800;color:#FCD34D;font-size:14px;" id="sumClaim">₪${fmtNum((boq.structItems||[]).concat(boq.contentsItems||[]).concat(boq.serviceItems||[]).reduce((s,i)=>s+(parseFloat(i.claim)||0),0))}</div>
+    </div>
+    <div class="total-row" style="font-size:11px;"><span class="c-muted">מבנה (כינון)</span><span class="fw7 c-blue" id="sumStruct">₪${fmtNum(structTotal)}</span></div>
+    <div class="total-row" style="font-size:11px;"><span class="c-muted">תכולה (כינון)</span><span class="fw7 c-blue" id="sumCont">₪${fmtNum(contTotal)}</span></div>
+    <div class="total-row" style="font-size:11px;"><span class="c-muted">שירותים (כינון)</span><span class="fw7 c-blue" id="sumServ">₪${fmtNum(servTotal)}</span></div>
+    ${deduct>0?`<div class="total-row"><span class="c-muted">פחות השתתפות עצמית</span><span class="c-muted">-₪${fmtNum(deduct)}</span></div>`:''}
+    `:`
     <div class="total-row"><span class="c-muted">מבנה</span><span class="fw7" id="sumStruct">₪${fmtNum(structTotal)}</span></div>
     <div class="total-row"><span class="c-muted">תכולה</span><span class="fw7" id="sumCont">₪${fmtNum(contTotal)}</span></div>
     <div class="total-row"><span class="c-muted">שירותים</span><span class="fw7" id="sumServ">₪${fmtNum(servTotal)}</span></div>
     <div class="total-row grand"><span class="fw8">סה"כ לפני מע"מ</span><span class="fw8 c-accent fs16" id="sumGrand">₪${fmtNum(grand)}</span></div>
     ${boq.vat?`<div class="total-row"><span class="c-muted">מע"מ 18%</span><span>₪${fmtNum(Math.round(vat))}</span></div>
     <div class="total-row"><span class="fw8">סה"כ כולל מע"מ</span><span class="fw8 c-accent fs16">₪${fmtNum(Math.round(totalWithVat))}</span></div>`:''}
-    ${mode==='insurance'&&grand>0?`<div class="divider"></div>
-    <div class="total-row"><span class="c-blue fw7">ערך כינון</span><span class="c-blue fw8">₪${fmtNum(grand)}</span></div>
-    <div class="total-row"><span class="c-green fw7">ערך שיפוי (×0.67)</span><span class="c-green fw8">₪${fmtNum(shiput)}</span></div>
-    ${deduct>0?`<div class="total-row"><span class="c-muted">השתתפות עצמית</span><span class="c-muted">-₪${fmtNum(deduct)}</span></div>`:''}
-    ${boq.hasClaim&&boq.claimAmount?`<div class="total-row"><span style="color:#FDA4AF;font-weight:700;">תביעת שמאי פרטי</span><span style="color:#FDA4AF;font-weight:800;">₪${fmtNum(parseFloat(boq.claimAmount)||0)}</span></div>`:''}
-    <div class="total-row grand"><span class="c-red fw8 fs16">פיצוי מומלץ</span><span class="c-red fw9 fs20">₪${fmtNum(recPayout)}</span></div>`:''}
+    `}
+    ${mode==='insurance'&&grand>0?`
+    <div class="divider"></div>
+    <div class="total-row" style="background:rgba(251,191,36,.06);padding:8px 10px;border-radius:8px;gap:8px;align-items:center;">
+      <span style="color:#FCD34D;font-weight:700;font-size:12px;">📋 סה"כ תביעה (שמאי פרטי) — מולא בעמודת תביעה לעיל</span>
+    </div>`:''}
   </div>`;
   return html;
 }
 
 function renderBOQSection(key, title, color){
   const items = STATE.boq[key]||[];
+  const isIns = (typeof mode !== 'undefined' && mode === 'insurance');
 
-  // Resolve supervision price (5% of ALL repair work: struct + cont, not just this section)
-  const repairItems = items.filter(i=>!i.isSupervision&&!i.isRental);
+  // Resolve supervision price (5% of ALL repair work)
   const allRepairTotal = calcSectionTotal(STATE.boq.structItems) + calcSectionTotal(STATE.boq.contentsItems);
   const supervisionAmt = Math.round(allRepairTotal*0.05);
   items.forEach(i=>{ if(i.isSupervision) i.price = String(supervisionAmt>0?supervisionAmt:0); });
   const totalSec = calcSectionTotal(items.filter(i=>!i.isRental));
+  const totalClaim = isIns ? (items||[]).reduce((s,i)=>s+(parseFloat(i.claim)||0),0) : 0;
 
-  // Hierarchical numbering: group by roomHeader → 1. Area / 1.1, 1.2 ...
+  // Hierarchical numbering
   let areaNum = 0, lastArea = null, itemCounters = {}, noAreaCounter = 0;
+  const COLS = isIns ? 9 : 7; // total columns for colspan
 
   let html = `<div class="boq-section">
     <div class="flex justify-between items-center mb8">
@@ -1836,14 +2186,34 @@ function renderBOQSection(key, title, color){
       <button class="btn btn-ghost btn-xs" onclick="addBOQItem('${key}')">+ הוסף שורה</button>
     </div>
     <table class="boq-table">
-      <thead><tr>
+      <thead>`;
+
+  if(isIns){
+    html += `<tr style="font-size:11px;">
+        <th rowspan="2" style="width:46px">#</th>
+        <th rowspan="2">תיאור עבודה</th>
+        <th rowspan="2" style="width:50px" class="ta-c">יח'</th>
+        <th rowspan="2" style="width:62px" class="ta-l">כמות</th>
+        <th rowspan="2" style="width:76px" class="ta-l">מחיר יח'</th>
+        <th colspan="2" style="text-align:center;background:rgba(59,130,246,.1);color:var(--blue);border-bottom:1px solid rgba(59,130,246,.25);">הערכה ב-₪</th>
+        <th rowspan="2" style="width:84px;background:rgba(252,211,77,.07);color:#FCD34D;" class="ta-l">תביעה ₪</th>
+        <th rowspan="2" style="width:24px"></th>
+      </tr>
+      <tr style="font-size:11px;">
+        <th style="width:78px;background:rgba(59,130,246,.07);color:var(--blue);" class="ta-l">כינון</th>
+        <th style="width:78px;background:rgba(16,185,129,.07);color:var(--green);" class="ta-l">שיפוי</th>
+      </tr>`;
+  } else {
+    html += `<tr>
         <th style="width:60px">#</th><th>תיאור עבודה</th>
         <th style="width:70px" class="ta-c">יח'</th>
         <th style="width:80px" class="ta-l">כמות</th>
         <th style="width:90px" class="ta-l">מחיר יח'</th>
         <th style="width:95px" class="ta-l">סה"כ</th>
         <th style="width:28px"></th>
-      </tr></thead><tbody>`;
+      </tr>`;
+  }
+  html += `</thead><tbody>`;
 
   items.forEach(item=>{
     if(item.roomHeader && item.roomHeader !== lastArea){
@@ -1851,7 +2221,7 @@ function renderBOQSection(key, title, color){
       areaNum++;
       itemCounters[item.roomHeader] = 0;
       html += `<tr style="background:rgba(245,158,11,.08);">
-        <td colspan="7" style="padding:6px 10px;font-weight:800;font-size:12px;color:var(--accent);letter-spacing:.04em;">
+        <td colspan="${COLS}" style="padding:6px 10px;font-weight:800;font-size:12px;color:var(--accent);letter-spacing:.04em;">
           ${areaNum}. ${item.roomHeader}</td></tr>`;
     }
     let displayId;
@@ -1862,19 +2232,47 @@ function renderBOQSection(key, title, color){
       noAreaCounter++;
       displayId = String(noAreaCounter);
     }
-    const tot = item.isRental?(item.rentalAmount||0):(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
-    html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
-      <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;">${displayId}</td>
-      <td><input class="boq-input w100" value="${esc(item.desc)}" oninput="updateBOQItem('${key}','${item.id}','desc',this.value)"></td>
-      <td><input class="boq-input" style="width:60px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
-      <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
-      <td><input class="boq-input num" type="number" value="${item.isSupervision?item.price:esc(item.price)}" ${item.zeroPrice||item.isRental?'disabled':''} ${item.isSupervision?'disabled title="מחושב אוטומטית 5%"':''} oninput="updateBOQItem('${key}','${item.id}','price',this.value)"></td>
-      <td class="ta-l fw7" style="color:${tot>0?'var(--accent)':'var(--subtle)'};">${item.zeroPrice?'—':item.isRental?`<span style="color:var(--blue);">₪${fmtNum(tot)}</span>`:tot>0?'₪'+fmtNum(tot):''}</td>
-      <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
-    </tr>`;
+    const kinun = item.isRental?(item.rentalAmount||0):(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
+    const shiput = Math.round(kinun*0.67);
+
+    if(isIns){
+      html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
+        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;">${displayId}</td>
+        <td><input class="boq-input w100" value="${esc(item.desc)}" oninput="updateBOQItem('${key}','${item.id}','desc',this.value)"></td>
+        <td><input class="boq-input" style="width:44px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
+        <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
+        <td><input class="boq-input num" type="number" value="${item.isSupervision?item.price:esc(item.price)}" ${item.zeroPrice||item.isRental?'disabled':''} ${item.isSupervision?'disabled title="מחושב אוטומטית 5%"':''} oninput="updateBOQItem('${key}','${item.id}','price',this.value)"></td>
+        <td class="ta-l" style="background:rgba(59,130,246,.04);color:${kinun>0?'var(--blue)':'var(--subtle)'};font-weight:700;font-size:12px;" data-total="${key}_${item.id}">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
+        <td class="ta-l" style="background:rgba(16,185,129,.04);color:${shiput>0?'var(--green)':'var(--subtle)'};font-size:12px;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>
+        <td style="background:rgba(252,211,77,.04);"><input class="boq-input num" type="number" placeholder="₪" style="width:70px;color:#FCD34D;" value="${esc(item.claim||'')}" oninput="updateBOQItem('${key}','${item.id}','claim',this.value)" title="תביעת השמאי הפרטי לסעיף זה"></td>
+        <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
+      </tr>`;
+    } else {
+      html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
+        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;">${displayId}</td>
+        <td><input class="boq-input w100" value="${esc(item.desc)}" oninput="updateBOQItem('${key}','${item.id}','desc',this.value)"></td>
+        <td><input class="boq-input" style="width:60px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
+        <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
+        <td><input class="boq-input num" type="number" value="${item.isSupervision?item.price:esc(item.price)}" ${item.zeroPrice||item.isRental?'disabled':''} ${item.isSupervision?'disabled title="מחושב אוטומטית 5%"':''} oninput="updateBOQItem('${key}','${item.id}','price',this.value)"></td>
+        <td class="ta-l fw7" data-total="${key}_${item.id}" style="color:${kinun>0?'var(--accent)':'var(--subtle)'};">${item.zeroPrice?'—':item.isRental?`<span style="color:var(--blue);">₪${fmtNum(kinun)}</span>`:kinun>0?'₪'+fmtNum(kinun):''}</td>
+        <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
+      </tr>`;
+    }
   });
-  if(totalSec>0) html += `<tr class="row-subtotal"><td colspan="5" class="ta-r">סה"כ פרק</td><td class="ta-l">₪${fmtNum(totalSec)}</td><td></td></tr>`;
-  if(items.length===0) html += `<tr><td colspan="7" class="ta-c c-subtle" style="padding:20px;font-size:13px;">אין פריטים</td></tr>`;
+
+  if(isIns && totalSec>0){
+    const totalShiput = Math.round(totalSec*0.67);
+    html += `<tr class="row-subtotal">
+      <td colspan="5" class="ta-r">סה"כ פרק</td>
+      <td class="ta-l" style="color:var(--blue);">₪${fmtNum(totalSec)}</td>
+      <td class="ta-l" style="color:var(--green);">₪${fmtNum(totalShiput)}</td>
+      <td class="ta-l" style="color:#FCD34D;">${totalClaim>0?'₪'+fmtNum(totalClaim):''}</td>
+      <td></td>
+    </tr>`;
+  } else if(!isIns && totalSec>0){
+    html += `<tr class="row-subtotal"><td colspan="5" class="ta-r">סה"כ פרק</td><td class="ta-l">₪${fmtNum(totalSec)}</td><td></td></tr>`;
+  }
+  if(items.length===0) html += `<tr><td colspan="${COLS}" class="ta-c c-subtle" style="padding:20px;font-size:13px;">אין פריטים</td></tr>`;
   html += `</tbody></table></div>`;
   return html;
 }
@@ -2007,10 +2405,11 @@ function renderCard8(){
     </table>
     <table style="width:100%;border-collapse:collapse;font-size:13px;direction:rtl;">
       <tbody>
-        <tr><td style="padding:10px;border:1px solid var(--border);font-weight:700;">סך כל הנזקים המוערכים:</td><td style="padding:10px;border:1px solid var(--border);text-align:left;font-weight:700;">₪${fmtNum(grand)}</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);font-weight:700;">סך כל הנזקים המוערכים (כינון):</td><td style="padding:10px;border:1px solid var(--border);text-align:left;font-weight:700;">₪${fmtNum(grand)}</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);">ערך שיפוי (×0.67):</td><td style="padding:10px;border:1px solid var(--border);text-align:left;color:var(--green);font-weight:700;">₪${fmtNum(shiput)}</td></tr>
         <tr><td style="padding:10px;border:1px solid var(--border);">פחות השתתפות עצמית:</td><td style="padding:10px;border:1px solid var(--border);text-align:left;">${deduct>0?`₪${fmtNum(deduct)} לפי פוליסה`:'—'}</td></tr>
         ${rentalTotal>0?`<tr style="background:rgba(59,130,246,.06);"><td style="padding:10px;border:1px solid var(--border);">🏠 שכירות חלופית (${f.rentalMonths} חודשים × ₪${fmtNum(parseCurrency(f.rentalMonthly))}):</td><td style="padding:10px;border:1px solid var(--border);text-align:left;color:var(--blue);">₪${fmtNum(rentalTotal)}<br><span style="font-size:10px;color:var(--muted);">כפוף להסכם שכירות חתום</span></td></tr>`:''}
-        <tr style="background:rgba(245,158,11,.08);"><td style="padding:10px;border:1px solid var(--border);font-weight:900;font-size:14px;">סכום נטו לתשלום (שיפוי):</td><td style="padding:10px;border:1px solid var(--border);text-align:left;font-weight:900;font-size:16px;color:var(--red);">${recPayout>0?'₪'+fmtNum(recPayout):'—'}</td></tr>
+        <tr style="background:rgba(252,211,77,.1);"><td style="padding:10px;border:1px solid var(--border);font-weight:900;font-size:14px;color:#92400E;">סה"כ תביעה (שמאי פרטי):</td><td style="padding:10px;border:1px solid var(--border);text-align:left;font-weight:900;font-size:16px;color:#92400E;">${boq.claimAmount&&parseFloat(boq.claimAmount)>0?'₪'+fmtNum(parseFloat(boq.claimAmount)):'לא צוין'}</td></tr>
       </tbody>
     </table>`;
   } else if(mode==='private'){
@@ -2077,7 +2476,17 @@ function genOpeningText(){
   const addrStr = addr ? `ברחוב ${addr}` : '';
   const reqName = (reqMap[ev.requestedBy]||'') + (ev.requesterName ? ` ${ev.requesterName}` : '');
   const evName = evMap[ev.eventType]||'נזק';
-  const subStr = ev.eventSubType ? ` (${ev.eventSubType})` : '';
+  // Map English subtype codes to Hebrew
+  const subTypeMapHe = {
+    pipe_burst:'קרע בצנרת', leak:'נזילה', overflow:'הצפה', flood:'שיטפון',
+    sewage:'ביוב', condensation:'עיבוי', roof_leak:'נזילת גג', pipe_block:'סתימה',
+    fire:'שריפה', smoke:'עשן', arson:'הצתה',
+    break_in:'פריצה', vandalism:'גניבה', theft:'גניבה',
+    short_circuit:'קצר חשמלי', surge:'עומס חשמלי',
+    wind:'רוח וסערה', hail:'ברד', earthquake:'רעידת אדמה',
+    third_party:'נזק מדייר/שכן',
+  };
+  const subStr = ev.eventSubType ? ` (${subTypeMapHe[ev.eventSubType]||ev.eventSubType})` : '';
   const polStr = ev.policeReport==='yes' ? (ev.policeNum?` הוגשה תלונה במשטרה, מס' אסמכתא ${ev.policeNum}.`:' הוגשה תלונה במשטרה.') : '';
   const profs = (ev.professionals||[]).filter(p=>ev.profDetails[p]?.name).map(p=>ev.profDetails[p].name);
   const profStr = profs.length ? ` בנכס הוזמנו: ${profs.join(', ')}.` : '';
@@ -2378,26 +2787,74 @@ function _doGenerateReport(){
   const mkBOQSection = (items, title) => {
     if(!items.length) return '';
     const sec = calcSectionTotal(items);
+    const secShiput = Math.round(sec*0.67);
+    const secClaim = items.reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+    const isInsRpt = (mode === 'insurance');
     let h = `<div style="margin-bottom:20px;"><h4 style="font-size:13px;font-weight:800;color:#1F2937;margin-bottom:8px;">${title}</h4>
-    <table class="rpt-table"><thead><tr>
-      <th style="width:36px">#</th><th>תיאור עבודה</th>
-      <th style="width:70px;text-align:center;">יח'</th>
-      <th style="width:75px;text-align:left;">כמות</th>
-      <th style="width:90px;text-align:left;">מחיר יח'</th>
-      <th style="width:95px;text-align:left;">סה"כ</th>
-    </tr></thead><tbody>`;
-    items.forEach(item=>{
-      const tot=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
-      h+=`<tr>
-        <td style="color:#9CA3AF;font-size:11px;">${item.id}</td>
-        <td>${esc(item.desc)}</td>
-        <td style="text-align:center;">${esc(item.unit)}</td>
-        <td style="text-align:left;">${esc(item.qty)}</td>
-        <td style="text-align:left;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>
-        <td style="text-align:left;font-weight:700;color:${item.zeroPrice?'#9CA3AF':'#111'}">${item.zeroPrice?'—':tot>0?'₪'+fmtNum(tot):''}</td>
+    <table class="rpt-table"><thead>`;
+
+    if(isInsRpt){
+      h += `<tr style="font-size:11px;background:#F9FAFB;">
+        <th style="width:32px" rowspan="2">#</th>
+        <th rowspan="2">תיאור עבודה</th>
+        <th style="width:55px;text-align:center;" rowspan="2">יח'</th>
+        <th style="width:55px;text-align:right;" rowspan="2">כמות</th>
+        <th style="width:70px;text-align:right;" rowspan="2">מחיר יח'</th>
+        <th colspan="2" style="text-align:center;background:#EFF6FF;color:#1D4ED8;border-bottom:2px solid #BFDBFE;">הערכה ב-₪</th>
+        <th style="width:80px;text-align:right;background:#FFFBEB;color:#92400E;" rowspan="2">תביעה ₪</th>
+      </tr>
+      <tr style="font-size:11px;">
+        <th style="width:80px;text-align:right;background:#EFF6FF;color:#1D4ED8;">כינון</th>
+        <th style="width:80px;text-align:right;background:#ECFDF5;color:#065F46;">שיפוי</th>
       </tr>`;
+    } else {
+      h += `<tr>
+        <th style="width:36px">#</th><th>תיאור עבודה</th>
+        <th style="width:70px;text-align:center;">יח'</th>
+        <th style="width:75px;text-align:left;">כמות</th>
+        <th style="width:90px;text-align:left;">מחיר יח'</th>
+        <th style="width:95px;text-align:left;">סה"כ</th>
+      </tr>`;
+    }
+    h += `</thead><tbody>`;
+
+    items.forEach(item=>{
+      const kinun=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
+      const shiput=Math.round(kinun*0.67);
+      const claimVal=parseFloat(item.claim)||0;
+      if(isInsRpt){
+        h+=`<tr>
+          <td style="color:#9CA3AF;font-size:11px;">${item.id}</td>
+          <td>${esc(item.desc)}</td>
+          <td style="text-align:center;">${esc(item.unit)}</td>
+          <td style="text-align:right;">${esc(item.qty)}</td>
+          <td style="text-align:right;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>
+          <td style="text-align:right;background:#F0F9FF;font-weight:700;color:#1D4ED8;">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
+          <td style="text-align:right;background:#F0FDF4;font-weight:700;color:#065F46;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>
+          <td style="text-align:right;background:#FFFBEB;font-weight:700;color:#92400E;">${claimVal>0?'₪'+fmtNum(claimVal):'—'}</td>
+        </tr>`;
+      } else {
+        h+=`<tr>
+          <td style="color:#9CA3AF;font-size:11px;">${item.id}</td>
+          <td>${esc(item.desc)}</td>
+          <td style="text-align:center;">${esc(item.unit)}</td>
+          <td style="text-align:left;">${esc(item.qty)}</td>
+          <td style="text-align:left;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>
+          <td style="text-align:left;font-weight:700;color:${item.zeroPrice?'#9CA3AF':'#111'};">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
+        </tr>`;
+      }
     });
-    h+=`<tr class="st"><td colspan="5" style="text-align:right;padding:8px 10px;">סה"כ פרק</td><td style="text-align:left;padding:8px 10px;">₪${fmtNum(sec)}</td></tr>`;
+
+    if(isInsRpt){
+      h+=`<tr class="st">
+        <td colspan="5" style="text-align:right;padding:8px 10px;font-weight:700;">סה"כ פרק</td>
+        <td style="text-align:right;padding:8px 10px;background:#EFF6FF;font-weight:800;color:#1D4ED8;">₪${fmtNum(sec)}</td>
+        <td style="text-align:right;padding:8px 10px;background:#ECFDF5;font-weight:800;color:#065F46;">₪${fmtNum(secShiput)}</td>
+        <td style="text-align:right;padding:8px 10px;background:#FFFBEB;font-weight:800;color:#92400E;">${secClaim>0?'₪'+fmtNum(secClaim):'—'}</td>
+      </tr>`;
+    } else {
+      h+=`<tr class="st"><td colspan="5" style="text-align:right;padding:8px 10px;">סה"כ פרק</td><td style="text-align:left;padding:8px 10px;">₪${fmtNum(sec)}</td></tr>`;
+    }
     h+=`</tbody></table></div>`;
     return h;
   };
@@ -2503,24 +2960,58 @@ function _doGenerateReport(){
 
     rpt += `<div style="margin-top:20px;">`;
     if(mode==='insurance'){
-      rpt += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;">
+      // Calculate per-category totals for 3-column summary
+      const structKinun = calcSectionTotal(boq.structItems);
+      const contKinun   = calcSectionTotal(boq.contentsItems);
+      const servKinun   = calcSectionTotal(boq.serviceItems);
+      const structShiput = Math.round(structKinun*0.67);
+      const contShiput   = Math.round(contKinun*0.67);
+      const servShiput   = Math.round(servKinun*0.67);
+      const structClaim = (boq.structItems||[]).reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+      const contClaim   = (boq.contentsItems||[]).reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+      const servClaim   = (boq.serviceItems||[]).reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+      // supervision is 5% of struct+cont for kinun, 0 for shiput (arrangement), per claim entry
+      const supervisionKinun = boq.serviceItems.find(i=>i.isSupervision) ? Math.round((structKinun+contKinun)*0.05) : 0;
+      const structPlusSup   = structKinun + supervisionKinun;
+      const structPlusSupSh = Math.round(structPlusSup*0.67);
+      const totalKinun = grand;
+      const totalShiput = shiput;
+      const totalClaim = structClaim + contClaim + servClaim;
+
+      const TD = (txt,style='') => `<td style="padding:9px 12px;border:1px solid #D1D5DB;${style}">${txt}</td>`;
+      const TH = (txt,style='') => `<th style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;${style}">${txt}</th>`;
+      const mkRow = (label, kinunV, shiputV, claimV, rowStyle='') =>
+        `<tr style="${rowStyle}">
+          ${TD(label,'font-weight:600;')}
+          ${TD(kinunV?'₪ '+fmtNum(kinunV):'—','text-align:right;color:#1D4ED8;font-weight:700;background:#F0F9FF;')}
+          ${TD(shiputV?'₪ '+fmtNum(shiputV):'—','text-align:right;color:#065F46;font-weight:700;background:#F0FDF4;')}
+          ${TD(claimV?'₪ '+fmtNum(claimV):'—','text-align:right;color:#92400E;font-weight:700;background:#FFFBEB;')}
+        </tr>`;
+
+      rpt += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px;">
         <thead><tr style="background:#F3F4F6;">
-          <th style="padding:9px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:700;">התביעה</th>
-          <th style="padding:9px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:700;">הערכה בקינון</th>
-          <th style="padding:9px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:700;">הערכה בשיפוי</th>
-        </tr></thead>
-        <tbody><tr>
-          <td style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;font-size:14px;">₪ ${fmtNum(parseCurrency(boq.claimAmount))}</td>
-          <td style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;font-size:14px;">₪ ${fmtNum(grand)}</td>
-          <td style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;font-size:14px;">₪ ${fmtNum(shiput)}</td>
-        </tr></tbody>
-      </table>
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          ${TH('פרק','text-align:right;')}
+          ${TH('הערכה בכינון','text-align:right;background:#EFF6FF;color:#1D4ED8;')}
+          ${TH('הערכה בשיפוי','text-align:right;background:#ECFDF5;color:#065F46;')}
+          ${TH('תביעה (שמאי פרטי)','text-align:right;background:#FFFBEB;color:#92400E;')}
+        </tr></thead><tbody>
+        ${structKinun>0?mkRow('א. מבנה', structKinun, structShiput, structClaim):''}
+        ${supervisionKinun>0?mkRow('פיקוח 5%', supervisionKinun, Math.round(supervisionKinun*0.67), 0):''}
+        ${contKinun>0?mkRow('ב. תכולה', contKinun, contShiput, contClaim):''}
+        ${servKinun>0?mkRow('ג. שירותים', servKinun, servShiput, servClaim):''}
+        ${boq.vat?mkRow(`מע"מ 18%`, Math.round(totalKinun*0.18), 0, 0):''}
+        <tr style="background:#F9FAFB;font-weight:900;">
+          ${TD('<strong>סה"כ כללי</strong>','font-weight:900;font-size:13px;')}
+          ${TD('₪ '+fmtNum(boq.vat?Math.round(totalKinun*1.18):totalKinun),'text-align:right;background:#DBEAFE;color:#1D4ED8;font-weight:900;font-size:13px;')}
+          ${TD('₪ '+fmtNum(boq.vat?Math.round(totalShiput*1.18):totalShiput),'text-align:right;background:#D1FAE5;color:#065F46;font-weight:900;font-size:13px;')}
+          ${TD(totalClaim>0?'₪ '+fmtNum(totalClaim):'—','text-align:right;background:#FEF3C7;color:#92400E;font-weight:900;font-size:13px;')}
+        </tr>
+        </tbody></table>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">
         <tbody>
-          <tr><td style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;">סך כל הנזקים המוערכים:</td><td style="padding:9px 12px;border:1px solid #D1D5DB;text-align:left;font-weight:700;">₪ ${fmtNum(grand)}</td></tr>
-          <tr><td style="padding:9px 12px;border:1px solid #D1D5DB;">פחות השתתפות עצמית:</td><td style="padding:9px 12px;border:1px solid #D1D5DB;text-align:left;">${deduct>0?`₪ ${fmtNum(deduct)} לפי פוליסה`:'—'}</td></tr>
-          <tr style="background:#FFFBEB;"><td style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:900;font-size:13px;">סכום נטו לתשלום:</td><td style="padding:9px 12px;border:1px solid #D1D5DB;text-align:left;font-weight:900;font-size:15px;">${recPayout>0?'₪ '+fmtNum(recPayout):'—'}</td></tr>
-          ${rentalTotal>0?`<tr style="background:#EFF6FF;"><td style="padding:9px 12px;border:1px solid #D1D5DB;">שכירות חלופית (${f.rentalMonths} חודשים × ₪${fmtNum(parseCurrency(f.rentalMonthly))}):<br><span style="font-size:10px;color:#6B7280;">כפוף להצגת הסכם שכירות חתום – אינו נכלל בשיפוי</span></td><td style="padding:9px 12px;border:1px solid #D1D5DB;text-align:left;color:#1D4ED8;font-weight:700;">₪ ${fmtNum(rentalTotal)}</td></tr>`:''}
+          <tr><td style="padding:8px 12px;border:1px solid #D1D5DB;">פחות השתתפות עצמית:</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;">${deduct>0?`₪ ${fmtNum(deduct)} לפי פוליסה`:'—'}</td></tr>
+          ${rentalTotal>0?`<tr style="background:#EFF6FF;"><td style="padding:8px 12px;border:1px solid #D1D5DB;">שכירות חלופית (${f.rentalMonths} חודשים × ₪${fmtNum(parseCurrency(f.rentalMonthly))}):</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;color:#1D4ED8;font-weight:700;">₪ ${fmtNum(rentalTotal)}</td></tr>`:''}
+          <tr style="background:#FFFBEB;"><td style="padding:8px 12px;border:1px solid #D1D5DB;font-weight:900;font-size:13px;color:#92400E;">סה"כ תביעה (שמאי פרטי):</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:900;font-size:15px;color:#92400E;">${totalClaim>0?'₪ '+fmtNum(totalClaim):'לא צוין'}</td></tr>
         </tbody>
       </table>`;
     } else if(mode==='private'){
@@ -2599,6 +3090,61 @@ function shareReport(){
       table{width:100%;border-collapse:collapse;}td,th{padding:6px 8px;border:1px solid #ddd;}
       .rpt-table td,.rpt-table th{padding:6px 8px;border:1px solid #e5e7eb;}</style>
       </head><body>${html}
+<!-- ══════════════════ BOQ LIBRARY MODAL ══════════════════ -->
+<div id="boqLibModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">
+  <div style="background:#111827;border:1px solid #374151;border-radius:18px;width:100%;max-width:860px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Header -->
+    <div style="padding:18px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#F9FAFB;">📚 ספריית כתב כמויות</div>
+        <div style="font-size:12px;color:#9CA3AF;margin-top:2px;">297 סעיפים מקצועיים — בחר ולחץ "הוסף"</div>
+      </div>
+      <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <!-- Filters -->
+    <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input id="boqLibSearch" type="text" placeholder="🔍 חפש סעיף..." oninput="renderBOQLibList()" 
+          style="flex:1;min-width:180px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;outline:none;">
+        <select id="boqLibChapter" onchange="renderBOQLibList()"
+          style="padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
+          <option value="">כל הפרקים</option>
+          <option value="1">פרק 1 – פירוק והריסה</option>
+          <option value="2">פרק 2 – אינסטלציה</option>
+          <option value="3">פרק 3 – איתור וייבוש</option>
+          <option value="4">פרק 4 – בנייה ותיקונים</option>
+          <option value="5">פרק 5 – ריצוף, חיפוי ופרקט</option>
+          <option value="6">פרק 6 – טיח, שפכטל וצבע</option>
+          <option value="7">פרק 7 – נגרות</option>
+          <option value="8">פרק 8 – אלומיניום, זכוכית ותריסים</option>
+          <option value="9">פרק 9 – שיש ואבן</option>
+          <option value="10">פרק 10 – חשמל משלים</option>
+          <option value="11">פרק 11 – ניקיון ופינוי</option>
+          <option value="12">פרק 12 – ניקוי נזקי אש</option>
+          <option value="13">פרק 13 – פריצה ומיגון</option>
+          <option value="14">פרק 14 – סעיפים כלליים</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9CA3AF;cursor:pointer;white-space:nowrap;">
+          <input type="checkbox" id="boqLibFilter" onchange="renderBOQLibList()" style="accent-color:#F59E0B;width:14px;height:14px;">
+          סנן לפי סוג נזק
+        </label>
+      </div>
+      <div id="boqLibStats" style="font-size:11px;color:#6B7280;"></div>
+    </div>
+    <!-- Items list -->
+    <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
+    <!-- Footer -->
+    <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+      <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
+      <div style="display:flex;gap:8px;">
+        <button onclick="boqLibSelectAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">בחר הכל</button>
+        <button onclick="boqLibClearAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">נקה הכל</button>
+        <button onclick="addLibraryItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body></html>`], {type:'text/html'});
     const file = new File([blob], 'report.html', {type:'text/html'});
     navigator.share({title, text, files:[file]}).catch(()=>window.print());
@@ -2803,7 +3349,7 @@ function genRehabRecommendations(){
   txt+=`${step++}️⃣ ביצוע עבודות תשתית (טיח, איטום${hasWater?', צנרת':''}${(boq.structItems||[]).some(i=>i.desc.includes('חשמל'))?', חשמל':''}) לפי כתב הכמויות.\n`;
   txt+=`${step++}️⃣ עבודות גמר (${hasFloor?'ריצוף, ':''}${hasWall?'צבע, ':''}נגרות) רק לאחר אישור שכבות התשתית.\n`;
   txt+=`${step++}️⃣ ניקיון סופי ובדיקת קבלה.\n`;
-  if(rehabTime) txt+=`\n⏱️ זמן שיקום צפוי: ${rehabTime}${STATE.summary.rehabNotes?' – '+STATE.summary.rehabNotes:''}.\n`;
+  if(rehabTime){ const rehabDisplay = /^\d+$/.test(rehabTime)?`${rehabTime} ימים`:rehabTime; txt+=`\n⏱️ זמן שיקום צפוי: ${rehabDisplay}${STATE.summary.rehabNotes?' – '+STATE.summary.rehabNotes:''}.\n`; }
   txt+=`\n⚠️ הערות חשובות:\n`;
   txt+=`• טרם ביצוע תיקוני גמר נדרש טיפול יסודי במקור הנזק.\n`;
   txt+=`• מומלץ פיקוח הנדסי לאורך כל שלבי השיקום.\n`;
@@ -3053,7 +3599,7 @@ function addBOQItem(section){
   const items = STATE.boq[section];
   const prefix = section==='structItems'?'':section==='contentsItems'?'C':'S';
   const newId = prefix+(items.length+1);
-  items.push({id:newId,desc:'',unit:"קומפ'",qty:'1',price:'',zeroPrice:false});
+  items.push({id:newId,desc:'',unit:"קומפ'",qty:'1',price:'',claim:'',zeroPrice:false});
   renderCard(7);
 }
 function updateBOQItem(section, id, field, val){
@@ -3211,70 +3757,273 @@ function attachListeners(n){/* no-op, inline handlers used */}
   }
 })();
 
-</script>
-  <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/appraiser-Pro/sw.js");
-  });
+
+// ══════════════════════════════════════════════════
+// BOQ LIBRARY FUNCTIONS
+// ══════════════════════════════════════════════════
+let _boqLibSelected = new Set(); // stores item codes
+
+function openBOQLibrary(){
+  _boqLibSelected.clear();
+  // Auto-check damage filter if eventType set
+  const hasEvent = ['water','fire','burglary'].includes(STATE.event.eventType);
+  const cb = document.getElementById('boqLibFilter');
+  if(cb) cb.checked = hasEvent;
+  // Reset chapter filter
+  const sel = document.getElementById('boqLibChapter');
+  if(sel) sel.value = '';
+  document.getElementById('boqLibSearch').value = '';
+  document.getElementById('boqLibModal').style.display = 'flex';
+  renderBOQLibList();
 }
+
+function closeBOQLibrary(){
+  document.getElementById('boqLibModal').style.display = 'none';
+}
+
+function renderBOQLibList(){
+  const search   = (document.getElementById('boqLibSearch')?.value||'').trim().toLowerCase();
+  const chapter  = document.getElementById('boqLibChapter')?.value||'';
+  const filtered = document.getElementById('boqLibFilter')?.checked;
+  const evtType  = STATE.event.eventType;
+  const allowedDT = filtered && BOQ_DT_MAP[evtType] ? BOQ_DT_MAP[evtType] : null;
+
+  let items = BOQ_LIBRARY.filter(item=>{
+    if(chapter && item.ch !== chapter) return false;
+    if(allowedDT && !allowedDT.some(dt => item.dt.includes(dt))) return false;
+    if(search){
+      const hay = (item.title + ' ' + item.kw + ' ' + item.code).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Group by chapter
+  const byChapter = {};
+  items.forEach(item=>{
+    if(!byChapter[item.ch]) byChapter[item.ch]=[];
+    byChapter[item.ch].push(item);
+  });
+
+  const sectionColors = {
+    structItems:'#3B82F6', contentsItems:'#10B981', serviceItems:'#8B5CF6'
+  };
+  const sectionLabels = {
+    structItems:'מבנה', contentsItems:'תכולה', serviceItems:'שירותים'
+  };
+
+  let html = '';
+  Object.entries(byChapter).sort((a,b)=>+a[0]-+b[0]).forEach(([ch, chItems])=>{
+    html += `<div style="padding:6px 24px 2px;">
+      <div style="font-size:10px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;padding:8px 0 4px;border-bottom:1px solid #1F2937;margin-bottom:4px;">
+        פרק ${ch} — ${BOQ_CHAPTER_TITLES[ch]||''}
+        <span style="font-weight:600;color:#4B5563;font-size:10px;"> (${chItems.length} סעיפים)</span>
+      </div>`;
+    chItems.forEach(item=>{
+      const sec = BOQ_CH_SECTION[item.ch]||'structItems';
+      const secColor = sectionColors[sec];
+      const secLabel = sectionLabels[sec];
+      const checked = _boqLibSelected.has(item.code);
+      html += `<label style="display:flex;align-items:center;gap:10px;padding:7px 4px;cursor:pointer;border-radius:8px;transition:background .12s;"
+        onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+        <input type="checkbox" data-code="${item.code}" ${checked?'checked':''}
+          onchange="boqLibToggle('${item.code}',this.checked)"
+          style="width:15px;height:15px;flex-shrink:0;accent-color:#F59E0B;cursor:pointer;">
+        <span style="font-size:11px;color:#6B7280;font-weight:700;min-width:34px;">${item.code}</span>
+        <span style="flex:1;font-size:13px;color:#E5E7EB;font-weight:600;">${item.title}</span>
+        <span style="font-size:11px;color:#9CA3AF;min-width:36px;text-align:center;">${item.unit}</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${secColor}20;color:${secColor};min-width:42px;text-align:center;">${secLabel}</span>
+      </label>`;
+    });
+    html += '</div>';
+  });
+
+  if(!html) html = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:14px;">לא נמצאו פריטים לחיפוש זה</div>';
+
+  document.getElementById('boqLibList').innerHTML = html;
+  const statsEl = document.getElementById('boqLibStats');
+  if(statsEl) statsEl.textContent = `מציג ${items.length} סעיפים מתוך 297`;
+  updateBOQLibCount();
+}
+
+function boqLibToggle(code, checked){
+  if(checked) _boqLibSelected.add(code);
+  else _boqLibSelected.delete(code);
+  updateBOQLibCount();
+}
+
+function updateBOQLibCount(){
+  const n = _boqLibSelected.size;
+  const el = document.getElementById('boqLibCount');
+  if(el) el.textContent = n===0 ? 'לא נבחרו פריטים' : `נבחרו ${n} פריטים`;
+}
+
+function boqLibSelectAll(){
+  document.querySelectorAll('#boqLibList input[type=checkbox]').forEach(cb=>{
+    cb.checked = true;
+    _boqLibSelected.add(cb.dataset.code);
+  });
+  updateBOQLibCount();
+}
+
+function boqLibClearAll(){
+  document.querySelectorAll('#boqLibList input[type=checkbox]').forEach(cb=>cb.checked=false);
+  _boqLibSelected.clear();
+  updateBOQLibCount();
+}
+
+function addLibraryItemsToBOQ(){
+  if(_boqLibSelected.size===0){ alert('לא נבחרו פריטים'); return; }
+  let added = 0;
+  _boqLibSelected.forEach(code=>{
+    const libItem = BOQ_LIBRARY.find(i=>i.code===code);
+    if(!libItem) return;
+    const section = BOQ_CH_SECTION[libItem.ch]||'structItems';
+    const items = STATE.boq[section];
+    // Avoid duplicate by code
+    if(items.some(i=>i.libCode===code)) return;
+    const prefix = section==='structItems'?'L':section==='contentsItems'?'LC':'LS';
+    const newId = prefix+(items.length+1)+'_'+Date.now().toString(36);
+    items.push({
+      id: newId,
+      libCode: code,
+      desc: libItem.title,
+      unit: libItem.unit,
+      qty: '1',
+      price: '',
+      zeroPrice: false,
+      roomHeader: ''
+    });
+    added++;
+  });
+  closeBOQLibrary();
+  renderCard(7);
+  // Show feedback
+  setTimeout(()=>{
+    const btn = document.querySelector('.boq-lib-toast');
+    if(!btn) {
+      const toast = document.createElement('div');
+      toast.className = 'boq-lib-toast';
+      toast.textContent = `✅ ${added} פריטים נוספו לכתב הכמויות`;
+      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#059669;color:#fff;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+      document.body.appendChild(toast);
+      setTimeout(()=>toast.remove(), 3000);
+    }
+  }, 100);
+}
+
+// ══════════════════════════════════════════════════
+// BILLING UI FUNCTIONS
+// ══════════════════════════════════════════════════
+function showUpgradeScreen(reason){
+  // Remove any existing overlay
+  document.getElementById('billing-overlay')?.remove();
+
+  const msgs = {
+    trial_expired: {
+      icon:'⏰', title:'תקופת הניסיון הסתיימה',
+      body:'14 ימי הניסיון החינמי הסתיימו.<br>שדרג לפלאן פרו כדי להמשיך לעבוד.',
+      cta:'שדרג לפרו — 99₪/חודש',
+    },
+    subscription_expired: {
+      icon:'💳', title:'המנוי פג תוקף',
+      body:'המנוי שלך פג. חדש אותו כדי להמשיך.',
+      cta:'חדש מנוי',
+    }
+  };
+  const m = msgs[reason] || msgs['trial_expired'];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'billing-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(3,7,18,.97);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:\'Heebo\',sans-serif;direction:rtl;';
+  overlay.innerHTML = `
+    <div style="background:#111827;border:1px solid rgba(245,158,11,.35);border-radius:24px;padding:48px 40px;max-width:440px;width:90%;text-align:center;box-shadow:0 40px 100px rgba(0,0,0,.7);">
+      <div style="font-size:52px;margin-bottom:16px;">${m.icon}</div>
+      <h2 style="color:#f9fafb;font-size:22px;font-weight:900;margin-bottom:12px;">${m.title}</h2>
+      <p style="color:#9ca3af;font-size:15px;line-height:1.65;margin-bottom:28px;">${m.body}</p>
+      <button onclick="alert('מערכת תשלום בהקמה — צור קשר: 050-3292066')" style="
+        width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;
+        border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;
+        cursor:pointer;font-family:\'Heebo\',sans-serif;margin-bottom:12px;">${m.cta}</button>
+      <button onclick="window._FB.logout().then(()=>location.reload())" style="
+        width:100%;background:transparent;color:#6b7280;border:1px solid rgba(255,255,255,.1);
+        border-radius:12px;padding:11px;font-size:14px;font-weight:600;
+        cursor:pointer;font-family:\'Heebo\',sans-serif;">התנתק</button>
+      <div style="margin-top:16px;font-size:12px;color:#4b5563;">
+        שאלות? <a href="mailto:support@omdan.co.il" style="color:#f59e0b;text-decoration:none;">support@omdan.co.il</a>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function showTrialBanner(daysLeft){
+  if(document.getElementById('trial-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'trial-banner';
+  banner.style.cssText = 'background:rgba(245,158,11,.12);border-bottom:1px solid rgba(245,158,11,.25);padding:7px 20px;text-align:center;font-family:\'Heebo\',sans-serif;direction:rtl;font-size:13px;color:#fcd34d;font-weight:600;position:relative;z-index:50;';
+  banner.innerHTML = `⏰ <strong>ניסיון חינם</strong> — נותרו ${daysLeft} ימים בלבד
+    &nbsp;|&nbsp;
+    <a href="javascript:alert('מערכת תשלום בהקמה — צור קשר: 050-3292066')" style="color:#f59e0b;text-decoration:underline;">שדרג עכשיו</a>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:16px;position:absolute;left:12px;top:50%;transform:translateY(-50%);">✕</button>`;
+  document.body.insertBefore(banner, document.body.firstChild);
+}
+
 </script>
 
-<!-- ── MOBILE BOTTOM NAV (form) ── -->
-<div class="ap-form-more-overlay" id="apFormMoreOverlay" onclick="apFormCloseMobMore()"></div>
-<div class="ap-form-more-panel" id="apFormMorePanel">
-  <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:12px;text-align:center">אפשרויות נוספות</div>
-  <div class="ap-form-more-grid">
-    <div class="ap-form-more-item" onclick="toggleFieldMode();apFormCloseMobMore()"><span>📱</span><span>מצב שטח</span></div>
-    <div class="ap-form-more-item" onclick="changeMode();apFormCloseMobMore()"><span>↩</span><span>שנה מצב</span></div>
-    <div class="ap-form-more-item" onclick="window.location.href='settings.html'"><span>⚙️</span><span>הגדרות</span></div>
-    <div class="ap-form-more-item" onclick="openCaseMgr();apFormCloseMobMore()"><span>📁</span><span>תיקים</span></div>
-    <div class="ap-form-more-item" onclick="doLogout()"><span>🚪</span><span style="color:#f87171">יציאה</span></div>
+<!-- ══════════════════ BOQ LIBRARY MODAL ══════════════════ -->
+<div id="boqLibModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">
+  <div style="background:#111827;border:1px solid #374151;border-radius:18px;width:100%;max-width:860px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Header -->
+    <div style="padding:18px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#F9FAFB;">📚 ספריית כתב כמויות</div>
+        <div style="font-size:12px;color:#9CA3AF;margin-top:2px;">297 סעיפים מקצועיים — בחר ולחץ "הוסף"</div>
+      </div>
+      <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <!-- Filters -->
+    <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input id="boqLibSearch" type="text" placeholder="🔍 חפש סעיף..." oninput="renderBOQLibList()" 
+          style="flex:1;min-width:180px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;outline:none;">
+        <select id="boqLibChapter" onchange="renderBOQLibList()"
+          style="padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
+          <option value="">כל הפרקים</option>
+          <option value="1">פרק 1 – פירוק והריסה</option>
+          <option value="2">פרק 2 – אינסטלציה</option>
+          <option value="3">פרק 3 – איתור וייבוש</option>
+          <option value="4">פרק 4 – בנייה ותיקונים</option>
+          <option value="5">פרק 5 – ריצוף, חיפוי ופרקט</option>
+          <option value="6">פרק 6 – טיח, שפכטל וצבע</option>
+          <option value="7">פרק 7 – נגרות</option>
+          <option value="8">פרק 8 – אלומיניום, זכוכית ותריסים</option>
+          <option value="9">פרק 9 – שיש ואבן</option>
+          <option value="10">פרק 10 – חשמל משלים</option>
+          <option value="11">פרק 11 – ניקיון ופינוי</option>
+          <option value="12">פרק 12 – ניקוי נזקי אש</option>
+          <option value="13">פרק 13 – פריצה ומיגון</option>
+          <option value="14">פרק 14 – סעיפים כלליים</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9CA3AF;cursor:pointer;white-space:nowrap;">
+          <input type="checkbox" id="boqLibFilter" onchange="renderBOQLibList()" style="accent-color:#F59E0B;width:14px;height:14px;">
+          סנן לפי סוג נזק
+        </label>
+      </div>
+      <div id="boqLibStats" style="font-size:11px;color:#6B7280;"></div>
+    </div>
+    <!-- Items list -->
+    <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
+    <!-- Footer -->
+    <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+      <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
+      <div style="display:flex;gap:8px;">
+        <button onclick="boqLibSelectAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">בחר הכל</button>
+        <button onclick="boqLibClearAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">נקה הכל</button>
+        <button onclick="addLibraryItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      </div>
+    </div>
   </div>
 </div>
-
-<nav class="ap-form-nav">
-  <div class="ap-form-nav-items">
-    <a href="index.html" class="ap-form-btn">
-      <span class="ap-ico">🏠</span>
-      <span class="ap-lbl">דשבורד</span>
-    </a>
-    <button class="ap-form-btn green" onclick="saveDraft()">
-      <span class="ap-ico">💾</span>
-      <span class="ap-lbl">שמור</span>
-    </button>
-    <button class="ap-form-btn gold" onclick="generateReport()">
-      <span class="ap-ico">📄</span>
-      <span class="ap-lbl">דוח</span>
-    </button>
-    <button class="ap-form-btn" onclick="prevCard()">
-      <span class="ap-ico">→</span>
-      <span class="ap-lbl">הקודם</span>
-    </button>
-    <button class="ap-form-btn" onclick="nextCard()">
-      <span class="ap-ico">←</span>
-      <span class="ap-lbl">הבא</span>
-    </button>
-    <button class="ap-form-btn" onclick="apFormToggleMobMore()">
-      <span class="ap-ico">⋯</span>
-      <span class="ap-lbl">עוד</span>
-    </button>
-  </div>
-</nav>
-
-<script>
-function apFormToggleMobMore() {
-  const p = document.getElementById('apFormMorePanel');
-  const o = document.getElementById('apFormMoreOverlay');
-  const open = p.classList.contains('open');
-  p.classList.toggle('open', !open);
-  o.classList.toggle('open', !open);
-}
-function apFormCloseMobMore() {
-  document.getElementById('apFormMorePanel').classList.remove('open');
-  document.getElementById('apFormMoreOverlay').classList.remove('open');
-}
-</script>
 
 </body>
 </html>

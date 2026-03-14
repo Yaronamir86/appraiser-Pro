@@ -47,7 +47,7 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
       <div style="font-size:12px;color:#f59e0b;font-weight:700;">כלי עבודה לשמאי רכוש עצמאי</div>
     </div>
   </div>
-  <div class="subtitle">050-3292066 &nbsp;|&nbsp; yaronamir86@gmail.com</div>
+  <div class="subtitle">050-3292066 &nbsp;|&nbsp; <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="651c04170a0b04080c175d53250208040c094b060a08">[email&#160;protected]</a></div>
 
   <div style="text-align:center;margin-bottom:28px;">
     <span class="trial-badge">✅ ניסיון חינמי 14 יום — ללא כרטיס אשראי</span>
@@ -112,7 +112,7 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
   <div class="login-link">כבר יש לך חשבון? <a href="index.html">כניסה למערכת</a></div>
 </div>
 
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -160,6 +160,7 @@ window.doRegister = async function(){
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 14);
 
+    // Write user profile
     await setDoc(doc(db,'users',uid), {
       uid, firstName, lastName,
       fullName: firstName+' '+lastName,
@@ -168,6 +169,18 @@ window.doRegister = async function(){
       plan: 'trial',
       trialEnd: trialEnd.toISOString(),
       createdAt: serverTimestamp()
+    });
+
+    // Write billing record (billing core)
+    await setDoc(doc(db,'billing',uid), {
+      uid, email, plan: 'trial',
+      products: ['appraiser-pro'],
+      trialEnd: trialEnd.toISOString(),
+      subscriptionEnd: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     });
 
     document.getElementById('regForm').style.display='none';
@@ -203,12 +216,4 @@ function checkPW(v){
   if(/[A-Za-z]/.test(v))s++;
   if(/[^A-Za-z0-9]/.test(v))s++;
   const c=['#ef4444','#f59e0b','#3b82f6','#10b981'];
-  const l=['חלשה','בינונית','טובה','חזקה'];
-  const p=['25%','50%','75%','100%'];
-  const i=Math.max(s-1,0);
-  fill.style.width=p[i]; fill.style.background=c[i];
-  hint.textContent='חוזק: '+l[i]; hint.style.color=c[i];
-}
-</script>
-</body>
-</html>
+  const l=['חלשה','בינונית'
