@@ -3,13 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מערכת שמאות | דשבורד</title>
-<link rel="manifest" href="/appraiser-Pro/manifest.json">
-<link rel="icon" type="image/png" href="/appraiser-Pro/assets/omdan-favicon.png">
-<link rel="apple-touch-icon" href="/appraiser-Pro/assets/omdan-app-icon-192.png">
-<meta name="theme-color" content="#1f2a44">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<title>OMDAN | לוח בקרה</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -699,75 +693,6 @@ footer {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.7); }
 }
-
-/* ── MOBILE BOTTOM NAV ── */
-@media (max-width: 768px) {
-  .header-actions { display: none; }
-  .header-inner { padding: 0 16px; height: 56px; }
-  main { padding-bottom: 80px; }
-
-  .ap-mob-nav {
-    display: block;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(3,7,18,0.97);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(20px);
-    z-index: 200;
-    padding: 6px 0 env(safe-area-inset-bottom, 6px);
-  }
-  .ap-mob-nav-items {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
-  .ap-mob-btn {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 10px; min-width: 52px; cursor: pointer;
-    border: none; background: none; color: inherit;
-    font-family: 'Heebo', sans-serif;
-    border-radius: 10px; transition: all .15s;
-    text-decoration: none;
-  }
-  .ap-mob-btn .ap-ico { font-size: 20px; color: #6b7280; transition: color .15s; }
-  .ap-mob-btn .ap-lbl { font-size: 10px; color: #6b7280; font-weight: 600; transition: color .15s; }
-  .ap-mob-btn.primary .ap-ico,
-  .ap-mob-btn.primary .ap-lbl { color: #f59e0b; }
-  .ap-mob-btn:active { background: rgba(255,255,255,.06); }
-
-  /* more panel */
-  .ap-more-overlay { display: none; position: fixed; inset: 0; z-index: 198; }
-  .ap-more-overlay.open { display: block; }
-  .ap-more-panel {
-    display: none; position: fixed;
-    bottom: 68px; left: 0; right: 0;
-    background: #0d1117;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px 20px 0 0;
-    padding: 16px 20px;
-    z-index: 199;
-    animation: apSlideUp .2s ease;
-  }
-  .ap-more-panel.open { display: block; }
-  @keyframes apSlideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-  .ap-more-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
-  .ap-more-item {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    padding: 12px 6px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px; cursor: pointer; transition: all .15s;
-    font-size: 11px; color: #6b7280; font-family: 'Heebo', sans-serif;
-  }
-  .ap-more-item span:first-child { font-size: 22px; }
-  .ap-more-item:active { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); }
-}
-
-@media (min-width: 769px) {
-  .ap-mob-nav { display: none; }
-  .ap-more-panel { display: none !important; }
-  .ap-more-overlay { display: none !important; }
-}
 </style>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -900,9 +825,11 @@ window.doForgotPassword = async () => {
 <!-- ══════ LOGIN SCREEN ══════ -->
 <div id="loginScreen" style="position:fixed;inset:0;background:#0f1117;z-index:99999;display:none;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;direction:rtl;">
   <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:48px 40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5);">
-    <div style="font-size:40px;margin-bottom:8px;">⚖️</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="56" height="56"><rect width="64" height="64" rx="16" fill="#f59e0b"/><text x="32" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="900" fill="#0f1117" text-anchor="middle" letter-spacing="-1">YA</text></svg><div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#fff;">ירון אמיר</div><div style="font-size:12px;color:#f59e0b;font-weight:700;">שמאי רכוש</div></div></div>
-    <div style="font-size:12px;color:#6b7280;margin-bottom:28px;">בת-ים &nbsp;|&nbsp; 050-3292066</div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+      <img src="assets/omdan-logo.png" alt="OMDAN" style="height:56px;object-fit:contain;margin-bottom:8px;" onerror="this.style.display='none';document.getElementById('omdan-idx-fallback').style.display='block'">
+      <div id="omdan-idx-fallback" style="display:none;font-size:28px;font-weight:900;color:#f59e0b;letter-spacing:2px;">OMDAN</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;">מערכת שמאות מקצועית</div>
+    </div>
     <div style="margin-bottom:14px;text-align:right;">
       <label style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">שם משתמש</label>
       <input id="loginUser" type="text" placeholder="your@email.com" type="email" autocomplete="email"
@@ -935,7 +862,7 @@ window.doForgotPassword = async () => {
     <div class="logo" style="display:flex;align-items:center;gap:10px;">
   <div id="headerLogo" style="width:36px;height:36px;border-radius:10px;background:#f59e0b;color:#0f1117;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;">YA</div>
   <div style="line-height:1.2;">
-    <div id="headerName" style="font-size:15px;font-weight:800;color:#fff;">מערכת שמאות</div>
+    <div id="headerName" style="font-size:15px;font-weight:800;color:#fff;">OMDAN</div>
     <div id="headerTitle" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.04em;">מקצועית</div>
   </div>
 </div>
@@ -1051,7 +978,7 @@ window.doForgotPassword = async () => {
 </main>
 
 <footer>
-  מערכת שמאות מקצועית &nbsp;·&nbsp; כל הנתונים נשמרים מקומית בדפדפן
+  OMDAN — מערכת שמאות מקצועית &nbsp;·&nbsp; כל הנתונים מסונכרנים לענן
 </footer>
 
 <!-- New Case Modal -->
@@ -1471,59 +1398,5 @@ function escHtml(str) {
 // ══════════════════════════════════════════════════
 // render called by Firebase auth listener
 </script>
-  <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/appraiser-Pro/sw.js");
-  });
-}
-</script>
-
-<!-- ── MOBILE BOTTOM NAV ── -->
-<div class="ap-more-overlay" id="apMoreOverlay" onclick="apCloseMobMore()"></div>
-<div class="ap-more-panel" id="apMorePanel">
-  <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:12px;text-align:center">אפשרויות נוספות</div>
-  <div class="ap-more-grid">
-    <div class="ap-more-item" onclick="exportAll();apCloseMobMore()"><span>📤</span><span>ייצוא</span></div>
-    <div class="ap-more-item" onclick="window.location.href='settings.html'"><span>⚙️</span><span>הגדרות</span></div>
-    <div class="ap-more-item" onclick="doLogout()"><span>🚪</span><span style="color:#f87171">יציאה</span></div>
-  </div>
-</div>
-
-<nav class="ap-mob-nav">
-  <div class="ap-mob-nav-items">
-    <button class="ap-mob-btn primary" onclick="">
-      <span class="ap-ico">🏠</span>
-      <span class="ap-lbl">דשבורד</span>
-    </button>
-    <button class="ap-mob-btn" onclick="openNewCase()">
-      <span class="ap-ico">➕</span>
-      <span class="ap-lbl">תיק חדש</span>
-    </button>
-    <button class="ap-mob-btn" onclick="document.getElementById('searchInput').focus()">
-      <span class="ap-ico">🔍</span>
-      <span class="ap-lbl">חיפוש</span>
-    </button>
-    <button class="ap-mob-btn" onclick="apToggleMobMore()">
-      <span class="ap-ico">⋯</span>
-      <span class="ap-lbl">עוד</span>
-    </button>
-  </div>
-</nav>
-
-<script>
-function apToggleMobMore() {
-  const p = document.getElementById('apMorePanel');
-  const o = document.getElementById('apMoreOverlay');
-  const open = p.classList.contains('open');
-  p.classList.toggle('open', !open);
-  o.classList.toggle('open', !open);
-}
-function apCloseMobMore() {
-  document.getElementById('apMorePanel').classList.remove('open');
-  document.getElementById('apMoreOverlay').classList.remove('open');
-}
-</script>
-
 </body>
 </html>
