@@ -173,32 +173,46 @@ textarea{resize:vertical;min-height:80px;}
 .form-mob-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:200;
+  width:100%;
   background:rgba(13,17,23,.98);
   border-top:1px solid var(--border);
   backdrop-filter:blur(16px);
-  height:60px;
+  height:64px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
 }
-.form-mob-nav-inner{display:flex;align-items:stretch;height:100%;}
+.form-mob-nav-inner{
+  display:flex;
+  flex-direction:row;
+  direction:ltr;
+  align-items:center;
+  justify-content:stretch;
+  width:100%;
+  height:64px;
+}
 .fmn-item{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;
+  flex:1 1 0;min-width:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
   cursor:pointer;color:var(--subtle);
-  font-size:9px;font-weight:700;letter-spacing:.02em;
   border:none;background:none;font-family:inherit;
   text-decoration:none;transition:color .15s;
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  height:100%;padding-bottom:4px;
 }
-.fmn-item .fmn-icon{font-size:18px;line-height:1;}
+.fmn-item .fmn-icon{font-size:20px;line-height:1;}
+.fmn-item .fmn-label{
+  font-size:10px;font-weight:700;letter-spacing:.02em;
+  line-height:1;direction:rtl;margin-top:1px;
+}
 .fmn-item:hover,.fmn-item.active{color:var(--accent);}
-.fmn-item.save-action{color:var(--accent);}
+.fmn-item.report-action{position:relative;top:-2px;}
 .fmn-item.report-action .fmn-wrap{
   background:linear-gradient(135deg,var(--accent),var(--accent3));
-  width:38px;height:38px;border-radius:10px;
+  width:34px;height:34px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
   font-size:18px;box-shadow:0 3px 10px rgba(245,158,11,.4);
-  margin-top:-4px;
 }
-.fmn-item.report-action .fmn-label{color:var(--accent);margin-top:2px;}
+.fmn-item.report-action .fmn-label{color:var(--accent);position:relative;top:2px;}
 
 /* ── SIDEBAR ── */
 #layout{display:flex;min-height:calc(100vh - 56px);}
@@ -672,7 +686,10 @@ window.doForgotPassword = async () => {
 <!-- ══════════════════ LANDING ══════════════════ -->
 <div id="landing" class="hidden">
   <a href="index.html" style="position:absolute;top:20px;right:20px;color:var(--muted);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.04);transition:all .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">← דשבורד</a>
-  <div style="margin-bottom:16px;"><img src="assets/omdan-logo.png" alt="OMDAN" style="height:52px;object-fit:contain;" onerror="this.outerHTML='<span style=\"font-size:28px;font-weight:900;color:#f59e0b;letter-spacing:2px;\">OMDAN</span>'"></div>
+  <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:center;">
+    <img src="assets/omdan-logo.png" alt="" style="height:52px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span style="display:none;font-size:28px;font-weight:900;color:#f59e0b;letter-spacing:2px;">OMDAN</span>
+  </div>
   <h1 class="land-title">מערכת שמאות מקצועית</h1>
   <p class="land-sub">בחר את סוג השומה להתחיל</p>
   <div class="mode-grid">
@@ -720,7 +737,7 @@ window.doForgotPassword = async () => {
     <div class="tb-left">
       <a href="index.html" class="tb-icon-btn" title="חזרה לדשבורד" style="font-size:13px;font-weight:800;width:auto;padding:0 10px;gap:4px;color:var(--muted);">← דשבורד</a>
       <div class="tb-divider"></div>
-      <img src="assets/omdan-logo.png" alt="OMDAN" class="tb-logo-img">
+      <img src="assets/omdan-logo.png" alt="" class="tb-logo-img" onerror="this.style.display='none'">
       <span class="tb-name">OMDAN</span>
       <span class="tb-mode" id="tbModeLabel"></span>
     </div>
@@ -1632,7 +1649,7 @@ function renderCard(n){
   };
   const d = cardDefs[n];
   let html = `<div><h2 class="page-title">${d.icon} ${d.title}</h2><p class="page-sub">${d.sub}</p></div>`;
-  html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;">`;
+  html += `<div class="card-container" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">`;
   if(n===1) html += renderCard1();
   else if(n===2) html += renderCard2();
   else if(n===3) html += renderCard3();
