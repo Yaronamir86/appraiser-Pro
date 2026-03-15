@@ -214,7 +214,11 @@ textarea{resize:vertical;min-height:80px;}
 }
 .fmn-item.report-action .fmn-label{color:var(--accent);position:relative;top:2px;}
 
-/* ── MERGED CARD GRID (cards 1+2, 4+5) ── */
+.area-picker{background:var(--primary2);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.area-group{margin-bottom:10px;}
+.area-group-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.area-chip{font-size:12px;padding:5px 10px;}
+
 .merged-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
 .merged-grid>div:first-child,.merged-grid>div:last-child{background:var(--primary2);border:1px solid var(--border);border-radius:12px;padding:18px;}
 .merged-sep{display:none;}
@@ -1311,7 +1315,7 @@ let STATE = {
   insurance:{company:'',policyNum:'',claimNum:'',eventReportDate:'',appointmentDate:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extNaturalDisaster:false,extTerror:false,lastDocDate:''},
   event:{eventType:'',eventSubType:'',plumberType:'',requestedBy:'',requesterName:'',visitPurpose:[],policeReport:'',policeNum:'',professionals:[],profDetails:{},appraiserDeclaration:''},
   circ:{infoSource:'',infoName:'',discDate:'',discTime:'',wasOccupied:'',immediateAction:'',ongoingDmg:'',pastEvent:'',waterOrigin:'',waterDuration:'',wallOpened:'',prevRepair:'',prevRepairDate:'',prevRepairBy:'',prevRepairReason:'',recentPlumber:'',recentPlumberDate:'',recentPlumberReason:'',fireLocation:'',fireType:'',fireDept:'',burglaryMethod:'',stolenItems:'',alarmExists:'',camerasExist:'',extraNotes:'',circumOverride:''},
-  findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:''},
+  findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:'',_showAllAreas:false},
   boq:{structItems:[],contentsItems:[],serviceItems:[],vat:false,hasClaim:false,claimAmount:'',restoredState:'',genItems:{cleaning:true,waste:false,container:false,moveContents:false,drying:false},genNote:'',boqOverride:''},
   summary:{openingOverride:'',appraisalNotes:'',explanations:'',recommendations:'',signature:'',claimTotal:''}
 };
@@ -1426,30 +1430,55 @@ const TAX_SIGNS = {'נזקי מס רכוש':[
   {id:'t_secondary',l:'נזק משני (רטיבות/קריסה)'}
 ]};
 const ROOMS_RES = [
-  {id:'living',l:'סלון',sqm:25,rep:false},
-  {id:'kitchen',l:'מטבח',sqm:12,rep:false},
-  {id:'bedroom',l:'חדר שינה',sqm:14,rep:true},
-  {id:'kids',l:'חדר ילדים',sqm:12,rep:true},
-  {id:'bath',l:'חדר רחצה',sqm:6,rep:false},
-  {id:'toilet',l:'שירותים',sqm:3,rep:false},
-  {id:'hall',l:'מסדרון',sqm:8,rep:false},
-  {id:'balcony',l:'מרפסת',sqm:10,rep:false},
-  {id:'service',l:'חדר שירות',sqm:5,rep:false},
-  {id:'storage',l:'מחסן',sqm:6,rep:false},
-  {id:'ceil_general',l:'תקרה (כללי)',sqm:0,rep:false},
-  {id:'other_r',l:'אחר',sqm:0,rep:false}
+  {id:'living',   l:'סלון',          sqm:25, rep:false, icon:'🛋️'},
+  {id:'kitchen',  l:'מטבח',          sqm:12, rep:false, icon:'🍳'},
+  {id:'bedroom',  l:'חדר שינה',      sqm:14, rep:true,  icon:'🛏️'},
+  {id:'kids',     l:'חדר ילדים',     sqm:12, rep:true,  icon:'🧸'},
+  {id:'bath',     l:'חדר רחצה',      sqm:6,  rep:false, icon:'🚿'},
+  {id:'toilet',   l:'שירותים',       sqm:3,  rep:false, icon:'🚽'},
+  {id:'hall',     l:'מסדרון',        sqm:8,  rep:false, icon:'🚪'},
+  {id:'balcony',  l:'מרפסת',         sqm:10, rep:false, icon:'🌿'},
+  {id:'service',  l:'חדר שירות',     sqm:5,  rep:false, icon:'🧹'},
+  {id:'storage',  l:'מחסן פנימי',    sqm:6,  rep:false, icon:'📦'},
+  {id:'mamad',    l:'ממ"ד',          sqm:9,  rep:false, icon:'🛡️'},
+  {id:'other_r',  l:'אחר',           sqm:0,  rep:false, icon:'➕'},
 ];
 const ROOMS_BIZ = [
-  {id:'sales',l:'חלל מכירה',sqm:60,rep:false},
-  {id:'office',l:'משרד',sqm:20,rep:true},
-  {id:'warehouse',l:'מחסן',sqm:30,rep:false},
-  {id:'ind_kitchen',l:'מטבח תעשייתי',sqm:20,rep:false},
-  {id:'production',l:'אזור ייצור',sqm:40,rep:false},
-  {id:'server',l:'חדר שרתים',sqm:10,rep:false},
-  {id:'lobby',l:'לובי',sqm:15,rep:false},
-  {id:'bath_biz',l:'שירותים',sqm:5,rep:false},
-  {id:'other_b',l:'אחר',sqm:0,rep:false}
+  {id:'sales',       l:'חלל מכירה',       sqm:60, rep:false, icon:'🏪'},
+  {id:'office',      l:'משרד',            sqm:20, rep:true,  icon:'💼'},
+  {id:'warehouse',   l:'מחסן',            sqm:30, rep:false, icon:'📦'},
+  {id:'ind_kitchen', l:'מטבח תעשייתי',   sqm:20, rep:false, icon:'🍳'},
+  {id:'production',  l:'אזור ייצור',      sqm:40, rep:false, icon:'🏭'},
+  {id:'server',      l:'חדר שרתים',       sqm:10, rep:false, icon:'💻'},
+  {id:'lobby',       l:'לובי',            sqm:15, rep:false, icon:'🏨'},
+  {id:'bath_biz',    l:'שירותים',         sqm:5,  rep:false, icon:'🚽'},
+  {id:'other_b',     l:'אחר',             sqm:0,  rep:false, icon:'➕'},
 ];
+// Exterior / peripheral areas — relevant for all event types, especially tax
+const ROOMS_EXT = [
+  {id:'facade',       l:'חזית בניין',      sqm:0,  rep:false, icon:'🏛️'},
+  {id:'roof',         l:'גג',              sqm:0,  rep:false, icon:'🏠'},
+  {id:'stairwell',    l:'חדר מדרגות',      sqm:0,  rep:false, icon:'🪜'},
+  {id:'lobby_common', l:'לובי משותף',      sqm:0,  rep:false, icon:'🚪'},
+  {id:'parking',      l:'חניה',            sqm:0,  rep:false, icon:'🚗'},
+  {id:'storage_ext',  l:'מחסן חיצוני',    sqm:0,  rep:false, icon:'🏗️'},
+  {id:'fence',        l:'גדר / חומה',      sqm:0,  rep:false, icon:'🧱'},
+  {id:'yard',         l:'חצר',             sqm:0,  rep:false, icon:'🌳'},
+  {id:'entry',        l:'כניסה לבניין',    sqm:0,  rep:false, icon:'🔑'},
+  {id:'service_balc', l:'מרפסת שירות',    sqm:0,  rep:false, icon:'🌿'},
+  {id:'wall_envelope',l:'קיר מעטפת',       sqm:0,  rep:false, icon:'🧱'},
+  {id:'other_ext',    l:'אחר - חוץ',       sqm:0,  rep:false, icon:'➕'},
+];
+// Quick picks per event type — shown first before "show more"
+const AREA_QUICK_PICKS = {
+  water:    ['living','kitchen','bath','bedroom'],
+  fire:     ['living','kitchen','bedroom','hall'],
+  burglary: ['entry','living','storage','facade'],
+  tax:      ['facade','roof','living','bedroom'],
+  electrical:['living','kitchen','bedroom','hall'],
+  default:  ['living','kitchen','bedroom','bath'],
+};
+
 
 // ══════════════════════════════════════════════════════════════
 // ROOM-SPECIFIC DAMAGE ITEMS (per area type, for findings card)
@@ -1638,9 +1667,13 @@ const ROOM_ITEM_MAP = {
   kitchen:'kitchen', bath:'bath', toilet:'toilet',
   living:'living', bedroom:'bedroom', kids:'kids',
   hall:'hall', balcony:'balcony', storage:'storage',
-  service:'storage',
+  service:'storage', mamad:'storage',
   sales:'sales', warehouse:'warehouse', office:'office',
-  ind_kitchen:'ind_kitchen', bath_biz:'bath'
+  ind_kitchen:'ind_kitchen', bath_biz:'bath',
+  // exterior — no special ROOM_ITEMS, handled by signs only
+  facade:null, roof:null, stairwell:null, lobby_common:null,
+  parking:null, storage_ext:'storage', fence:null, yard:null,
+  entry:null, service_balc:'balcony', wall_envelope:null,
 };
 
 
@@ -1655,7 +1688,7 @@ function selectMode(m){
     insurance:{company:'',policyNum:'',claimNum:'',eventReportDate:'',appointmentDate:'',structureSum:'',contentsSum:'',structureActual:'',contentsActual:'',deductStruct:'',deductContents:'',thirdParty:false,lossOfProfits:false,vatBiz:false,arrangementPlumber:false,coverageType:'both',extNaturalDisaster:false,extTerror:false,lastDocDate:''},
     event:{eventType:'',eventSubType:'',plumberType:'',requestedBy:'',requesterName:'',visitPurpose:[],policeReport:'',policeNum:'',professionals:[],profDetails:{},appraiserDeclaration:''},
     circ:{infoSource:'',infoName:'',discDate:'',discTime:'',wasOccupied:'',immediateAction:'',ongoingDmg:'',pastEvent:'',waterOrigin:'',waterDuration:'',wallOpened:'',prevRepair:'',prevRepairDate:'',prevRepairBy:'',prevRepairReason:'',recentPlumber:'',recentPlumberDate:'',recentPlumberReason:'',fireLocation:'',fireType:'',fireDept:'',burglaryMethod:'',stolenItems:'',alarmExists:'',camerasExist:'',extraNotes:'',circumOverride:''},
-    findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:''},
+    findings:{areas:[],labTest:false,matchesStory:'',generalNotes:'',findingsOverride:'',freeAreaName:'',residents:'',habitableStatus:'yes',rentalMonths:'',rentalMonthly:'',_showAllAreas:false},
     boq:{structItems:[],contentsItems:[],serviceItems:[],vat:false,hasClaim:false,claimAmount:'',restoredState:'',genItems:{cleaning:true,waste:false,container:false,moveContents:false,drying:false},genNote:'',boqOverride:''},
     summary:{openingOverride:'',appraisalNotes:'',explanations:'',recommendations:'',signature:'',claimTotal:'',rehabTime:'',rehabNotes:''},
     photos:{main:null,mainCaption:'',items:[]}
@@ -1990,7 +2023,7 @@ function renderCard4(){
     <option value="other" ${ev.requestedBy==='other'?'selected':''}>אחר</option>
   </select></div>`;
   html += `<div class="field"><label class="label" style="${insAutoReq?'color:var(--subtle);':''}">${insAutoReq?'שם הפונה (לא רלוונטי)':'שם הפונה'}</label>
-    <input type="text" value="${esc(ev.requesterName)}" oninput="STATE.event.requesterName=this.value" ${insAutoReq?'disabled placeholder="חברת הביטוח" style=\'opacity:0.4;\'':`placeholder="שם מלא..."`}></div>`;
+    <input type="text" value="${esc(ev.requesterName)}" oninput="STATE.event.requesterName=this.value" ${insAutoReq?'disabled placeholder="חברת הביטוח" style=\'opacity:0.4;\'':'placeholder="שם מלא..."'}></div>`;
   html += `</div>`;
   html += `<div class="field mt16"><label class="label">מטרת הביקור (ניתן לסמן מספר)</label><div class="flex flex-wrap gap8" id="purposeChips">`;
   ['הערכת נזק לצורך תביעה','בדיקת היקף שיקום','חקירה ראשונית','בדיקת תכולה/מלאי','ביקור חוזר/עדכון אומדן','אחר'].forEach(p=>{
@@ -2162,12 +2195,10 @@ function renderCard6(){
   const f = STATE.findings;
   const et = STATE.event.eventType;
   const usage = STATE.property.usage;
-  const rooms = usage==='business' ? ROOMS_BIZ : ROOMS_RES;
-  const addedIds = f.areas.map(a=>a.id);
 
   let html = `<div class="grid2 mb16">
     <div class="field"><label class="label">👥 מספר דיירים בנכס</label>
-      <input type="number" min="0" max="20" value="${esc(f.residents)}" oninput="STATE.findings.residents=this.value" placeholder="מספר אנשים (לפיצוי ביגוד)">
+      <input type="number" min="0" max="20" value="${esc(f.residents)}" oninput="STATE.findings.residents=this.value" >
     </div>
     <div class="field"><label class="label">🏠 הנכס ראוי למגורים בזמן תיקון?</label>
       <div class="pill-group" id="habitPills">
@@ -2175,7 +2206,7 @@ function renderCard6(){
       </div>
     </div>
     ${f.habitableStatus==='no'?`<div class="field"><label class="label">תקופת שכירות (חודשים)</label>
-      <input type="number" min="1" max="24" value="${esc(f.rentalMonths)}" oninput="STATE.findings.rentalMonths=this.value" placeholder="מס' חודשים">
+      <input type="number" min="1" max="24" value="${esc(f.rentalMonths)}" oninput="STATE.findings.rentalMonths=this.value" >
     </div>
     <div class="field"><label class="label">שכירות חודשית (₪)</label>
       <input type="text" value="${fmtCurrency(f.rentalMonthly)}" oninput="STATE.findings.rentalMonthly=parseCurrency(this.value);this.value=fmtCurrency(this.value)" placeholder="₪">
@@ -2183,27 +2214,73 @@ function renderCard6(){
     <div class="note note-blue span2" style="font-size:12px;">⚠️ עלות שכירות לא תיכלל בסיכום השיפוי – תשולם בכפוף להצגת הסכם שכירות חתום.</div>`:''}
   </div>`;
 
-  html += `<label class="label">בחר אזורים שנבדקו</label>
-    <div class="flex flex-wrap gap8 mb16">`;
-  rooms.forEach(room=>{
-    if(room.rep){
-      [1,2,3].forEach(n=>{
-        const uid = `${room.id}_${n}`;
-        const added = addedIds.includes(uid);
-        html += `<button class="chip ${added?'checked':''}" onclick="${added?'':'addArea(\''+uid+'\',\''+room.l+' '+n+'\','+room.sqm+')'}" style="${added?'cursor:default;':''}">
-          ${added?'✓':'+'}  ${room.l} ${n}</button>`;
-      });
-    } else {
-      const added = addedIds.includes(room.id);
-      html += `<button class="chip ${added?'checked':''}" onclick="${added?'':'addArea(\''+room.id+'\',\''+room.l+'\','+room.sqm+')'}" style="${added?'cursor:default;':''}">
-        ${added?'✓':'+'}  ${room.l}</button>`;
+  // ── Smart area picker ──
+  const isBiz = usage === 'business';
+  const interiorRooms = isBiz ? ROOMS_BIZ : ROOMS_RES;
+  const allRooms = [...interiorRooms, ...ROOMS_EXT];
+  const addedIds = f.areas.map(a => a.id.replace(/_\d+$/, ''));
+  const quickPickIds = AREA_QUICK_PICKS[et] || AREA_QUICK_PICKS.default;
+  const showAll = f._showAllAreas || false;
+
+  // Helper: next available id for repeatable room
+  const nextRepId = (room) => {
+    for(let n = 1; n <= 5; n++){
+      const uid = `${room.id}_${n}`;
+      if(!f.areas.find(a => a.id === uid)) return {uid, label:`${room.l} ${n}`};
     }
-  });
-  html += `</div>`;
+    return null;
+  };
+  // Helper: chip for a room
+  const roomChip = (room) => {
+    if(room.rep){
+      const next = nextRepId(room);
+      if(!next) return ''; // max reached
+      const alreadyHasOne = f.areas.find(a => a.id.startsWith(room.id+'_'));
+      return `<button class="chip area-chip" onclick="addArea('${next.uid}','${next.label}',${room.sqm})">
+        ${alreadyHasOne ? `+ ${room.l} ${parseInt(next.uid.split('_').pop())}` : `${room.icon||'+'} ${room.l}`}</button>`;
+    } else {
+      const added = f.areas.find(a => a.id === room.id);
+      if(added) return `<button class="chip checked area-chip" style="cursor:default;">✓ ${room.l}</button>`;
+      return `<button class="chip area-chip" onclick="addArea('${room.id}','${room.l}',${room.sqm})">${room.icon||'+'} ${room.l}</button>`;
+    }
+  };
+
+  // Quick picks section
+  const quickRooms = quickPickIds.map(id => allRooms.find(r => r.id === id)).filter(Boolean);
+  const quickHtml = quickRooms.map(roomChip).join('');
+
+  // Remaining interior rooms (not in quick picks)
+  const moreInterior = interiorRooms.filter(r => !quickPickIds.includes(r.id));
+  const moreInteriorHtml = moreInterior.map(roomChip).join('');
+
+  // Exterior rooms
+  const extHtml = ROOMS_EXT.map(roomChip).join('');
+
+  html += `<div class="area-picker mb16">
+    <label class="label mb8">בחר אזורים שנבדקו</label>
+
+    <div class="area-group mb8">
+      <div class="area-group-label">⚡ מוצע לאירוע זה</div>
+      <div class="flex flex-wrap gap8">${quickHtml}</div>
+    </div>
+
+    ${showAll ? `
+    <div class="area-group mb8">
+      <div class="area-group-label">🏠 חדרי פנים</div>
+      <div class="flex flex-wrap gap8">${moreInteriorHtml}</div>
+    </div>
+    <div class="area-group mb8">
+      <div class="area-group-label">🏗️ חוץ ומעטפת</div>
+      <div class="flex flex-wrap gap8">${extHtml}</div>
+    </div>
+    ` : `<button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=true;renderCard(6)" style="font-size:12px;">▾ הצג את כל האזורים</button>`}
+    ${showAll ? `<button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=false;renderCard(6)" style="font-size:12px;">▴ הסתר</button>` : ''}
+  </div>`;
+
   // Free area addition
   html += `<div class="flex gap8 mb16 items-center">
     <input type="text" id="freeAreaInput" value="${esc(f.freeAreaName||'')}" oninput="STATE.findings.freeAreaName=this.value" placeholder="שם אזור חופשי..." style="flex:1;padding:8px 12px;border-radius:8px;background:var(--primary2);border:1px solid var(--primary3);color:var(--text);font-size:13px;">
-    <button class="btn btn-secondary btn-sm" onclick="addFreeArea()">+ הוסף אזור</button>
+    <button class="btn btn-secondary btn-sm" onclick="addFreeArea()">+ הוסף</button>
   </div>`;
   f.areas.forEach((area,ai)=>{
     const signsMap = et==='water'?WATER_SIGNS:et==='fire'?FIRE_SIGNS:et==='burglary'?BURGLARY_SIGNS:et==='tax'?TAX_SIGNS:{};
@@ -2274,7 +2351,7 @@ function renderCard6(){
 
     html += `<div class="field mt12">
       <label class="label">📌 גורם/סיבת הנזק באזור זה</label>
-      <input type="text" value="${esc(area.causeDesc||'')}" oninput="setAreaField('${area.id}','causeDesc',this.value)" placeholder="לדוגמה: נזילה מדירה עילאית, חדירת גשם מחלון, שריפה במטבח...">
+      <input type="text" value="${esc(area.causeDesc||'')}" oninput="setAreaField('${area.id}','causeDesc',this.value)" placeholder="נזילה מדירה עילאית, חדירת גשם, רקטה...">
     </div>
     <div class="field mt8"><label class="label">הערות שמאי לאזור</label><textarea rows="2" oninput="setAreaField('${area.id}','notes',this.value)" placeholder="ממצאים נוספים, הסתייגויות...">${esc(area.notes||'')}</textarea></div>`;
     html += `</div></div>`;
