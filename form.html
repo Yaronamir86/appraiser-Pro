@@ -214,7 +214,16 @@ textarea{resize:vertical;min-height:80px;}
 }
 .fmn-item.report-action .fmn-label{color:var(--accent);position:relative;top:2px;}
 
-/* ── SIDEBAR ── */
+/* ── MERGED CARD GRID (cards 1+2, 4+5) ── */
+.merged-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+.merged-grid>div:first-child,.merged-grid>div:last-child{background:var(--primary2);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.merged-sep{display:none;}
+.merged-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+@media(max-width:768px){
+  .merged-grid{grid-template-columns:1fr;}
+}
+
+
 #layout{display:flex;min-height:calc(100vh - 56px);}
 #sidebar{width:230px;background:rgba(15,23,42,.85);border-left:1px solid var(--border);padding:10px 8px;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
 .nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;cursor:pointer;margin-bottom:3px;transition:all .18s;border-right:3px solid transparent;}
@@ -831,19 +840,13 @@ window.doForgotPassword = async () => {
   <div id="layout">
     <div id="sidebar">
       <div class="nav-item active" data-card="1" onclick="goCard(1)">
-        <span class="ni">👤</span><div><div class="nt">נתוני בסיס</div><div class="ns">שם, כתובת, תאריכים</div></div>
-      </div>
-      <div class="nav-item" data-card="2" onclick="goCard(2)">
-        <span class="ni">🏠</span><div><div class="nt">מאפייני נכס</div><div class="ns">סוג, שימוש, שטח</div></div>
+        <span class="ni">👤</span><div><div class="nt">נתוני בסיס + נכס</div><div class="ns">שם, כתובת, תאריכים</div></div>
       </div>
       <div class="nav-item nav-insurance-only" data-card="3" onclick="goCard(3)">
         <span class="ni">📋</span><div><div class="nt">ביטוח וכיסויים</div><div class="ns">פוליסה וסכומים</div></div>
       </div>
       <div class="nav-item" data-card="4" onclick="goCard(4)">
-        <span class="ni">⚡</span><div><div class="nt">פרטי אירוע</div><div class="ns">סוג, מקור, גורמים</div></div>
-      </div>
-      <div class="nav-item" data-card="5" onclick="goCard(5)">
-        <span class="ni">💬</span><div><div class="nt">נסיבות המקרה</div><div class="ns">גרסה ושאלות</div></div>
+        <span class="ni">⚡</span><div><div class="nt">אירוע ונסיבות</div><div class="ns">סוג, מקור, גורמים</div></div>
       </div>
       <div class="nav-item" data-card="6" onclick="goCard(6)">
         <span class="ni">🔍</span><div><div class="nt">ממצאים וסיבות לנזק</div><div class="ns">אזורים וסימני פגיעה</div></div>
@@ -1711,7 +1714,7 @@ function prevCard(){
   if(idx > 0) goCard(cards[idx-1]);
 }
 function getVisibleCards(){
-  return mode === 'tax' ? [1,2,4,5,6,7,8,9] : [1,2,3,4,5,6,7,8,9];
+  return mode==='tax'?[1,4,6,7,8,9]:[1,3,4,6,7,8,9];
 }
 
 // ══════════════════════════════════════════════════
@@ -1732,6 +1735,39 @@ function renderCard(n){
     9:{title:'תמונות',icon:'📷',sub:'תיעוד ביקור וממצאים'}
   };
   const d = cardDefs[n];
+
+  // Cards 1+2: render both inside one standard card-container with inner grid
+  if(n===1){
+    let html = `<div><h2 class="page-title">👤 נתוני בסיס ומאפייני הנכס</h2><p class="page-sub">פרטי מזמין, כתובת, תאריכים ומאפייני הנכס</p></div>`;
+    html += `<div class="card-container" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">`;
+    html += `<div class="merged-grid">`;
+    html += `<div><div class="merged-label">👤 נתוני בסיס</div>${renderCard1()}</div>`;
+    html += `<div class="merged-sep"></div>`;
+    html += `<div><div class="merged-label">🏠 מאפייני נכס</div>${renderCard2()}</div>`;
+    html += `</div>`;
+    html += `</div>`;
+    const cards=getVisibleCards(),idx=cards.indexOf(n),isLast=idx===cards.length-1;
+    html+=`<div class="card-nav"><button class="btn btn-primary" onclick="nextCard()">${isLast?'📄 צור דוח':'הבא ←'}</button><button class="btn btn-secondary" onclick="prevCard()" ${idx===0?'disabled style="opacity:.4"':''}>→ הקודם</button></div>`;
+    main.innerHTML=html; main.querySelectorAll('textarea.desc-input').forEach(ta=>autoResizeTA(ta)); attachListeners(n); return;
+  }
+  if(n===2){ goCard(3); return; }
+
+  // Cards 4+5: render both inside one standard card-container with inner grid
+  if(n===4){
+    let html = `<div><h2 class="page-title">⚡ פרטי האירוע ונסיבות המקרה</h2><p class="page-sub">סוג האירוע, גורמים, נסיבות ושאלות חקירה</p></div>`;
+    html += `<div class="card-container" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">`;
+    html += `<div class="merged-grid">`;
+    html += `<div><div class="merged-label">⚡ פרטי האירוע</div>${renderCard4()}</div>`;
+    html += `<div class="merged-sep"></div>`;
+    html += `<div><div class="merged-label">💬 נסיבות המקרה</div>${renderCard5()}</div>`;
+    html += `</div>`;
+    html += `</div>`;
+    const cards=getVisibleCards(),idx=cards.indexOf(n),isLast=idx===cards.length-1;
+    html+=`<div class="card-nav"><button class="btn btn-primary" onclick="nextCard()">${isLast?'📄 צור דוח':'הבא ←'}</button><button class="btn btn-secondary" onclick="prevCard()" ${idx===0?'disabled style="opacity:.4"':''}>→ הקודם</button></div>`;
+    main.innerHTML=html; main.querySelectorAll('textarea.desc-input').forEach(ta=>autoResizeTA(ta)); attachListeners(n); return;
+  }
+  if(n===5){ goCard(6); return; }
+
   let html = `<div><h2 class="page-title">${d.icon} ${d.title}</h2><p class="page-sub">${d.sub}</p></div>`;
   html += `<div class="card-container" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">`;
   if(n===1) html += renderCard1();
@@ -2046,7 +2082,7 @@ function renderCard5(){
     <div class="divider"></div>
     <div class="label" style="color:var(--accent);font-size:11px;">🔧 תיקון קודם / טיפול קודם</div>
     <div class="field mb12"><label class="label">בוצע תיקון קודם באזור הנזק?</label><div class="pill-group" id="prevRepPills">
-      ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא'}], c.prevRepair, "STATE.circ.prevRepair=v;refreshPills('prevRepPills',v);renderCard(5)")}
+      ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא'}], c.prevRepair, "STATE.circ.prevRepair=v;refreshPills('prevRepPills',v);renderCard(4)")}
     </div></div>
     ${c.prevRepair==='yes'?`<div class="grid2 mb12 p12 rounded8" style="background:var(--primary2);">
       <div class="field"><label class="label">תאריך תיקון קודם</label><input type="date" value="${esc(c.prevRepairDate)}" oninput="STATE.circ.prevRepairDate=this.value"></div>
@@ -2060,7 +2096,7 @@ function renderCard5(){
       <div class="field span2"><label class="label">סיבת התיקון</label><input type="text" value="${esc(c.prevRepairReason)}" oninput="STATE.circ.prevRepairReason=this.value"></div>
     </div>`:''}
     <div class="field"><label class="label">הוזמן שרברב בחודשים האחרונים?</label><div class="pill-group" id="recPlPills">
-      ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא'}], c.recentPlumber, "STATE.circ.recentPlumber=v;refreshPills('recPlPills',v);renderCard(5)")}
+      ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא'}], c.recentPlumber, "STATE.circ.recentPlumber=v;refreshPills('recPlPills',v);renderCard(4)")}
     </div></div>
     ${c.recentPlumber==='yes'?`<div class="grid2 mt8 p12 rounded8" style="background:var(--primary2);">
       <div class="field"><label class="label">תאריך משוער</label><input type="date" value="${esc(c.recentPlumberDate)}" oninput="STATE.circ.recentPlumberDate=this.value"></div>
@@ -2109,7 +2145,7 @@ function renderCard5(){
 
   html += `<div class="flex items-center gap12 mt12 mb8">
     <button class="btn btn-primary" onclick="genAndSetCircumText()" style="gap:6px;">✨ צור טקסט נסיבות אוטומטי</button>
-    ${STATE.circ.circumOverride?`<button class="btn btn-ghost btn-sm" onclick="STATE.circ.circumOverride='';renderCard(5)">🗑️ נקה</button>`:''}
+    ${STATE.circ.circumOverride?`<button class="btn btn-ghost btn-sm" onclick="STATE.circ.circumOverride='';renderCard(4)">🗑️ נקה</button>`:''}
   </div>`;
   if(STATE.circ.circumOverride){
     html += `<div class="field"><label class="label" style="color:var(--accent);">✏️ טקסט נסיבות (ניתן לעריכה)</label>
@@ -2689,7 +2725,7 @@ function renderCard8(){
 // ══════════════════════════════════════════════════
 function genAndSetCircumText(){
   const txt = genCircumText();
-  if(txt){ STATE.circ.circumOverride = txt; renderCard(5); }
+  if(txt){ STATE.circ.circumOverride = txt; renderCard(4); }
   else alert('אנא מלא נסיבות לפני יצירת הטקסט.');
 }
 function genAppraiserDeclarationText(){
