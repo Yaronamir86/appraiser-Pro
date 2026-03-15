@@ -2381,7 +2381,6 @@ function renderBOQSection(key, title, color){
   let html = `<div class="boq-section">
     <div class="flex justify-between items-center mb8">
       <div class="boq-section-title" style="color:${color};background:${color}15;">${title}</div>
-      <button class="btn btn-ghost btn-xs" onclick="addBOQItem('${key}')">+ הוסף שורה</button>
     </div>
     <table class="boq-table">
       <thead>`;
@@ -2413,7 +2412,14 @@ function renderBOQSection(key, title, color){
   }
   html += `</thead><tbody>`;
 
-  items.forEach(item=>{
+  // Build a map: roomHeader → last item index
+  const lastIdxByRoom = {};
+  items.forEach((item, i) => {
+    const key2 = item.roomHeader || '__none__';
+    lastIdxByRoom[key2] = i;
+  });
+
+  items.forEach((item, idx)=>{
     if(item.roomHeader && item.roomHeader !== lastArea){
       lastArea = item.roomHeader;
       areaNum++;
@@ -2456,6 +2462,19 @@ function renderBOQSection(key, title, color){
         <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
       </tr>`;
     }
+
+    // After last item of each room group — show "+ הוסף שורה לחדר"
+    const roomKey = item.roomHeader || '__none__';
+    if(idx === lastIdxByRoom[roomKey]){
+      const roomLabel = item.roomHeader || null;
+      const btnLabel = roomLabel ? `+ שורה ל${roomLabel}` : '+ הוסף שורה';
+      const addCall = roomLabel
+        ? `addBOQItem('${key}','${roomLabel.replace(/'/g,"\\'")}')`
+        : `addBOQItem('${key}')`;
+      html += `<tr><td colspan="${COLS}" style="padding:2px 8px 6px;">
+        <button class="btn btn-ghost btn-xs" style="font-size:10px;color:var(--accent);opacity:.7;" onclick="${addCall}">${btnLabel}</button>
+      </td></tr>`;
+    }
   });
 
   if(isIns && totalSec>0){
@@ -2471,7 +2490,11 @@ function renderBOQSection(key, title, color){
     html += `<tr class="row-subtotal"><td colspan="5" class="ta-r">סה"כ פרק</td><td class="ta-l">₪${fmtNum(totalSec)}</td><td></td></tr>`;
   }
   if(items.length===0) html += `<tr><td colspan="${COLS}" class="ta-c c-subtle" style="padding:20px;font-size:13px;">אין פריטים</td></tr>`;
-  html += `</tbody></table></div>`;
+  html += `</tbody></table>
+    <div style="padding:6px 4px;">
+      <button class="btn btn-ghost btn-xs" style="font-size:11px;" onclick="addBOQItem('${key}')">+ הוסף שורה ללא שיוך לחדר</button>
+    </div>
+  </div>`;
   return html;
 }
 
@@ -3096,12 +3119,14 @@ function _doGenerateReport(){
   // ══ INSURANCE ONLY: structured data panel at top of report ══
   if(mode === 'insurance'){
     const addr = [b.street, b.streetNum, b.apartment, b.city].filter(Boolean).join(' ');
-    const policyPeriod = (ins.policyFrom && ins.policyTo) ? `${ins.policyFrom} – ${ins.policyTo}` : (ins.policyFrom||ins.policyTo||'—');
-    const mkCell = (label, val) => `
+    // Only show cells that have data
+    const mkCell = (label, val) => val ? `
       <tr>
         <td style="padding:7px 12px;font-weight:600;color:#374151;border-bottom:1px solid #F3F4F6;width:48%;">${label}</td>
-        <td style="padding:7px 12px;font-weight:700;color:#111827;border-bottom:1px solid #F3F4F6;direction:rtl;">${val||'—'}</td>
-      </tr>`;
+        <td style="padding:7px 12px;font-weight:700;color:#111827;border-bottom:1px solid #F3F4F6;direction:rtl;">${val}</td>
+      </tr>` : '';
+
+    const appraiserCompany = (window._profile||{}).company || APPRAISER.company || '';
 
     rpt = `
     <style>
@@ -3131,7 +3156,8 @@ function _doGenerateReport(){
           ${mkCell('חברת ביטוח', ins.company)}
           ${mkCell('מספר פוליסה', ins.policyNum)}
           ${mkCell('מספר תביעה', ins.claimNum)}
-          ${mkCell('תקופת ביטוח', policyPeriod)}
+          ${mkCell('סכום ביטוח מבנה', ins.structureSum ? '₪'+fmtNum(parseCurrency(ins.structureSum)) : null)}
+          ${mkCell('סכום ביטוח תכולה', ins.contentsSum ? '₪'+fmtNum(parseCurrency(ins.contentsSum)) : null)}
           ${mkCell('השתתפות עצמית', ins.deductStruct ? '₪'+fmtNum(parseCurrency(ins.deductStruct)) : null)}
           ${mkCell('שמאי ממונה', ins.opposingAppraiser)}
         </tbody></table>
@@ -3143,7 +3169,7 @@ function _doGenerateReport(){
         <table><tbody>
           ${mkCell('שם השמאי', APPRAISER.nameHe)}
           ${mkCell('מספר רישיון', APPRAISER.license)}
-          ${mkCell('חברת שמאות', APPRAISER.company||'')}
+          ${appraiserCompany ? mkCell('חברת שמאות', appraiserCompany) : ''}
         </tbody></table>
       </div>
 
@@ -3159,8 +3185,6 @@ function _doGenerateReport(){
       </div>
 
     </div>
-
-    <!-- divider before appraiser header -->
     ` + rpt;
   }
 
@@ -3172,26 +3196,17 @@ function _doGenerateReport(){
     </div>`;
   }
 
-  rpt += `<div class="rpt-section"><h3>פרטי המזמין</h3>
-    <table class="rpt-table"><tbody>
-      ${mkInfoRow('שם',b.fullName)}
-      ${mkInfoRow('ת.ז/ח.פ',b.idNum)}
-      ${mkInfoRow('טלפון',b.phone)}
-      ${mkInfoRow('כתובת',[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' '))}
-      ${mkInfoRow('תאריך אירוע',b.eventDate)}
-      ${mkInfoRow('תאריך ביקור',b.visitDate)}
-    </tbody></table></div>`;
-
-  if(mode!=='tax'&&(ins.company||ins.policyNum)){
-    rpt += `<div class="rpt-section"><h3>פרטי ביטוח</h3>
+  // ── For private/tax: standard info sections ──
+  // ── For insurance: skip (already in the data panel above) ──
+  if(mode !== 'insurance'){
+    rpt += `<div class="rpt-section"><h3>פרטי המזמין</h3>
       <table class="rpt-table"><tbody>
-        ${mkInfoRow('חברת ביטוח',ins.company)}
-        ${mkInfoRow('מספר פוליסה',ins.policyNum)}
-        ${mkInfoRow('מספר תביעה',ins.claimNum)}
-        ${ins.structureSum?mkInfoRow('סכום ביטוח מבנה','₪'+fmtNum(parseCurrency(ins.structureSum))):''}
-        ${ins.contentsSum?mkInfoRow('סכום ביטוח תכולה','₪'+fmtNum(parseCurrency(ins.contentsSum))):''}
-        ${ins.deductStruct?mkInfoRow('השתתפות עצמית','₪'+fmtNum(parseCurrency(ins.deductStruct))):''}
-        ${ins.lastDocDate?mkInfoRow('תאריך קבלת מסמך אחרון',ins.lastDocDate):''}
+        ${mkInfoRow('שם',b.fullName)}
+        ${mkInfoRow('ת.ז/ח.פ',b.idNum)}
+        ${mkInfoRow('טלפון',b.phone)}
+        ${mkInfoRow('כתובת',[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' '))}
+        ${mkInfoRow('תאריך אירוע',b.eventDate)}
+        ${mkInfoRow('תאריך ביקור',b.visitDate)}
       </tbody></table></div>`;
   }
 
@@ -3871,11 +3886,21 @@ function toggleRoomSign(areaId, signId, btn){
   renderCard(6);
 }
 
-function addBOQItem(section){
+function addBOQItem(section, roomHeader){
   const items = STATE.boq[section];
   const prefix = section==='structItems'?'':section==='contentsItems'?'C':'S';
-  const newId = prefix+(items.length+1);
-  items.push({id:newId,desc:'',unit:"קומפ'",qty:'1',price:'',claim:'',zeroPrice:false});
+  const newId = prefix+(Date.now()%100000); // unique id
+  const newItem = {id:newId,desc:'',unit:"קומפ'",qty:'1',price:'',claim:'',zeroPrice:false};
+  if(roomHeader) newItem.roomHeader = roomHeader;
+  // Insert after last item with this roomHeader (or at end if no match)
+  if(roomHeader){
+    let lastIdx = -1;
+    items.forEach((it,i)=>{ if(it.roomHeader===roomHeader) lastIdx=i; });
+    if(lastIdx>=0){ items.splice(lastIdx+1,0,newItem); }
+    else items.push(newItem);
+  } else {
+    items.push(newItem);
+  }
   renderCard(7);
 }
 function updateBOQSummary(){
