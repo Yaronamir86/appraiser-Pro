@@ -2236,7 +2236,11 @@ function renderCard6(){
       </div>`;
     }
 
-    html += `<div class="field mt12"><label class="label">הערות שמאי לאזור</label><input type="text" value="${esc(area.notes||'')}" oninput="setAreaField('${area.id}','notes',this.value)" placeholder="ממצאים נוספים..."></div>`;
+    html += `<div class="field mt12">
+      <label class="label">📌 גורם/סיבת הנזק באזור זה</label>
+      <input type="text" value="${esc(area.causeDesc||'')}" oninput="setAreaField('${area.id}','causeDesc',this.value)" placeholder="לדוגמה: נזילה מדירה עילאית, חדירת גשם מחלון, שריפה במטבח...">
+    </div>
+    <div class="field mt8"><label class="label">הערות שמאי לאזור</label><textarea rows="2" oninput="setAreaField('${area.id}','notes',this.value)" placeholder="ממצאים נוספים, הסתייגויות...">${esc(area.notes||'')}</textarea></div>`;
     html += `</div></div>`;
   });
 
@@ -2766,17 +2770,20 @@ function genFindingsText(){
   const et = STATE.event.eventType;
   const areas = f.areas||[];
   if(!areas.length) return '';
+
+  // Build lookup for all sign labels
   const allSigns = [];
   [WATER_SIGNS,FIRE_SIGNS,BURGLARY_SIGNS,TAX_SIGNS].forEach(sm=>{
     Object.values(sm).forEach(arr=>allSigns.push(...arr));
   });
   const getLabel = id => (allSigns.find(s=>s.id===id)||{}).l||id;
-  // Sign → professional finding description mapping
+
+  // Professional descriptions per sign
   const signToDesc = {
-    w_stain_wall:'סימני רטיבות בקירות במספר מוקדים',
+    w_stain_wall:'כתמי רטיבות בקירות במספר מוקדים',
     w_stain_ceil:'כתמי רטיבות בתקרה',
     w_capillary:'סימני רטיבות בשיפולי קירות (עליות קפילריות)',
-    w_plaster_swell:'פגיעה בטיח, בשכבות שפכטל ובצבע',
+    w_plaster_swell:'פגיעה בטיח ובשכבות שפכטל — נפיחות והתנתקות',
     w_plaster_fall:'התפרקות וקילוף טיח',
     w_paint_peel:'קילופי צבע וניתוק גבס',
     w_humid_ind:'אינדיקציה ללחות חריגה בקירות',
@@ -2789,27 +2796,130 @@ function genFindingsText(){
     w_seal:'ליקויי איטום ורובה בחדר רטוב',
     w_kit_back:'רטיבות והתנפחות גב ארון מטבח',
     w_kit_base:'רטיבות והתנפחות בצוקל מטבח',
-    w_frame:'נזקי רטיבות והתנפחות למשקופים פנימיים',
+    w_frame:'נזקי רטיבות והתנפחות במשקופים פנימיים',
     w_elec_panel:'פגיעה בארון חשמל',
     w_elec_sys:'פגיעה במערכת חשמל',
-    w_mold:'סימני עובש ופטריות',
-    w_smell:'ריח טחב – חשש לזיהום בקטריאלי'
+    w_mold:'סימני עובש ופטריות על משטחי הקירות',
+    w_smell:'ריח טחב — חשש לזיהום בקטריאלי',
+    f_soot:'נזקי פיח ועשן על משטחי הקירות והתקרה',
+    f_smoke:'חדירת עשן לכל חלקי האזור',
+    f_direct:'פגיעה ישירה באלמנטים מבניים',
+    f_water_ext:'נזקי רטיבות ממי כיבוי',
+    f_melt:'התכה ועיוות של חומרים',
+    f_elec:'נזק למערכות חשמל',
+    f_false_ceil:'נזק לתקרה משנית',
+    f_wall_scorch:'שריפה וחריכה של קירות',
+    f_wall_plaster:'נפילת טיח מקירות',
+    f_wall_paint:'צבע מקולקל ומתקלף',
+    f_wall_tiles:'אריחי קיר שנפגעו מחום',
+    f_ceil_scorch:'חריכת תקרה',
+    f_ceil_collapse:'קריסת תקרה חלקית',
+    f_ceil_gypsum:'גבס ומינרלית שנפגעו',
+    f_ceil_soot:'פיח על התקרה',
+    f_floor_burn:'שריפת ריצוף',
+    f_floor_parquet:'פרקט שנפגע מאש ומי כיבוי',
+    f_floor_warped:'עיוות ריצוף',
+    f_floor_wet:'ריצוף רטוב ממי כיבוי',
+    b_frame:'נזק למשקוף — עיוות ופגיעה מבנית',
+    b_door:'שבר ועיוות בדלת',
+    b_window:'שבר בחלון ובמסגרת',
+    b_lock:'עקירת מנגנון נעילה',
+    b_vandal:'נזקי ונדליזם — כתובות, שברים ופגיעה בפנים',
+    b_alarm:'נזק למערכת אזעקה',
+    b_camera:'נזק למצלמות אבטחה',
+    t_direct:'פגיעה ישירה בקירות החוץ',
+    t_envelope:'פגיעה במעטפת הבניין',
+    t_shock:'נזקי הדף — שברים וסדקים',
+    t_shrapnel:'נזקי רסיסים',
+    t_secondary:'נזק משני — חדירת רטיבות וקריסה חלקית'
   };
+
+  // Opening sentence per event type
+  const openingByType = {
+    water:  (area) => area.causeDesc
+      ? `במהלך ביקורי בנכס נצפו ב${area.label} סימני נזק הנובעים מ${area.causeDesc}.`
+      : `במהלך ביקורי בנכס נצפו ב${area.label} סימני נזק עקב חדירת רטיבות.`,
+    fire:   (area) => area.causeDesc
+      ? `במהלך ביקורי בנכס נצפו ב${area.label} נזקים הנובעים מ${area.causeDesc}.`
+      : `במהלך ביקורי בנכס נצפו ב${area.label} נזקי אש ועשן.`,
+    burglary:(area) => area.causeDesc
+      ? `במהלך ביקורי בנכס נצפו ב${area.label} נזקים הנובעים מ${area.causeDesc}.`
+      : `במהלך ביקורי בנכס נצפו ב${area.label} נזקי פריצה.`,
+    tax:    (area) => area.causeDesc
+      ? `במהלך ביקורי בנכס נצפו ב${area.label} נזקים הנובעים מ${area.causeDesc}.`
+      : `במהלך ביקורי בנכס נצפו ב${area.label} נזקי מס רכוש.`,
+  };
+  const defaultOpening = (area) => area.causeDesc
+    ? `במהלך ביקורי בנכס נצפו ב${area.label} נזקים הנובעים מ${area.causeDesc}.`
+    : `במהלך ביקורי בנכס נצפו ב${area.label} הממצאים הבאים.`;
+
+  // Summarize damage scope in a short phrase
+  const scopePhrase = (signs) => {
+    const hasWall  = signs.some(s=>['w_stain_wall','w_stain_ceil','w_capillary','w_plaster_swell','w_plaster_fall','w_paint_peel','w_humid_ind','w_false_ceil'].includes(s));
+    const hasFloor = signs.some(s=>['w_parquet','w_water_up','w_grout','w_subfloor'].includes(s));
+    const hasKit   = signs.some(s=>['w_kit_back','w_kit_base'].includes(s));
+    const hasFrame = signs.includes('w_frame');
+    const hasFire  = signs.some(s=>s.startsWith('f_'));
+    const hasBurg  = signs.some(s=>s.startsWith('b_'));
+    const parts = [];
+    if(hasWall)  parts.push('בקירות ובתקרה');
+    if(hasFloor) parts.push('ברצפה ובתשתית');
+    if(hasKit)   parts.push('בנגרות המטבח');
+    if(hasFrame) parts.push('במשקופים');
+    if(hasFire && !hasWall) parts.push('בכל אלמנטי האזור');
+    if(hasBurg && !hasWall) parts.push('בדלתות ובחלונות');
+    if(!parts.length) return '';
+    return `הנזק מתבטא ${parts.join(', ')}:`;
+  };
+
   const heLetters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ'];
-  const paras = areas.map((area,i)=>{
-    if(!area.signs||!area.signs.length) return null;
-    const letter = heLetters[i]||String(i+1);
-    const bullets = area.signs.map(s=>signToDesc[s]||getLabel(s));
-    let txt = `${letter}. ${area.label}\nבמהלך הביקור בנכס נצפו הממצאים הבאים:`;
-    bullets.forEach(b=>{ txt += `\n   • ${b}`; });
-    if(area.humidTest==='high'){
-      txt += `\n   • רטיבות במצע שמתחת לריצוף, לרבות חשש לזיהום בקטריאלי עקב שהות מים ממושכת`;
+
+  const paras = areas.map((area, i) => {
+    const signs = area.signs||[];
+    const roomSigns = area.roomSigns||[];
+    if(!signs.length && !roomSigns.length && !area.notes && !area.causeDesc) return null;
+
+    const letter = heLetters[i] || String(i+1);
+    const opening = (openingByType[et] || defaultOpening)(area);
+    // Build all bullets first, then decide scope phrase
+    const allRoomItems = Object.values(ROOM_ITEMS).flatMap(v=>[...(v.struct||[]),...(v.cont||[])]);
+    const roomSignLabels = roomSigns.map(sid=>{
+      const item = allRoomItems.find(x=>x.id===sid);
+      return item ? item.l : null;
+    }).filter(Boolean);
+
+    const scope = (signs.length || roomSigns.length) ? scopePhrase(signs) : '';
+
+    let txt = `${letter}. ${area.label}\n${opening}`;
+
+    if(signs.length || roomSigns.length || area.humidTest==='high' || area.notes){
+      if(scope) txt += `\n${scope}`;
+      // WATER_SIGNS / FIRE_SIGNS bullets
+      signs.forEach(s => {
+        txt += `\n   • ${signToDesc[s] || getLabel(s)}`;
+      });
+      // Humidity
+      if(area.humidTest==='high'){
+        txt += `\n   • רטיבות חריגה במצע שמתחת לריצוף — חשש לזיהום בקטריאלי עקב שהות מים ממושכת`;
+      }
+      // Room-specific damage items (ROOM_ITEMS)
+      roomSignLabels.forEach(label => {
+        txt += `\n   • ${label}`;
+      });
+      // Notes
+      if(area.notes) txt += `\n${area.notes}`;
     }
-    if(area.notes) txt += `\n   • ${area.notes}`;
+
+    // Severity closing
+    const sevLabel = {light:'קל',medium:'בינוני',severe:'משמעותי'}[area.severity];
+    if(sevLabel) txt += `\nהיקף הנזק: ${sevLabel}.`;
+
     return txt;
   }).filter(Boolean);
+
+  // Story match
   if(f.matchesStory){
-    const mm={yes:'הממצאים תואמים את גרסת המבוטח.',partial:'הממצאים תואמים חלקית את גרסת המבוטח.',no:'הממצאים אינם תואמים את גרסת המבוטח.',tbd:'ההתאמה לגרסת המבוטח טרם הוכרעה.'};
+    const mm={yes:'הממצאים שנצפו בשטח תואמים את גרסת המבוטח.',partial:'הממצאים שנצפו בשטח תואמים חלקית את גרסת המבוטח.',no:'הממצאים שנצפו בשטח אינם תואמים את גרסת המבוטח.',tbd:'ההתאמה לגרסת המבוטח טרם הוכרעה.'};
     if(mm[f.matchesStory]) paras.push(mm[f.matchesStory]);
   }
   if(f.generalNotes) paras.push(f.generalNotes);
@@ -3198,13 +3308,7 @@ function _doGenerateReport(){
     ` + rpt;
   }
 
-  // Main photo
-  if(ph.main){
-    rpt += `<div class="rpt-section" style="text-align:center;">
-      <img src="${ph.main}" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid #E5E7EB;">
-      ${ph.mainCaption?`<div style="font-size:12px;color:#6B7280;margin-top:6px;">${esc(ph.mainCaption)}</div>`:''}
-    </div>`;
-  }
+  // ── Photos moved to end of report ──
 
   // ── For private/tax: standard info sections ──
   // ── For insurance: skip (already in the data panel above) ──
@@ -3227,19 +3331,6 @@ function _doGenerateReport(){
   
   if(circ) rpt += `<div class="rpt-section"><h3>נסיבות המקרה</h3><p class="rpt-p">${esc(circ).replace(/\n/g,'<br>')}</p></div>`;
   if(finds) rpt += `<div class="rpt-section"><h3>ממצאי הביקור ותיאור הנזק</h3><p class="rpt-p">${esc(finds).replace(/\n/g,'<br>')}</p></div>`;
-
-  // 8 photos before summary
-  if((ph.items||[]).length>0){
-    rpt += `<div class="rpt-section"><h3>תיעוד תמונות</h3>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">`;
-    ph.items.forEach((img,i)=>{
-      rpt += `<div style="text-align:center;">
-        <img src="${img.src}" style="width:100%;border-radius:6px;border:1px solid #E5E7EB;aspect-ratio:4/3;object-fit:cover;">
-        ${img.caption?`<div style="font-size:10px;color:#6B7280;margin-top:3px;">${esc(img.caption)}</div>`:''}
-      </div>`;
-    });
-    rpt += `</div></div>`;
-  }
 
   if(grand>0){
     rpt += `<div class="rpt-section"><h3>כתב כמויות</h3>`;
@@ -3349,6 +3440,22 @@ function _doGenerateReport(){
   </div>`;
 
   // Append digital signature from profile
+  // ── All photos at end of report ──
+  const allPhotos = [];
+  if(ph.main) allPhotos.push({src:ph.main, caption:ph.mainCaption||''});
+  (ph.items||[]).forEach(img=>allPhotos.push(img));
+  if(allPhotos.length>0){
+    rpt += `<div class="rpt-section"><h3>תיעוד תמונות</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">`;
+    allPhotos.forEach(img=>{
+      rpt += `<div style="text-align:center;">
+        <img src="${img.src}" style="width:100%;border-radius:6px;border:1px solid #E5E7EB;aspect-ratio:4/3;object-fit:cover;">
+        ${img.caption?`<div style="font-size:10px;color:#6B7280;margin-top:3px;">${esc(img.caption)}</div>`:''}
+      </div>`;
+    });
+    rpt += `</div></div>`;
+  }
+
   const _p2 = window._profile || {};
   if(_p2.signature){
     rpt += `<div style="margin-top:36px;padding-top:18px;border-top:1px solid #E5E7EB;display:flex;justify-content:flex-end;">
