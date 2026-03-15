@@ -3049,6 +3049,77 @@ function _doGenerateReport(){
     <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:8px;">${modeLabels[mode]}</h2>
     ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${b.visitDate}</div>`:''}  </div>`;
 
+  // ══ INSURANCE ONLY: structured data panel at top of report ══
+  if(mode === 'insurance'){
+    const addr = [b.street, b.streetNum, b.apartment, b.city].filter(Boolean).join(' ');
+    const policyPeriod = (ins.policyFrom && ins.policyTo) ? `${ins.policyFrom} – ${ins.policyTo}` : (ins.policyFrom||ins.policyTo||'—');
+    const mkCell = (label, val) => `
+      <tr>
+        <td style="padding:7px 12px;font-weight:600;color:#374151;border-bottom:1px solid #F3F4F6;width:48%;">${label}</td>
+        <td style="padding:7px 12px;font-weight:700;color:#111827;border-bottom:1px solid #F3F4F6;direction:rtl;">${val||'—'}</td>
+      </tr>`;
+
+    rpt = `
+    <style>
+      .data-panel{background:#fff;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:0;}
+      .data-panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#374151;padding:10px 14px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;}
+      .data-panel table{width:100%;border-collapse:collapse;font-size:13px;}
+    </style>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;direction:rtl;">
+
+      <!-- פרטי המבוטח -->
+      <div class="data-panel">
+        <div class="data-panel-title">👤 פרטי המבוטח</div>
+        <table><tbody>
+          ${mkCell('שם מלא', b.fullName)}
+          ${mkCell('מספר ת.ז. / ח.פ.', b.idNum)}
+          ${mkCell('טלפון', b.phone)}
+          ${mkCell('דוא"ל', b.email)}
+          ${mkCell('כתובת הנכס', addr)}
+          ${mkCell('קשר לנכס', b.ownerRelation)}
+        </tbody></table>
+      </div>
+
+      <!-- פרטי הפוליסה -->
+      <div class="data-panel">
+        <div class="data-panel-title">🛡️ פרטי הפוליסה</div>
+        <table><tbody>
+          ${mkCell('חברת ביטוח', ins.company)}
+          ${mkCell('מספר פוליסה', ins.policyNum)}
+          ${mkCell('מספר תביעה', ins.claimNum)}
+          ${mkCell('תקופת ביטוח', policyPeriod)}
+          ${mkCell('השתתפות עצמית', ins.deductStruct ? '₪'+fmtNum(parseCurrency(ins.deductStruct)) : null)}
+          ${mkCell('שמאי ממונה', ins.opposingAppraiser)}
+        </tbody></table>
+      </div>
+
+      <!-- פרטי השמאי המדווח -->
+      <div class="data-panel">
+        <div class="data-panel-title">🏛️ פרטי השמאי המדווח</div>
+        <table><tbody>
+          ${mkCell('שם השמאי', APPRAISER.nameHe)}
+          ${mkCell('מספר רישיון', APPRAISER.license)}
+          ${mkCell('חברת שמאות', APPRAISER.company||'')}
+        </tbody></table>
+      </div>
+
+      <!-- תאריכים מרכזיים -->
+      <div class="data-panel">
+        <div class="data-panel-title">📅 תאריכים מרכזיים</div>
+        <table><tbody>
+          ${mkCell('תאריך קרות המקרה', b.eventDate)}
+          ${mkCell('תאריך ביקור בנכס', b.visitDate)}
+          ${mkCell('מסמך אחרון מהחברה', ins.lastDocDate)}
+          ${mkCell('תאריך הפקת הדוח', new Date().toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}))}
+        </tbody></table>
+      </div>
+
+    </div>
+
+    <!-- divider before appraiser header -->
+    ` + rpt;
+  }
+
   // Main photo
   if(ph.main){
     rpt += `<div class="rpt-section" style="text-align:center;">
