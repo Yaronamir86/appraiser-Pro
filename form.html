@@ -316,7 +316,7 @@ textarea{resize:vertical;min-height:80px;}
   #sidebar{display:none;}
 
   /* Layout */
-  #main{padding:14px 12px 80px;}
+  #main{padding:14px 12px 100px;}
   #layout{flex-direction:column;}
 
   /* Topbar — slim on mobile: just logo + mode + save + report */
@@ -335,7 +335,19 @@ textarea{resize:vertical;min-height:80px;}
   /* Show mobile bottom nav */
   .form-mob-nav{display:flex;}
 
-  /* Grids */
+  /* Card nav — RTL: הבא on right (first in DOM), הקודם on left */
+  .card-nav{
+    flex-direction:row;
+    flex-wrap:nowrap;
+    gap:8px;
+    position:sticky;
+    bottom:68px;
+    background:var(--bg);
+    padding:10px 0 8px;
+    z-index:10;
+    border-top:1px solid var(--border);
+  }
+  .card-nav .btn{flex:1;justify-content:center;min-width:0;}
   .grid2,.grid3{grid-template-columns:1fr;}
   .event-grid{grid-template-columns:repeat(2,1fr);}
 
@@ -349,8 +361,6 @@ textarea{resize:vertical;min-height:80px;}
 
   /* Cards */
   .page-title{font-size:18px!important;}
-  .card-nav{flex-direction:column;gap:8px;}
-  .card-nav .btn{width:100%;justify-content:center;}
 
   /* BOQ table — horizontal scroll */
   .boq-section{overflow-x:auto;-webkit-overflow-scrolling:touch;}
