@@ -465,8 +465,8 @@ main {
 /* ── CASE ACTIONS ── */
 .case-actions {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  bottom: 14px;
+  right: 14px;
   display: flex;
   gap: 6px;
   opacity: 0;
@@ -1325,8 +1325,7 @@ async function renderCases() {
           ${c.state?.findings?.areas?.length ? `<span class="case-meta-item">📐 <strong>${c.state.findings.areas.length} אזורים</strong></span>` : ''}
         </div>
         <div class="case-actions" onclick="event.stopPropagation()">
-          <button class="action-btn" title="ייצוא" onclick="exportCase('${c.id}')">📤</button>
-          <button class="action-btn danger" title="מחיקה" onclick="promptDelete('${c.id}', '${escHtml(name).replace(/'/g,"\\'")}')">🗑️</button>
+          <button class="action-btn danger" title="מחיקת תיק" onclick="promptDelete('${c.id}', '${escHtml(name).replace(/'/g,"\\'")}')">🗑️</button>
         </div>
       </div>`;
   }).join('');
