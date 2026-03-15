@@ -2734,8 +2734,8 @@ function genAppraiserDeclarationText(){
   const evName = evMap[ev.eventType]||'נזק';
   const addr = [b.street,b.streetNum,b.city].filter(Boolean).join(' ');
   const addrStr = addr?`בנכס הממוקם ברחוב ${addr}`:'בנכס';
-  const evDate = b.eventDate||'___';
-  const visitDate = b.visitDate||'___';
+  const evDate = fmtDate(b.eventDate)||'___';
+  const visitDate = fmtDate(b.visitDate)||'___';
   return `הח"מ התבקש לערוך חוות דעת שמאית בגין ${evName} אשר אירעו ביום ${evDate}, ${addrStr}.\nהביקור בנכס נערך ביום ${visitDate}. במהלך הביקור נבדקו הנזקים, תועדו הממצאים ונערכה בדיקה מקצועית במקום.`;
 }
 function genOpeningText(){
@@ -2763,9 +2763,9 @@ function genOpeningText(){
   const profStr = profs.length ? ` בנכס הוזמנו: ${profs.join(', ')}.` : '';
   if(mode==='tax'){
     const sub = ev.eventSubType||'פגיעה';
-    return `הח"מ התבקש לערוך שומה במסגרת מס רכוש בגין ${sub} שאירעה ביום ${b.eventDate||'___'} ${addrStr}. הביקור בנכס נערך ביום ${b.visitDate||'___'}. במהלך הביקור נבדקו הנזקים ותועדו הממצאים לצורך הערכת שיפוי בהתאם לקריטריונים הרלוונטיים.`;
+    return `הח"מ התבקש לערוך שומה במסגרת מס רכוש בגין ${sub} שאירעה ביום ${fmtDate(b.eventDate)||'___'} ${addrStr}. הביקור בנכס נערך ביום ${fmtDate(b.visitDate)||'___'}. במהלך הביקור נבדקו הנזקים ותועדו הממצאים לצורך הערכת שיפוי בהתאם לקריטריונים הרלוונטיים.`;
   }
-  return `הח"מ התבקש ע"י ${reqName||'___'} לערוך חוות דעת שמאית בגין ${evName}${subStr} שאירעו ביום ${b.eventDate||'___'} ${addrStr}. הביקור בנכס נערך ביום ${b.visitDate||'___'}. במהלך הביקור נבדקו הנזקים, תועדו הממצאים ונערכה בדיקה ראשונית של נסיבות האירוע.${polStr}${profStr}`;
+  return `הח"מ התבקש ע"י ${reqName||'___'} לערוך חוות דעת שמאית בגין ${evName}${subStr} שאירעו ביום ${fmtDate(b.eventDate)||'___'} ${addrStr}. הביקור בנכס נערך ביום ${fmtDate(b.visitDate)||'___'}. במהלך הביקור נבדקו הנזקים, תועדו הממצאים ונערכה בדיקה ראשונית של נסיבות האירוע.${polStr}${profStr}`;
 }
 
 function genCircumText(){
@@ -3270,7 +3270,7 @@ function _doGenerateReport(){
     </div>
     <h1 style="font-size:24px;font-weight:900;color:#111;margin-bottom:4px;">חוות דעת שמאית</h1>
     <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:8px;">${modeLabels[mode]}</h2>
-    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${b.visitDate}</div>`:''}  </div>`;
+    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}  </div>`;
 
   // ══ INSURANCE ONLY: structured data panel at top of report ══
   if(mode === 'insurance'){
@@ -3333,9 +3333,9 @@ function _doGenerateReport(){
       <div class="data-panel">
         <div class="data-panel-title">📅 תאריכים מרכזיים</div>
         <table><tbody>
-          ${mkCell('תאריך קרות המקרה', b.eventDate)}
-          ${mkCell('תאריך ביקור בנכס', b.visitDate)}
-          ${mkCell('מסמך אחרון מהחברה', ins.lastDocDate)}
+          ${mkCell('תאריך קרות המקרה', fmtDate(b.eventDate))}
+          ${mkCell('תאריך ביקור בנכס', fmtDate(b.visitDate))}
+          ${mkCell('מסמך אחרון מהחברה', fmtDate(ins.lastDocDate))}
           ${mkCell('תאריך הפקת הדוח', new Date().toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}))}
         </tbody></table>
       </div>
@@ -3355,8 +3355,8 @@ function _doGenerateReport(){
         ${mkInfoRow('ת.ז/ח.פ',b.idNum)}
         ${mkInfoRow('טלפון',b.phone)}
         ${mkInfoRow('כתובת',[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' '))}
-        ${mkInfoRow('תאריך אירוע',b.eventDate)}
-        ${mkInfoRow('תאריך ביקור',b.visitDate)}
+        ${mkInfoRow('תאריך אירוע',fmtDate(b.eventDate))}
+        ${mkInfoRow('תאריך ביקור',fmtDate(b.visitDate))}
       </tbody></table></div>`;
   }
 
@@ -3472,7 +3472,7 @@ function _doGenerateReport(){
   rpt+=`<div class="rpt-signature">
     <p style="margin:24px 0 6px;">_______________________</p>
     <p style="font-weight:700;">${esc(sigLine)}</p>
-    <p style="color:#9CA3AF;margin-top:4px;">תאריך: ${b.visitDate||new Date().toLocaleDateString('he-IL')}</p>
+    <p style="color:#9CA3AF;margin-top:4px;">תאריך: ${fmtDate(b.visitDate)||new Date().toLocaleDateString('he-IL')}</p>
   </div>`;
 
   // Append digital signature from profile
@@ -3951,6 +3951,7 @@ function addFreeArea(){
 }
 function esc(v){if(!v) return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtNum(n){return Math.round(n||0).toLocaleString('he-IL');}
+function fmtDate(d){if(!d) return '';const p=String(d).split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d;}
 function fmtCurrency(v){const n=parseFloat(String(v).replace(/,/g,''))||0;return n?n.toLocaleString('he-IL'):'';}
 function parseCurrency(v){return parseFloat(String(v||'').replace(/,/g,'').replace(/[^\d.]/g,''))||0;}
 function formatPhone(v){const d=v.replace(/\D/g,'');if(d.length<=3)return d;return d.slice(0,3)+'-'+d.slice(3,10);}
