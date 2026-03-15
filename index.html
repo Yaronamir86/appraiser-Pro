@@ -54,8 +54,8 @@ header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(3,7,18,0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(3,7,18,0.95);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 .header-inner {
@@ -67,40 +67,119 @@ header {
   align-items: center;
   justify-content: space-between;
 }
+/* Logo area */
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
-.logo-icon {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, var(--accent), var(--accent3));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 3px 12px rgba(245,158,11,0.3);
+.logo-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(16,185,129,0.8);
+  flex-shrink: 0;
 }
-.logo-text {
-  font-family: 'Frank Ruhl Libre', serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-}
-.logo-sub {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 400;
-  display: block;
-  margin-top: -2px;
-}
+/* Actions area */
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
+.header-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border2);
+  margin: 0 4px;
+}
+.btn-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all .18s;
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn-icon:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+.btn-icon.danger:hover { background: rgba(239,68,68,.1); color: #f87171; border-color: rgba(239,68,68,.3); }
+
+/* ── MOBILE BOTTOM NAV ── */
+.mob-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  width: 100%;
+  background: rgba(13,17,23,0.98);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+.mob-nav-inner {
+  display: flex;
+  flex-direction: row;
+  direction: ltr;
+  align-items: center;
+  justify-content: stretch;
+  width: 100%;
+  height: 64px;
+}
+.mob-nav-item {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: var(--subtle);
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-decoration: none;
+  transition: color .15s;
+  height: 100%;
+  padding-bottom: 4px;
+}
+.mob-nav-item .mob-icon { font-size: 20px; line-height: 1; }
+.mob-nav-item .mob-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1;
+  direction: rtl;
+  margin-top: 1px;
+}
+.mob-nav-item:hover, .mob-nav-item.active { color: var(--accent); }
+/* Primary "New" action button */
+.mob-nav-item.primary-action {
+  position: relative;
+  top: -2px;
+}
+.mob-nav-item.primary-action .mob-icon-wrap {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 3px 10px rgba(245,158,11,0.4);
+}
+.mob-nav-item.primary-action .mob-nav-label {
+  color: var(--accent);
+  position: relative;
+  top: 2px;
+}
+.mob-nav-item.danger:hover { color: #f87171; }
 
 /* ── BUTTONS ── */
 .btn {
@@ -669,25 +748,13 @@ footer {
 .case-card { animation: fadeUp 0.3s ease both; }
 .stat-card { animation: fadeUp 0.3s ease both; }
 
-.badge-new {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: rgba(245,158,11,0.15);
-  color: var(--accent);
-  font-weight: 700;
-  border: 1px solid rgba(245,158,11,0.3);
-}
-.pulse {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 1.5s ease-in-out infinite;
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 640px) {
+  .mob-nav { display: flex; }
+  .header-actions { display: none; }
+  .header-inner { padding: 0 16px; }
+  main { padding: 24px 16px 90px; }
+  footer { display: none; }
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -859,22 +926,52 @@ window.doForgotPassword = async () => {
 
 <header>
   <div class="header-inner">
-    <div class="logo" style="display:flex;align-items:center;gap:10px;">
-      <img src="assets/omdan-logo.png" alt="OMDAN" style="height:36px;width:auto;" id="headerLogoImg">
-      <div style="line-height:1.2;">
-        <div id="headerName" style="font-size:15px;font-weight:800;color:#fff;">OMDAN</div>
-        <div id="headerTitle" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.04em;">מערכת שמאות מקצועית</div>
+    <!-- Logo -->
+    <div class="logo">
+      <img src="assets/omdan-logo.png" alt="OMDAN" style="height:34px;width:auto;" id="headerLogoImg">
+      <div style="line-height:1.25;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span id="headerName" style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px;">OMDAN</span>
+          <span class="logo-status-dot" title="מערכת פעילה"></span>
+        </div>
+        <div id="headerTitle" style="font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.04em;">מערכת שמאות מקצועית</div>
       </div>
     </div>
-    </div>
+    <!-- Desktop Actions -->
     <div class="header-actions">
-      <span class="badge-new"><span class="pulse"></span> מערכת פעילה</span>
-      <a href="settings.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">⚙️ הגדרות</a>
-      <button class="btn btn-primary" onclick="openNewCase()">+ תיק חדש</button>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:#f87171;" title="התנתקות">🚪 התנתקות</button>
+      <a href="settings.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">
+        <span style="font-size:14px;">⚙️</span> הגדרות
+      </a>
+      <div class="header-sep"></div>
+      <button class="btn btn-primary btn-sm" onclick="openNewCase()">
+        <span style="font-size:15px;font-weight:900;">+</span> תיק חדש
+      </button>
+      <button class="btn-icon danger" onclick="doLogout()" title="התנתקות">🚪</button>
     </div>
   </div>
 </header>
+
+<!-- Mobile Bottom Nav -->
+<nav class="mob-nav">
+  <div class="mob-nav-inner">
+    <a href="index.html" class="mob-nav-item active">
+      <span class="mob-icon">📊</span>
+      <span class="mob-nav-label">דשבורד</span>
+    </a>
+    <button class="mob-nav-item primary-action" onclick="openNewCase()">
+      <div class="mob-icon-wrap">➕</div>
+      <span class="mob-nav-label">חדש</span>
+    </button>
+    <a href="settings.html" class="mob-nav-item">
+      <span class="mob-icon">⚙️</span>
+      <span class="mob-nav-label">הגדרות</span>
+    </a>
+    <button class="mob-nav-item danger" onclick="doLogout()">
+      <span class="mob-icon">🚪</span>
+      <span class="mob-nav-label">יציאה</span>
+    </button>
+  </div>
+</nav>
 
 <main>
   <!-- Page Title -->

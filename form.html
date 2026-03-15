@@ -133,17 +133,76 @@ textarea{resize:vertical;min-height:80px;}
 .mode-cta span{padding:7px 18px;border-radius:18px;font-size:12px;font-weight:700;color:#111;}
 
 /* ── TOP BAR ── */
-#topbar{position:sticky;top:0;z-index:100;background:rgba(15,23,42,.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.tb-left{display:flex;align-items:center;gap:12px;}
-.tb-logo{font-size:20px;}
-.tb-name{font-size:15px;font-weight:800;color:var(--text);}
-.tb-mode{padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;}
-.tb-right{display:flex;gap:8px;}
+#topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(15,23,42,.97);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-logo-img{height:30px;width:auto;}
+.tb-divider{width:1px;height:20px;background:var(--border2);flex-shrink:0;}
+.tb-name{font-size:15px;font-weight:900;color:var(--text);letter-spacing:-.2px;}
+.tb-mode{
+  padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;
+  letter-spacing:.04em;flex-shrink:0;
+}
+/* Right actions */
+.tb-right{display:flex;align-items:center;gap:6px;}
+.tb-icon-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--muted);font-size:15px;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+  text-decoration:none;flex-shrink:0;
+}
+.tb-icon-btn:hover{background:var(--primary2);color:var(--text);border-color:var(--border2);}
+.tb-icon-btn.danger:hover{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.3);}
+.tb-sep{width:1px;height:22px;background:var(--border2);margin:0 2px;}
+/* Progress */
+.progress-wrap{display:flex;align-items:center;gap:7px;}
+.progress-bar{width:80px;height:4px;background:var(--primary2);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s ease;}
+#progressTxt{font-size:11px;font-weight:700;color:var(--accent);min-width:28px;text-align:right;}
+
+/* ── FORM MOBILE BOTTOM NAV ── */
+.form-mob-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(13,17,23,.98);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  height:60px;
+}
+.form-mob-nav-inner{display:flex;align-items:stretch;height:100%;}
+.fmn-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  cursor:pointer;color:var(--subtle);
+  font-size:9px;font-weight:700;letter-spacing:.02em;
+  border:none;background:none;font-family:inherit;
+  text-decoration:none;transition:color .15s;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.fmn-item .fmn-icon{font-size:18px;line-height:1;}
+.fmn-item:hover,.fmn-item.active{color:var(--accent);}
+.fmn-item.save-action{color:var(--accent);}
+.fmn-item.report-action .fmn-wrap{
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:0 3px 10px rgba(245,158,11,.4);
+  margin-top:-4px;
+}
+.fmn-item.report-action .fmn-label{color:var(--accent);margin-top:2px;}
 
 /* ── SIDEBAR ── */
-#layout{display:flex;min-height:calc(100vh - 51px);}
-#sidebar{width:160px;background:rgba(15,23,42,.85);border-left:1px solid var(--border);padding:10px 6px;flex-shrink:0;position:sticky;top:51px;height:calc(100vh - 51px);overflow-y:auto;}
+#layout{display:flex;min-height:calc(100vh - 56px);}
+#sidebar{width:160px;background:rgba(15,23,42,.85);border-left:1px solid var(--border);padding:10px 6px;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
 .nav-item{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;cursor:pointer;margin-bottom:3px;transition:all .18s;border-right:3px solid transparent;}
 .nav-item:hover{background:var(--primary2);}
 .nav-item.active{background:rgba(245,158,11,.08);border-right-color:var(--accent);}
@@ -235,16 +294,24 @@ textarea{resize:vertical;min-height:80px;}
   #sidebar{display:none;}
 
   /* Layout */
-  #main{padding:14px 12px;}
+  #main{padding:14px 12px 80px;}
   #layout{flex-direction:column;}
 
-  /* Topbar */
-  #topbar{padding:10px 14px;flex-wrap:wrap;gap:6px;}
-  .tb-left{gap:8px;}
+  /* Topbar — slim on mobile: just logo + mode + save + report */
+  #topbar{padding:0 12px;height:52px;}
+  .tb-left{gap:7px;}
   .tb-name{font-size:13px;}
-  .tb-right{flex-wrap:wrap;gap:6px;}
-  .tb-right .btn-sm{padding:5px 8px;font-size:11px;}
+  /* Hide secondary icon buttons on mobile — moved to bottom nav */
+  .tb-icon-btn{display:none;}
+  .tb-sep{display:none;}
   #progressWrap{display:none!important;}
+  /* Keep only logo + mode + save + report visible */
+  .tb-right .btn-save,
+  .tb-right .btn-report{display:inline-flex;}
+  .tb-right{gap:6px;}
+
+  /* Show mobile bottom nav */
+  .form-mob-nav{display:flex;}
 
   /* Grids */
   .grid2,.grid3{grid-template-columns:1fr;}
@@ -265,7 +332,7 @@ textarea{resize:vertical;min-height:80px;}
 
   /* BOQ table — horizontal scroll */
   .boq-section{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .boq-table{min-width:720px;}  /* 9 cols in insurance mode */
+  .boq-table{min-width:720px;}
   .boq-table th,
   .boq-table td{padding:6px 7px;font-size:11px;}
   .boq-input.num{width:60px;}
@@ -649,26 +716,59 @@ window.doForgotPassword = async () => {
 
 <div id="appShell" class="hidden">
   <div id="topbar">
+    <!-- Logo + Mode -->
     <div class="tb-left">
-      <a href="index.html" class="btn btn-ghost btn-sm" style="gap:5px;text-decoration:none;" title="חזרה לדשבורד">← דשבורד</a>
-      <span class="tb-logo" style="margin-right:6px;">⚖️</span>
+      <a href="index.html" class="tb-icon-btn" title="חזרה לדשבורד" style="font-size:13px;font-weight:800;width:auto;padding:0 10px;gap:4px;color:var(--muted);">← דשבורד</a>
+      <div class="tb-divider"></div>
+      <img src="assets/omdan-logo.png" alt="OMDAN" class="tb-logo-img">
       <span class="tb-name">OMDAN</span>
       <span class="tb-mode" id="tbModeLabel"></span>
     </div>
-    <div class="tb-right" style="gap:6px;">
+    <!-- Actions -->
+    <div class="tb-right">
+      <!-- Progress -->
       <div class="progress-wrap" id="progressWrap" style="display:none;">
         <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
         <span id="progressTxt">0%</span>
       </div>
-      <button class="btn btn-ghost btn-sm" id="fieldModeBtn" onclick="toggleFieldMode()" title="מצב שטח">📱</button>
-      <a href="settings.html" class="btn btn-ghost btn-sm" style="text-decoration:none;" title="הגדרות">⚙️</a>
-      <button class="btn btn-ghost btn-sm" onclick="openCaseMgr()">📁 תיקים</button>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:#f87171;" title="התנתקות">🚪</button>
-      <button class="btn btn-ghost btn-sm" onclick="changeMode()">↩ שנה</button>
-      <button class="btn btn-secondary btn-sm" onclick="saveDraft()">💾 שמור</button>
-      <button class="btn btn-primary btn-sm" onclick="generateReport()">📄 דוח</button>
+      <!-- Secondary icon buttons (hidden on mobile) -->
+      <button class="tb-icon-btn" id="fieldModeBtn" onclick="toggleFieldMode()" title="מצב שטח">📱</button>
+      <a href="settings.html" class="tb-icon-btn" style="text-decoration:none;" title="הגדרות">⚙️</a>
+      <button class="tb-icon-btn" onclick="openCaseMgr()" title="תיקים">📁</button>
+      <button class="tb-icon-btn" onclick="changeMode()" title="שינוי סוג שמאות">↩</button>
+      <button class="tb-icon-btn danger" onclick="doLogout()" title="התנתקות">🚪</button>
+      <div class="tb-sep"></div>
+      <!-- Primary actions — always visible -->
+      <button class="btn btn-secondary btn-sm btn-save" onclick="saveDraft()" style="gap:5px;">💾 שמור</button>
+      <button class="btn btn-primary btn-sm btn-report" onclick="generateReport()" style="gap:5px;">📄 דוח</button>
     </div>
   </div>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="form-mob-nav">
+    <div class="form-mob-nav-inner">
+      <a href="index.html" class="fmn-item">
+        <span class="fmn-icon">🏠</span>
+        <span class="fmn-label">דשבורד</span>
+      </a>
+      <button class="fmn-item" onclick="openCaseMgr()">
+        <span class="fmn-icon">📁</span>
+        <span class="fmn-label">תיקים</span>
+      </button>
+      <button class="fmn-item report-action" onclick="generateReport()">
+        <div class="fmn-wrap">📄</div>
+        <span class="fmn-label">דוח</span>
+      </button>
+      <a href="settings.html" class="fmn-item">
+        <span class="fmn-icon">⚙️</span>
+        <span class="fmn-label">הגדרות</span>
+      </a>
+      <button class="fmn-item" onclick="doLogout()">
+        <span class="fmn-icon">🚪</span>
+        <span class="fmn-label">יציאה</span>
+      </button>
+    </div>
+  </nav>
   <div id="layout">
     <div id="sidebar">
       <div class="nav-item active" data-card="1" onclick="goCard(1)">
@@ -3096,10 +3196,10 @@ function shareReport(){
       table{width:100%;border-collapse:collapse;}td,th{padding:6px 8px;border:1px solid #ddd;}
       .rpt-table td,.rpt-table th{padding:6px 8px;border:1px solid #e5e7eb;}</style>
       </head><body>${html}
-<!-- ══════════════════ BOQ LIBRARY MODAL ══════════════════ -->
+<\!-- ══════════════════ BOQ LIBRARY MODAL ══════════════════ \-\->
 <div id="boqLibModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">
   <div style="background:#111827;border:1px solid #374151;border-radius:18px;width:100%;max-width:860px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
-    <!-- Header -->
+    <\!-- Header \-\->
     <div style="padding:18px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <div>
         <div style="font-size:17px;font-weight:900;color:#F9FAFB;">📚 ספריית כתב כמויות</div>
@@ -3107,7 +3207,7 @@ function shareReport(){
       </div>
       <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
-    <!-- Filters -->
+    <\!-- Filters \-\->
     <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <input id="boqLibSearch" type="text" placeholder="🔍 חפש סעיף..." oninput="renderBOQLibList()" 
@@ -3137,9 +3237,9 @@ function shareReport(){
       </div>
       <div id="boqLibStats" style="font-size:11px;color:#6B7280;"></div>
     </div>
-    <!-- Items list -->
+    <\!-- Items list \-\->
     <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
-    <!-- Footer -->
+    <\!-- Footer \-\->
     <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
       <div style="display:flex;gap:8px;">
