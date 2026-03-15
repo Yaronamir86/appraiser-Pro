@@ -886,327 +886,369 @@ window.doForgotPassword = async () => {
 let mode = null;
 
 const BOQ_LIBRARY = [
-  {ch:1,code:"1.01",title:"פירוק ריצוף קיים",unit:"מר",dt:"water_leak|sewage_leak|flood|subfloor_moisture",stage:"access",kw:"פירוק,ריצוף,מרצפות"},
-  {ch:1,code:"1.02",title:"פירוק חיפוי קיר",unit:"מר",dt:"water_leak|rain_penetration|waterproofing_failure",stage:"access",kw:"פירוק,חיפוי,קרמיקה"},
-  {ch:1,code:"1.03",title:"פירוק פנלים",unit:"מא",dt:"water_leak|flood|parquet_damage",stage:"access",kw:"פנלים,פירוק"},
-  {ch:1,code:"1.04",title:"פתיחת קיר בלוקים לצורך איתור או תיקון",unit:"מר",dt:"water_leak|sewage_leak",stage:"access",kw:"פתיחת קיר,בלוקים,איתור"},
-  {ch:1,code:"1.05",title:"פתיחת קיר גבס",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"access",kw:"גבס,פתיחה"},
-  {ch:1,code:"1.06",title:"פירוק תקרת גבס",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"access",kw:"תקרה,גבס,פירוק"},
-  {ch:1,code:"1.07",title:"פירוק ארונות או נגרות לצורך גישה",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון,נגרות,פירוק"},
-  {ch:1,code:"1.08",title:"פירוק משטח שיש או אבן",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"שיש,אבן,פירוק"},
-  {ch:1,code:"1.09",title:"פירוק חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage|rain_penetration",stage:"access",kw:"חלון,פירוק"},
-  {ch:1,code:"1.10",title:"פירוק ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה,פירוק"},
-  {ch:1,code:"1.11",title:"פירוק מסגרות אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration|burglary_theft_damage",stage:"access",kw:"אלומיניום,מסגרת,פירוק"},
-  {ch:1,code:"1.12",title:"פירוק תריס גלילה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"תריס,גלילה,פירוק"},
-  {ch:1,code:"1.13",title:"פירוק כלים סניטריים",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה,כיור,פירוק"},
-  {ch:1,code:"1.14",title:"פירוק מקלחון",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"מקלחון,פירוק"},
-  {ch:1,code:"1.15",title:"פירוק אמבטיה",unit:"יח'",dt:"water_leak",stage:"access",kw:"אמבטיה,פירוק"},
-  {ch:1,code:"1.16",title:"פירוק אסלה תלויה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה תלויה,פירוק"},
-  {ch:1,code:"1.17",title:"פירוק כיור תלוי",unit:"יח'",dt:"water_leak",stage:"access",kw:"כיור,תלוי,פירוק"},
-  {ch:1,code:"1.18",title:"פירוק משקוף פגום",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage",stage:"access",kw:"משקוף,פירוק"},
-  {ch:1,code:"1.19",title:"פירוק דלת פנים או חוץ",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage",stage:"access",kw:"דלת,פירוק"},
-  {ch:1,code:"1.20",title:"פירוק ריצוף פרקט קיים",unit:"מר",dt:"parquet_damage|flood",stage:"access",kw:"פרקט,פירוק"},
-  {ch:1,code:"1.21",title:"פירוק פרופיל אלומיניום",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"פרופיל,אלומיניום"},
-  {ch:1,code:"1.22",title:"פירוק זכוכית פגומה",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"זכוכית,פירוק"},
-  {ch:1,code:"1.23",title:"פירוק אדן חלון",unit:"מא",dt:"rain_penetration|combined_damage",stage:"access",kw:"אדן חלון,פירוק"},
-  {ch:1,code:"1.24",title:"פירוק סורג",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"access",kw:"סורג,פירוק"},
-  {ch:1,code:"1.25",title:"פינוי פסולת בניין",unit:"קומפ'",dt:"water_leak|sewage_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,פינוי,בניין"},
-  {ch:1,code:"1.26",title:"העמסת פסולת למכולה",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"פסולת,מכולה,העמסה"},
-  {ch:1,code:"1.27",title:"השכרת מכולה",unit:"יום",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,השכרה"},
-  {ch:1,code:"1.28",title:"הובלת מכולה לאתר מאושר",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,הובלה,אתר"},
-  {ch:1,code:"1.29",title:"אגרות הטמנה וטיפול באתר מאושר",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"הטמנה,אגרה,פינוי"},
-  {ch:1,code:"1.30",title:"פינוי רכיבים פגומים לאתר מורשה",unit:"קומפ'",dt:"fire_smoke_damage|burglary_theft_damage|combined_damage",stage:"ancillary",kw:"פינוי,מורשה,רכיבים"},
-  {ch:2,code:"2.01",title:"החלפת קטע צנרת מים",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"צנרת,מים,החלפה"},
-  {ch:2,code:"2.02",title:"תיקון נקודת נזילה בצנרת",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נזילה,צנרת,תיקון"},
-  {ch:2,code:"2.03",title:"החלפת מחברי צנרת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מחבר,צנרת"},
-  {ch:2,code:"2.04",title:"החלפת ברזי ניתוק",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז ניתוק,החלפה"},
-  {ch:2,code:"2.05",title:"החלפת סיפון",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"סיפון,כיור"},
-  {ch:2,code:"2.06",title:"החלפת ברז מטבח",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מטבח"},
-  {ch:2,code:"2.07",title:"החלפת ברז מקלחת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מקלחת"},
-  {ch:2,code:"2.08",title:"פירוק והרכבת אסלה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אסלה,פירוק,הרכבה"},
-  {ch:2,code:"2.09",title:"פירוק והרכבת כיור",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"כיור,פירוק,הרכבה"},
-  {ch:2,code:"2.10",title:"החלפת קו ביוב",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"ביוב,קו,החלפה"},
-  {ch:2,code:"2.11",title:"פתיחת סתימה בקו ביוב",unit:"קומפ'",dt:"sewage_leak",stage:"directRepair",kw:"סתימה,ביוב"},
-  {ch:2,code:"2.12",title:"התקנת נקודת מים חדשה",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נקודת מים,התקנה"},
-  {ch:2,code:"2.13",title:"החלפת צנרת דלוחין",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"דלוחין,צנרת"},
-  {ch:2,code:"2.14",title:"החלפת אביזרי אינסטלציה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אביזרים,אינסטלציה"},
-  {ch:2,code:"2.15",title:"החלפת מכל הדחה",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מכל הדחה,אסלה"},
-  {ch:2,code:"2.16",title:"פירוק והרכבת מקלחון לצורך עבודות",unit:"יח'",dt:"water_leak",stage:"access",kw:"מקלחון,פירוק,הרכבה"},
-  {ch:2,code:"2.17",title:"פירוק והרכבת אמבטיה או אגנית",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אמבטיה,אגנית"},
-  {ch:2,code:"2.18",title:"החלפת קופסת ביקורת",unit:"יח'",dt:"sewage_leak",stage:"directRepair",kw:"קופסת ביקורת,ביוב"},
-  {ch:2,code:"2.19",title:"תיקון קו ניקוז",unit:"מא",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"ניקוז,תיקון"},
-  {ch:2,code:"2.20",title:"החלפת סעפת או מחלק מים",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"סעפת,מחלק מים"},
-  {ch:2,code:"2.21",title:"החלפת ניאגרה סמויה",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ניאגרה סמויה"},
-  {ch:2,code:"2.22",title:"החלפת ברז פרח",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז פרח"},
-  {ch:2,code:"2.23",title:"החלפת אינטרפוץ",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אינטרפוץ"},
-  {ch:2,code:"2.24",title:"החלפת ראש מקלחת",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ראש מקלחת"},
-  {ch:2,code:"2.25",title:"תיקון חיבורי גיבריט",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"גיבריט,חיבורים"},
-  {ch:2,code:"2.26",title:"החלפת קטע צינור SP",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"SP,צינור"},
-  {ch:2,code:"2.27",title:"החלפת קטע צינור PEX",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"PEX,צינור"},
-  {ch:2,code:"2.28",title:"החלפת קטע צינור מתכת",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"צינור מתכת"},
-  {ch:2,code:"2.29",title:"החלפת מחסום רצפה",unit:"יח'",dt:"sewage_leak|water_leak",stage:"directRepair",kw:"מחסום רצפה"},
-  {ch:2,code:"2.30",title:"פירוק והרכבת דוד חשמל לצורך עבודות",unit:"יח'",dt:"water_leak|combined_damage",stage:"access",kw:"דוד,פירוק,הרכבה"},
-  {ch:3,code:"3.01",title:"בדיקת לחות בקירות או רצפה",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture|ongoing_dampness",stage:"inspection",kw:"לחות,בדיקה,רטיבות"},
-  {ch:3,code:"3.02",title:"בדיקת מצלמה תרמית",unit:"קומפ'",dt:"water_leak|rain_penetration",stage:"inspection",kw:"מצלמה תרמית,איתור"},
-  {ch:3,code:"3.03",title:"איתור נזילה באמצעות ציוד אקוסטי",unit:"קומפ'",dt:"water_leak",stage:"inspection",kw:"אקוסטי,איתור,נזילה"},
-  {ch:3,code:"3.04",title:"איתור נזילה מתקדם",unit:"קומפ'",dt:"water_leak|sewage_leak",stage:"inspection",kw:"איתור מתקדם"},
-  {ch:3,code:"3.05",title:"הצבת ציוד ייבוש תת רצפתי",unit:"יום",dt:"subfloor_moisture|flood",stage:"ancillary",kw:"ייבוש תת רצפתי"},
-  {ch:3,code:"3.06",title:"הצבת מפוחי ייבוש",unit:"יום",dt:"water_leak|flood",stage:"ancillary",kw:"מפוחים,ייבוש"},
-  {ch:3,code:"3.07",title:"הצבת סופחי לחות",unit:"יום",dt:"water_leak|flood|ongoing_dampness",stage:"ancillary",kw:"סופח לחות,ייבוש"},
-  {ch:3,code:"3.08",title:"ניטור רטיבות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"ניטור,ייבוש,רטיבות"},
-  {ch:3,code:"3.09",title:"ביקורות תקופתיות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood",stage:"inspection",kw:"ביקורת,ייבוש"},
-  {ch:3,code:"3.10",title:"פירוק ציוד ייבוש",unit:"קומפ'",dt:"water_leak|flood",stage:"ancillary",kw:"פירוק ציוד,ייבוש"},
-  {ch:3,code:"3.11",title:"דוח מדידות ייבוש",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"דוח,מדידה,ייבוש"},
-  {ch:3,code:"3.12",title:"בדיקות משלימות לאחר סיום ייבוש",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"בדיקות משלימות"},
-  {ch:3,code:"3.13",title:"בדיקת מד לחות לפרקט",unit:"קומפ'",dt:"parquet_damage|flood",stage:"inspection",kw:"מד לחות,פרקט"},
-  {ch:3,code:"3.14",title:"איתור רטיבות תת רצפתית",unit:"קומפ'",dt:"subfloor_moisture|flood",stage:"inspection",kw:"רטיבות תת רצפתית"},
-  {ch:3,code:"3.15",title:"בדיקת מקור חדירת גשם",unit:"קומפ'",dt:"rain_penetration|waterproofing_failure",stage:"inspection",kw:"חדירת גשם"},
-  {ch:3,code:"3.16",title:"בדיקת קונדנסציה",unit:"קומפ'",dt:"condensation",stage:"inspection",kw:"קונדנסציה,עיבוי"},
-  {ch:3,code:"3.17",title:"בדיקת עשן וריח לאחר שריפה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"inspection",kw:"עשן,ריח"},
-  {ch:3,code:"3.18",title:"בדיקת בטיחות חשמל לאחר רטיבות",unit:"קומפ'",dt:"electrical_water_damage",stage:"inspection",kw:"חשמל,רטיבות,בטיחות"},
-  {ch:4,code:"4.01",title:"סגירת פתחים בקיר בלוקים",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"סגירת פתחים,בלוקים"},
-  {ch:4,code:"4.02",title:"סגירת קיר גבס",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"קיר גבס,סגירה"},
-  {ch:4,code:"4.03",title:"תיקוני בטון",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בטון,תיקון"},
-  {ch:4,code:"4.04",title:"יציקת בטון מקומית",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"יציקה,בטון"},
-  {ch:4,code:"4.05",title:"תיקון סדקים בקיר",unit:"מא",dt:"rain_penetration|ongoing_dampness|waterproofing_failure",stage:"restoration",kw:"סדקים,קיר"},
-  {ch:4,code:"4.06",title:"בניית קיר בלוקים חדש",unit:"מר",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"קיר חדש,בלוקים"},
-  {ch:4,code:"4.07",title:"תיקון תקרה פגומה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה,תיקון"},
-  {ch:4,code:"4.08",title:"השלמת תשתית לאחר פירוק",unit:"מר",dt:"water_leak|sewage_leak|combined_damage",stage:"restoration",kw:"תשתית,השלמה"},
-  {ch:4,code:"4.09",title:"תיקון נישות או פתחים",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"נישה,פתחים"},
-  {ch:4,code:"4.10",title:"עבודות הכנה לפני גמר",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"ancillary",kw:"הכנה,גמר"},
-  {ch:4,code:"4.11",title:"בניית מחיצת גבס חדשה",unit:"מר",dt:"combined_damage",stage:"restoration",kw:"מחיצת גבס"},
-  {ch:4,code:"4.12",title:"תיקון חגורת בטון מקומית",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"חגורת בטון"},
-  {ch:4,code:"4.13",title:"מילוי תעלות בקיר לאחר צנרת",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"מילוי תעלות"},
-  {ch:4,code:"4.14",title:"יישור קיר לאחר סגירה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"יישור קיר"},
-  {ch:4,code:"4.15",title:"תיקון פינת קיר",unit:"יח'",dt:"combined_damage|water_leak",stage:"restoration",kw:"פינת קיר"},
-  {ch:4,code:"4.16",title:"בניית אדן פנימי",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"אדן פנימי"},
-  {ch:4,code:"4.17",title:"יציקת מצע לריצוף חוזר",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"מצע,ריצוף"},
-  {ch:4,code:"4.18",title:"שיקום קיר לאחר פריצה",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"קיר,פריצה"},
-  {ch:5,code:"5.01",title:"אספקה והתקנת ריצוף קרמיקה כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"ריצוף,קרמיקה,רובה"},
-  {ch:5,code:"5.02",title:"אספקה והתקנת ריצוף גרניט פורצלן כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"גרניט פורצלן,ריצוף,רובה"},
-  {ch:5,code:"5.03",title:"אספקה והתקנת חיפוי קיר קרמיקה כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"חיפוי,קרמיקה,רובה"},
-  {ch:5,code:"5.04",title:"אספקה והתקנת חיפוי קיר גרניט פורצלן כולל מילוי מישקים רובה",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"חיפוי,גרניט פורצלן,רובה"},
-  {ch:5,code:"5.05",title:"התאמות וחיתוכים לאריחים סביב אביזרים צנרת ופינות",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"חיתוך אריחים,התאמות"},
-  {ch:5,code:"5.06",title:"התקנת פנלים תואמים לריצוף",unit:"מא",dt:"water_leak|flood|subfloor_moisture",stage:"restoration",kw:"פנלים,ריצוף"},
-  {ch:5,code:"5.07",title:"השלמת ריצוף מקומית לאחר פתיחת תוואי",unit:"מר",dt:"water_leak",stage:"restoration",kw:"השלמת ריצוף,תוואי"},
-  {ch:5,code:"5.08",title:"פירוק פרקט קיים",unit:"מר",dt:"parquet_damage|flood",stage:"access",kw:"פירוק פרקט"},
-  {ch:5,code:"5.09",title:"אספקה והתקנת פרקט למינציה",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"פרקט למינציה"},
-  {ch:5,code:"5.10",title:"אספקה והתקנת פרקט פולימרי SPC",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"SPC,פרקט פולימרי"},
-  {ch:5,code:"5.11",title:"אספקה והתקנת פרקט עץ רב שכבתי",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ רב שכבתי"},
-  {ch:5,code:"5.12",title:"אספקה והתקנת פרקט עץ טבעי",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ טבעי"},
-  {ch:5,code:"5.13",title:"התקנת ספוג או תשתית לפרקט",unit:"מר",dt:"parquet_damage|flood",stage:"restoration",kw:"תשתית לפרקט,ספוג"},
-  {ch:5,code:"5.14",title:"התקנת פנלים תואמים לפרקט",unit:"מא",dt:"parquet_damage|flood",stage:"restoration",kw:"פנלים,פרקט"},
-  {ch:5,code:"5.15",title:"התאמות וחיתוכים בפרקט סביב משקופים וקירות",unit:"מא",dt:"parquet_damage",stage:"restoration",kw:"חיתוכים,פרקט,משקופים"},
-  {ch:5,code:"5.16",title:"פירוק והתקנה מחדש של פרקט קיים ככל שניתן",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פירוק והתקנה מחדש,פרקט"},
-  {ch:5,code:"5.17",title:"החלפת לוחות פרקט פגומים באופן נקודתי",unit:"יח'",dt:"parquet_damage|flood",stage:"restoration",kw:"לוחות פרקט,החלפה"},
-  {ch:5,code:"5.18",title:"השלמת חיפוי נקודתית",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"השלמת חיפוי"},
-  {ch:5,code:"5.19",title:"פירוק והחזרת פנלים",unit:"מא",dt:"water_leak|flood|parquet_damage",stage:"restoration",kw:"פנלים,החזרה"},
-  {ch:5,code:"5.20",title:"התאמת גוון או סוג ריצוף קיים",unit:"מר",dt:"water_leak|subfloor_moisture",stage:"restoration",kw:"גוון,ריצוף,התאמה"},
-  {ch:5,code:"5.21",title:"ריצוף מוזאיקה כולל רובה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"מוזאיקה,ריצוף"},
-  {ch:5,code:"5.22",title:"ריצוף דמוי פרקט כולל רובה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"דמוי פרקט"},
-  {ch:5,code:"5.23",title:"חיפוי פסיפס כולל מילוי מישקים",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"פסיפס,חיפוי"},
-  {ch:5,code:"5.24",title:"אספקה והתקנת אריחי שיש",unit:"מר",dt:"combined_damage",stage:"restoration",kw:"אריחי שיש"},
-  {ch:5,code:"5.25",title:"רובה אפוקסית לחיפוי או ריצוף",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה אפוקסית"},
-  {ch:5,code:"5.26",title:"פירוק רובה פגומה והחלפתה",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה,החלפה"},
-  {ch:5,code:"5.27",title:"יישור תשתית לריצוף",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"יישור תשתית"},
-  {ch:5,code:"5.28",title:"הדבקת אריחים חוזרת",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"הדבקה,אריחים"},
-  {ch:5,code:"5.29",title:"השלמת פנלים חסרים",unit:"מא",dt:"water_leak|flood",stage:"restoration",kw:"פנלים חסרים"},
-  {ch:5,code:"5.30",title:"מעבר פרופיל בין פרקט לריצוף",unit:"מא",dt:"parquet_damage|combined_damage",stage:"restoration",kw:"פרופיל מעבר"},
-  {ch:5,code:"5.31",title:"פירוק שטיח מקיר לקיר",unit:"מר",dt:"flood|combined_damage",stage:"access",kw:"שטיח,פירוק"},
-  {ch:5,code:"5.32",title:"אספקה והתקנת שטיח מקיר לקיר",unit:"מר",dt:"combined_damage|flood",stage:"restoration",kw:"שטיח,התקנה"},
-  {ch:5,code:"5.33",title:"ייבוש והחזרת שטיח קיים",unit:"מר",dt:"flood",stage:"restoration",kw:"שטיח,ייבוש"},
-  {ch:5,code:"5.34",title:"חידוש ספי דלת לאחר ריצוף",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"סף דלת,ריצוף"},
-  {ch:6,code:"6.01",title:"תיקוני טיח",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"טיח,תיקון"},
-  {ch:6,code:"6.02",title:"טיח שחור",unit:"מר",dt:"water_leak",stage:"restoration",kw:"טיח שחור"},
-  {ch:6,code:"6.03",title:"טיח לבן",unit:"מר",dt:"water_leak",stage:"restoration",kw:"טיח לבן"},
-  {ch:6,code:"6.04",title:"עבודות שפכטל",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"שפכטל"},
-  {ch:6,code:"6.05",title:"צביעה מקומית",unit:"מר",dt:"water_leak|flood|ongoing_dampness",stage:"restoration",kw:"צביעה מקומית"},
-  {ch:6,code:"6.06",title:"צביעה מלאה",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"צביעה מלאה"},
-  {ch:6,code:"6.07",title:"צבע נגד עובש",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,צבע"},
-  {ch:6,code:"6.08",title:"צבע אקרילי לקירות",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"צבע אקרילי"},
-  {ch:6,code:"6.09",title:"פריימר או יסוד לפני צביעה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"פריימר,יסוד"},
-  {ch:6,code:"6.10",title:"טיפול בקילופי צבע",unit:"מר",dt:"water_leak|fire_smoke_damage|ongoing_dampness",stage:"restoration",kw:"קילופי צבע"},
-  {ch:6,code:"6.11",title:"תיקון תקרות לאחר רטיבות",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"תקרה,רטיבות"},
-  {ch:6,code:"6.12",title:"צביעת תקרה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"צביעת תקרה"},
-  {ch:6,code:"6.13",title:"צביעת משקופים או דלתות",unit:"מא",dt:"burglary_theft_damage|fire_smoke_damage",stage:"restoration",kw:"צביעת משקופים,דלת"},
-  {ch:6,code:"6.14",title:"צבע חוסם כתמים",unit:"מר",dt:"water_leak|fire_smoke_damage|sewage_leak",stage:"restoration",kw:"חוסם כתמים"},
-  {ch:6,code:"6.15",title:"תיקון שפכטל מלא בקיר",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"שפכטל מלא"},
-  {ch:6,code:"6.16",title:"יישום בונדרול",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בונדרול"},
-  {ch:6,code:"6.17",title:"צביעת קיר חוץ",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"קיר חוץ"},
-  {ch:6,code:"6.18",title:"צבע אלסטי לקיר חוץ",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"צבע אלסטי"},
-  {ch:6,code:"6.19",title:"טיפול בעובש ופטריות לפני צבע",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,פטריות"},
-  {ch:6,code:"6.20",title:"הסרת פיח מקירות לפני צבע",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קיר"},
-  {ch:6,code:"6.21",title:"צביעת חדר מלא לאחר נזק",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"חדר מלא,צבע"},
-  {ch:6,code:"6.22",title:"גמר חלק לקיר לאחר תיקון",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"גמר חלק"},
-  {ch:6,code:"6.23",title:"תיקון צבע בתקרה אקוסטית",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה אקוסטית"},
-  {ch:6,code:"6.24",title:"צביעת סורג או מסגרת מתכת",unit:"מא",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג,מתכת"},
-  {ch:7,code:"7.01",title:"פירוק והרכבת ארון מטבח",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון מטבח,פירוק,הרכבה"},
-  {ch:7,code:"7.02",title:"תיקון ארון מטבח",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"ארון מטבח,תיקון"},
-  {ch:7,code:"7.03",title:"החלפת תחתית ארון",unit:"יח'",dt:"water_leak|flood|carpentry_damage",stage:"restoration",kw:"תחתית ארון,החלפה"},
-  {ch:7,code:"7.04",title:"החלפת צירים בארון",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"צירים,ארון"},
-  {ch:7,code:"7.05",title:"החלפת מסילות למגירות",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מסילות,מגירות"},
-  {ch:7,code:"7.06",title:"תיקון דלתות ארון",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"דלתות ארון,תיקון"},
-  {ch:7,code:"7.07",title:"החלפת חלקי נגרות פגומים",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"חלקי נגרות,פגומים"},
-  {ch:7,code:"7.08",title:"פירוק והרכבת ארון אמבטיה",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון אמבטיה"},
-  {ch:7,code:"7.09",title:"החלפת חזיתות",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"חזיתות,ארון"},
-  {ch:7,code:"7.10",title:"החלפת מדפים",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מדפים,החלפה"},
-  {ch:7,code:"7.11",title:"התאמות נגרות סביב צנרת או קירות",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"התאמות נגרות"},
-  {ch:7,code:"7.12",title:"החלפת סוקל",unit:"מא",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"סוקל,נגרות"},
-  {ch:7,code:"7.13",title:"תיקון נזקי נפיחות או רטיבות בנגרות",unit:"יח'",dt:"water_leak|ongoing_dampness|flood",stage:"restoration",kw:"נפיחות,רטיבות,נגרות"},
-  {ch:7,code:"7.14",title:"החלפת משטחי MDF או סנדוויץ'",unit:"מר",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"MDF,סנדוויץ"},
-  {ch:7,code:"7.15",title:"החלפת דלת פנים מעץ",unit:"יח'",dt:"fire_smoke_damage|burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"דלת פנים,עץ"},
-  {ch:7,code:"7.16",title:"החלפת משקוף עץ",unit:"יח'",dt:"burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"משקוף עץ"},
-  {ch:7,code:"7.17",title:"תיקון מזנון או נגרות סלון",unit:"יח'",dt:"carpentry_damage|combined_damage",stage:"restoration",kw:"מזנון"},
-  {ch:7,code:"7.18",title:"שיקום ארון קיר",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"ארון קיר"},
-  {ch:7,code:"7.19",title:"החלפת גב ארון",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"גב ארון"},
-  {ch:7,code:"7.20",title:"החלפת ידיות ופרזול נגרות",unit:"יח'",dt:"carpentry_damage|burglary_theft_damage",stage:"restoration",kw:"ידיות,פרזול"},
-  {ch:7,code:"7.21",title:"ייבוש ושיקום ארון קיים",unit:"יח'",dt:"water_leak|flood",stage:"restoration",kw:"ייבוש ארון"},
-  {ch:7,code:"7.22",title:"התאמת נגרות לאחר החלפת שיש",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"נגרות,שיש"},
-  {ch:8,code:"8.01",title:"תיקון תריס גלילה ידני",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס ידני"},
-  {ch:8,code:"8.02",title:"תיקון תריס גלילה חשמלי",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס חשמלי"},
-  {ch:8,code:"8.03",title:"החלפת מנוע תריס חשמלי",unit:"יח'",dt:"aluminum_damage",stage:"directRepair",kw:"מנוע תריס"},
-  {ch:8,code:"8.04",title:"החלפת שלבי תריס",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"שלבי תריס"},
-  {ch:8,code:"8.05",title:"החלפת רצועת תריס",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"רצועת תריס"},
-  {ch:8,code:"8.06",title:"תיקון מסילות תריס",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"מסילות תריס"},
-  {ch:8,code:"8.07",title:"פירוק והרכבת חלון אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"access",kw:"חלון אלומיניום"},
-  {ch:8,code:"8.08",title:"פירוק והרכבת ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה"},
-  {ch:8,code:"8.09",title:"תיקון מסגרת אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"restoration",kw:"מסגרת אלומיניום"},
-  {ch:8,code:"8.10",title:"החלפת גלגלים לחלון הזזה",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"גלגלים,חלון הזזה"},
-  {ch:8,code:"8.11",title:"תיקון נעילת חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"נעילה,חלון"},
-  {ch:8,code:"8.12",title:"החלפת זכוכית לחלון",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
-  {ch:8,code:"8.13",title:"החלפת זכוכית לוויטרינה",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
-  {ch:8,code:"8.14",title:"התקנת רשת לחלון",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"רשת,חלון"},
-  {ch:8,code:"8.15",title:"תיקון תריס ונציאני או פנימי",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"תריס ונציאני"},
-  {ch:8,code:"8.16",title:"תיקון פרופיל אלומיניום",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"פרופיל אלומיניום"},
-  {ch:8,code:"8.17",title:"החלפת ויטרינה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת ויטרינה"},
-  {ch:8,code:"8.18",title:"החלפת חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
-  {ch:8,code:"8.19",title:"תיקון אטמי אלומיניום",unit:"מא",dt:"rain_penetration|condensation|aluminum_damage",stage:"directRepair",kw:"אטמים,אלומיניום"},
-  {ch:8,code:"8.20",title:"תיקון מסגרת או כנף שנפגעה בפריצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת,כנף,פריצה"},
-  {ch:8,code:"8.21",title:"החלפת ארגז תריס",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ארגז תריס"},
-  {ch:8,code:"8.22",title:"החלפת מסילה לתריס גלילה",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"מסילה לתריס"},
-  {ch:8,code:"8.23",title:"החלפת נעילת ויטרינה",unit:"יח'",dt:"burglary_theft_damage|aluminum_damage",stage:"restoration",kw:"נעילת ויטרינה"},
-  {ch:8,code:"8.24",title:"התקנת זכוכית מחוסמת",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"זכוכית מחוסמת"},
-  {ch:8,code:"8.25",title:"החלפת ידית חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ידית חלון"},
-  {ch:8,code:"8.26",title:"כיוון כנף חלון או דלת הזזה",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"כיוון כנף"},
-  {ch:8,code:"8.27",title:"איטום היקפי לחלון או ויטרינה",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"directRepair",kw:"איטום היקפי"},
-  {ch:8,code:"8.28",title:"החלפת סורג אלומיניום או מתכת",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג"},
-  {ch:9,code:"9.01",title:"פירוק משטח שיש",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"פירוק שיש"},
-  {ch:9,code:"9.02",title:"התקנת משטח שיש חדש",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"restoration",kw:"משטח שיש חדש"},
-  {ch:9,code:"9.03",title:"התאמת שיש לכיור",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"שיש,כיור"},
-  {ch:9,code:"9.04",title:"חיתוך שיש",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"חיתוך שיש"},
-  {ch:9,code:"9.05",title:"תיקון סדקים בשיש",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"סדקים,שיש"},
-  {ch:9,code:"9.06",title:"פירוק והחזרת שיש קיים",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"החזרת שיש"},
-  {ch:9,code:"9.07",title:"התקנת קנטים או גמרי שיש",unit:"מא",dt:"combined_damage|water_leak",stage:"restoration",kw:"קנטים,שיש"},
-  {ch:9,code:"9.08",title:"התאמות שיש סביב קיר או נגרות",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"התאמות שיש"},
-  {ch:9,code:"9.09",title:"החלפת אדן חלון מאבן או שיש",unit:"מא",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"אדן חלון,שיש"},
-  {ch:9,code:"9.10",title:"החלפת סף שיש לדלת",unit:"יח'",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"סף שיש"},
-  {ch:9,code:"9.11",title:"ליטוש שיש מקומי",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"ליטוש שיש"},
-  {ch:9,code:"9.12",title:"הדבקת חלק שיש שנשבר",unit:"יח'",dt:"combined_damage",stage:"restoration",kw:"הדבקת שיש"},
-  {ch:9,code:"9.13",title:"החלפת שיש באמבטיה",unit:"מא",dt:"water_leak|combined_damage",stage:"restoration",kw:"שיש אמבטיה"},
-  {ch:9,code:"9.14",title:"החלפת חיפוי אבן",unit:"מר",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"חיפוי אבן"},
-  {ch:9,code:"9.15",title:"פירוק אבן קופינג או אדן חוץ",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"access",kw:"קופינג,אדן חוץ"},
-  {ch:10,code:"10.01",title:"פירוק והרכבת גוף תאורה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"גוף תאורה,פירוק,הרכבה"},
-  {ch:10,code:"10.02",title:"החלפת גוף תאורה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"החלפת גוף תאורה"},
-  {ch:10,code:"10.03",title:"החלפת מפסק חשמל",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"מפסק חשמל"},
-  {ch:10,code:"10.04",title:"החלפת שקע חשמל",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"שקע חשמל"},
-  {ch:10,code:"10.05",title:"תיקון חיווט מקומי",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"directRepair",kw:"חיווט,תיקון"},
-  {ch:10,code:"10.06",title:"התקנת נקודת חשמל",unit:"נק'",dt:"combined_damage|electrical_water_damage",stage:"restoration",kw:"נקודת חשמל"},
-  {ch:10,code:"10.07",title:"החלפת קופסת חשמל פגומה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"קופסת חשמל"},
-  {ch:10,code:"10.08",title:"בדיקת תקינות חשמל לאחר נזק",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת חשמל"},
-  {ch:10,code:"10.09",title:"החלפת אביזר חשמל שנפגע",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"אביזר חשמל"},
-  {ch:10,code:"10.10",title:"החלפת קטע כבל שנפגע",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"כבל,החלפה"},
-  {ch:10,code:"10.11",title:"עבודות חשמל נלוות לתריס חשמלי",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"ancillary",kw:"תריס חשמלי,חשמל"},
-  {ch:10,code:"10.12",title:"החלפת לוחון חשמל מקומי",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"לוחון חשמל"},
-  {ch:10,code:"10.13",title:"החלפת מפסק פחת",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"מפסק פחת"},
-  {ch:10,code:"10.14",title:"ייבוש ושיקום נקודת חשמל",unit:"יח'",dt:"electrical_water_damage",stage:"restoration",kw:"ייבוש נקודת חשמל"},
-  {ch:10,code:"10.15",title:"פירוק והרכבת מאוורר תקרה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"מאוורר תקרה"},
-  {ch:10,code:"10.16",title:"החלפת גלאי עשן",unit:"יח'",dt:"fire_smoke_damage|combined_damage",stage:"restoration",kw:"גלאי עשן"},
-  {ch:10,code:"10.17",title:"החלפת פס לד או תאורת נסתרת",unit:"מא",dt:"electrical_water_damage|combined_damage",stage:"restoration",kw:"פס לד"},
-  {ch:10,code:"10.18",title:"בדיקת בידוד למעגל חשמלי",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת בידוד"},
-  {ch:11,code:"11.01",title:"פינוי פסולת בניין",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,בניין"},
-  {ch:11,code:"11.02",title:"ניקיון לאחר עבודות",unit:"קומפ'",dt:"water_leak|flood|combined_damage",stage:"cleaning",kw:"ניקיון לאחר עבודות"},
-  {ch:11,code:"11.03",title:"פינוי אריזות וחומרים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"אריזות,חומרים"},
-  {ch:11,code:"11.04",title:"ניקוי יסודי לאחר שיקום",unit:"קומפ'",dt:"sewage_leak|fire_smoke_damage|flood",stage:"cleaning",kw:"ניקוי יסודי"},
-  {ch:11,code:"11.05",title:"עבודות הגנה או כיסוי לפני ביצוע",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנה,כיסוי"},
-  {ch:11,code:"11.06",title:"הובלות קטנות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הובלות קטנות"},
-  {ch:11,code:"11.07",title:"פירוק והחזרת ציוד או ריהוט לצורך ביצוע",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"ריהוט,פירוק,החזרה"},
-  {ch:11,code:"11.08",title:"עבודות תיאום מיוחדות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"תיאום מיוחד"},
-  {ch:11,code:"11.09",title:"חיטוי וניקוי לאחר ביוב",unit:"קומפ'",dt:"sewage_leak",stage:"cleaning",kw:"חיטוי,ביוב"},
-  {ch:11,code:"11.10",title:"ניקוי חלונות לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"חלונות,ניקיון"},
-  {ch:11,code:"11.11",title:"פוליש לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"פוליש"},
-  {ch:11,code:"11.12",title:"פינוי תכולה זמני לצורך שיקום",unit:"קומפ'",dt:"flood|fire_smoke_damage|combined_damage",stage:"ancillary",kw:"תכולה זמנית"},
-  {ch:11,code:"11.13",title:"כיסוי והגנת ריהוט",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנת ריהוט"},
-  {ch:11,code:"11.14",title:"שאיבת מים ראשונית",unit:"קומפ'",dt:"flood|water_leak",stage:"ancillary",kw:"שאיבת מים"},
-  {ch:12,code:"12.01",title:"ניקוי פיח מקירות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קירות"},
-  {ch:12,code:"12.02",title:"ניקוי פיח מתקרות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,תקרה"},
-  {ch:12,code:"12.03",title:"ניקוי פיח ממשטחים",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,משטחים"},
-  {ch:12,code:"12.04",title:"ניקוי ריח עשן באמצעים ייעודיים",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"ריח עשן,ניקוי"},
-  {ch:12,code:"12.05",title:"ניקוי מערכות אוורור או פתחים",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"אוורור,פתחים"},
-  {ch:12,code:"12.06",title:"קילוף צבע פגום",unit:"מר",dt:"fire_smoke_damage",stage:"access",kw:"קילוף צבע"},
-  {ch:12,code:"12.07",title:"תיקוני טיח לאחר חום או פיח",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"טיח,חום,פיח"},
-  {ch:12,code:"12.08",title:"פריימר חוסם פיח",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"פריימר,פיח"},
-  {ch:12,code:"12.09",title:"צביעה מלאה לאחר נזקי אש או עשן",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"צביעה,אש,עשן"},
-  {ch:12,code:"12.10",title:"צבע או חומר חוסם ריחות עשן",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"חוסם ריחות"},
-  {ch:12,code:"12.11",title:"פירוק נגרות שנפגעה משריפה",unit:"יח'",dt:"fire_smoke_damage",stage:"access",kw:"נגרות,שריפה"},
-  {ch:12,code:"12.12",title:"החלפת דלתות או ארונות שנפגעו",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"דלתות,ארונות"},
-  {ch:12,code:"12.13",title:"החלפת חיווט או אביזרי חשמל שנפגעו",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"חיווט,אביזרי חשמל"},
-  {ch:12,code:"12.14",title:"פינוי פסולת שריפה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"פסולת שריפה"},
-  {ch:12,code:"12.15",title:"פינוי תכולה פגומה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"תכולה,פינוי"},
-  {ch:12,code:"12.16",title:"ניקוי תקרת אקוסטית מפיח",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"תקרה אקוסטית,פיח"},
-  {ch:12,code:"12.17",title:"החלפת לוחות תקרה שנפגעו מאש",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"לוחות תקרה"},
-  {ch:12,code:"12.18",title:"ניקוי מסגרות אלומיניום מפיח",unit:"מא",dt:"fire_smoke_damage",stage:"cleaning",kw:"אלומיניום,פיח"},
-  {ch:13,code:"13.01",title:"החלפת דלת כניסה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת כניסה"},
-  {ch:13,code:"13.02",title:"תיקון דלת כניסה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון דלת כניסה"},
-  {ch:13,code:"13.03",title:"החלפת משקוף",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת משקוף"},
-  {ch:13,code:"13.04",title:"תיקון משקוף",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון משקוף"},
-  {ch:13,code:"13.05",title:"החלפת מנעול",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול,החלפה"},
-  {ch:13,code:"13.06",title:"החלפת צילינדר",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"צילינדר,החלפה"},
-  {ch:13,code:"13.07",title:"התקנת מנעול חדש",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול חדש,מיגון"},
-  {ch:13,code:"13.08",title:"החלפת זכוכית לחלון",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
-  {ch:13,code:"13.09",title:"תיקון חלון אלומיניום",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"חלון אלומיניום,תיקון"},
-  {ch:13,code:"13.10",title:"תיקון מסגרת חלון",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת חלון"},
-  {ch:13,code:"13.11",title:"החלפת חלון",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
-  {ch:13,code:"13.12",title:"תיקון תריס גלילה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תריס גלילה"},
-  {ch:13,code:"13.13",title:"החלפת שלבי תריס",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"שלבי תריס"},
-  {ch:13,code:"13.14",title:"תיקון מסילות תריס",unit:"מא",dt:"burglary_theft_damage",stage:"restoration",kw:"מסילות תריס"},
-  {ch:13,code:"13.15",title:"החלפת זכוכית ויטרינה",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
-  {ch:13,code:"13.16",title:"תיקון מסגרת ויטרינה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת ויטרינה"},
-  {ch:13,code:"13.17",title:"התקנת פרזול משלים",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"פרזול"},
-  {ch:13,code:"13.18",title:"תיקון דלת פנים או חוץ שנפרצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת שנפרצה"},
-  {ch:14,code:"14.01",title:"סעיף מותנה בכפוף לחשיפה",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"מותנה,חשיפה"},
-  {ch:14,code:"14.02",title:"סעיף מותנה ככל שיתגלה נזק נוסף",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"נזק נוסף,מותנה"},
-  {ch:14,code:"14.03",title:"עבודה מיוחדת לפי תנאי אתר",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"תנאי אתר,עבודה מיוחדת"},
-  {ch:14,code:"14.04",title:"עבודה בגישה מוגבלת",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"גישה מוגבלת"},
-  {ch:14,code:"14.05",title:"תוספת בגין פירוק והרכבה מורכבים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"פירוק מורכב,הרכבה מורכבת"},
-  {ch:14,code:"14.06",title:"התאמות מיוחדות לעבודות משולבות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודות משולבות,התאמות"},
-  {ch:14,code:"14.07",title:"סעיף כללי שאינו משויך לפרק אחר",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"סעיף כללי"},
-  {ch:14,code:"14.08",title:"תוספת עבור עבודה דחופה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודה דחופה"},
-  {ch:14,code:"14.09",title:"תוספת עבור עבודה בשעות חריגות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"שעות חריגות"},
-  {ch:14,code:"14.10",title:"תוספת עבור נגישות מורכבת או פירוק מיוחד",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"נגישות מורכבת"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 1 — עבודות פירוק, הריסה ופינוי
+  // ═══════════════════════════════════════════════
+  {ch:1,code:"1.01",title:"פירוק ריצוף קרמיקה / גרניט קיים לצורך גישה לתשתית",unit:"מר",dt:"water_leak|sewage_leak|flood|subfloor_moisture",stage:"access",kw:"פירוק,ריצוף,קרמיקה,גרניט"},
+  {ch:1,code:"1.02",title:"פירוק חיפוי קיר קרמיקה / גרניט קיים",unit:"מר",dt:"water_leak|rain_penetration|waterproofing_failure",stage:"access",kw:"פירוק,חיפוי,קרמיקה"},
+  {ch:1,code:"1.03",title:"פירוק פנלים ותחתיות ארונות לצורך גישה",unit:"מא",dt:"water_leak|flood|parquet_damage",stage:"access",kw:"פנלים,פירוק"},
+  {ch:1,code:"1.04",title:"פתיחת קיר בלוקים לאיתור מקור נזילה / תיקון",unit:"מר",dt:"water_leak|sewage_leak",stage:"access",kw:"פתיחת קיר,בלוקים,איתור"},
+  {ch:1,code:"1.05",title:"פתיחת קיר גבס לחשיפת מקור נזילה",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"access",kw:"גבס,פתיחה"},
+  {ch:1,code:"1.06",title:"פירוק תקרת גבס / תקרה מושעית לגישה לתשתיות",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"access",kw:"תקרה,גבס,פירוק"},
+  {ch:1,code:"1.07",title:"פירוק ארונות מטבח עליונים / תחתונים לצורך עבודות",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון,נגרות,פירוק"},
+  {ch:1,code:"1.08",title:"פירוק משטח שיש / אבן לצורך גישה לצנרת",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"שיש,אבן,פירוק"},
+  {ch:1,code:"1.09",title:"פירוק חלון אלומיניום / עץ לצורך עבודות",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage|rain_penetration",stage:"access",kw:"חלון,פירוק"},
+  {ch:1,code:"1.10",title:"פירוק ויטרינה / חזית אלומיניום לצורך עבודות",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה,פירוק"},
+  {ch:1,code:"1.11",title:"פירוק מסגרת אלומיניום / פרופיל חלון",unit:"יח'",dt:"aluminum_damage|rain_penetration|burglary_theft_damage",stage:"access",kw:"אלומיניום,מסגרת,פירוק"},
+  {ch:1,code:"1.12",title:"פירוק תריס גלילה ידני / חשמלי",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"תריס,גלילה,פירוק"},
+  {ch:1,code:"1.13",title:"פירוק כלים סניטריים — אסלה / כיור / מקלחון",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה,כיור,מקלחון,פירוק"},
+  {ch:1,code:"1.14",title:"פירוק מקלחון — דפנות, זכוכית ואגן",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"מקלחון,פירוק"},
+  {ch:1,code:"1.15",title:"פירוק אמבטיה ופתחי גישה לצנרת",unit:"יח'",dt:"water_leak",stage:"access",kw:"אמבטיה,פירוק"},
+  {ch:1,code:"1.16",title:"פירוק אסלה תלויה וכנה — כולל ניתוק ביוב",unit:"יח'",dt:"water_leak|sewage_leak",stage:"access",kw:"אסלה תלויה,פירוק"},
+  {ch:1,code:"1.17",title:"פירוק כיור תלוי / עמידה — כולל ניתוק",unit:"יח'",dt:"water_leak",stage:"access",kw:"כיור,תלוי,פירוק"},
+  {ch:1,code:"1.18",title:"פירוק משקוף עץ פגום לצורך החלפה",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage|carpentry_damage",stage:"access",kw:"משקוף,פירוק"},
+  {ch:1,code:"1.19",title:"פירוק דלת פנים / חוץ מעץ לצורך החלפה",unit:"יח'",dt:"burglary_theft_damage|fire_smoke_damage",stage:"access",kw:"דלת,פירוק"},
+  {ch:1,code:"1.20",title:"פירוק ריצוף פרקט — למינציה / SPC / עץ",unit:"מר",dt:"parquet_damage|flood",stage:"access",kw:"פרקט,פירוק"},
+  {ch:1,code:"1.21",title:"פירוק פרופיל אלומיניום / פרופיל מעבר",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"פרופיל,אלומיניום"},
+  {ch:1,code:"1.22",title:"פירוק והוצאת זכוכית פגומה — חלון / ויטרינה",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"זכוכית,פירוק"},
+  {ch:1,code:"1.23",title:"פירוק אדן חלון פנימי / חיצוני",unit:"מא",dt:"rain_penetration|combined_damage",stage:"access",kw:"אדן חלון,פירוק"},
+  {ch:1,code:"1.24",title:"פירוק והסרת סורג מתכת / אלומיניום",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"access",kw:"סורג,פירוק"},
+  {ch:1,code:"1.25",title:"פינוי פסולת בניין לאתר מורשה — כולל מיון חומרים",unit:"קומפ'",dt:"water_leak|sewage_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,פינוי,בניין"},
+  {ch:1,code:"1.26",title:"העמסת פסולת למכולה ייעודית",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"פסולת,מכולה,העמסה"},
+  {ch:1,code:"1.27",title:"השכרת מכולה ייעודית לפסולת",unit:"יום",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,השכרה"},
+  {ch:1,code:"1.28",title:"הובלת מכולה לאתר מורשה — אגרות הטמנה כלולות",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"מכולה,הובלה,אתר"},
+  {ch:1,code:"1.29",title:"אגרות הטמנה בפסולת בניין לאתר מאושר",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage",stage:"ancillary",kw:"הטמנה,אגרה,פינוי"},
+  {ch:1,code:"1.30",title:"פינוי רכיבים ומוצרים פגומים לאתר מורשה",unit:"קומפ'",dt:"fire_smoke_damage|burglary_theft_damage|combined_damage",stage:"ancillary",kw:"פינוי,מורשה,רכיבים"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 2 — עבודות איתור, בדיקה וייבוש
+  // ═══════════════════════════════════════════════
+  {ch:2,code:"2.01",title:"בדיקת רמות לחות בקירות וברצפה — בצרוף מדידות מד לחות",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture|ongoing_dampness",stage:"inspection",kw:"לחות,בדיקה,רטיבות,מד לחות"},
+  {ch:2,code:"2.02",title:"בדיקה במצלמה תרמית — איתור מקורות נזילה ורטיבות",unit:"קומפ'",dt:"water_leak|rain_penetration",stage:"inspection",kw:"מצלמה תרמית,איתור"},
+  {ch:2,code:"2.03",title:"איתור נזילה בציוד אקוסטי מתקדם",unit:"קומפ'",dt:"water_leak",stage:"inspection",kw:"אקוסטי,איתור,נזילה"},
+  {ch:2,code:"2.04",title:"איתור נזילה משולב — אקוסטי + תרמי + מד לחות",unit:"קומפ'",dt:"water_leak|sewage_leak",stage:"inspection",kw:"איתור מתקדם,נזילה"},
+  {ch:2,code:"2.05",title:"הצבת ציוד ייבוש תת-רצפתי — מפוחים + אבזור",unit:"יום",dt:"subfloor_moisture|flood",stage:"ancillary",kw:"ייבוש תת רצפתי"},
+  {ch:2,code:"2.06",title:"הצבת מפוחי ייבוש מקצועיים",unit:"יום",dt:"water_leak|flood",stage:"ancillary",kw:"מפוחים,ייבוש"},
+  {ch:2,code:"2.07",title:"הצבת סופחי לחות תעשייתיים",unit:"יום",dt:"water_leak|flood|ongoing_dampness",stage:"ancillary",kw:"סופח לחות,ייבוש"},
+  {ch:2,code:"2.08",title:"ניטור לחות ותיעוד מדידות יומיות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"ניטור,ייבוש,רטיבות"},
+  {ch:2,code:"2.09",title:"ביקורות פיקוח תקופתיות במהלך ייבוש",unit:"ביקור",dt:"water_leak|flood",stage:"inspection",kw:"ביקורת,ייבוש"},
+  {ch:2,code:"2.10",title:"פירוק ואיסוף ציוד ייבוש בתום תהליך",unit:"קומפ'",dt:"water_leak|flood",stage:"ancillary",kw:"פירוק ציוד,ייבוש"},
+  {ch:2,code:"2.11",title:"דוח מדידות ייבוש + אישור יובש לפני סגירה",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"דוח,מדידה,ייבוש"},
+  {ch:2,code:"2.12",title:"בדיקות משלימות לאחר סיום תהליך הייבוש",unit:"קומפ'",dt:"water_leak|flood|subfloor_moisture",stage:"inspection",kw:"בדיקות משלימות"},
+  {ch:2,code:"2.13",title:"בדיקת מד לחות לפרקט — לפני ואחרי",unit:"קומפ'",dt:"parquet_damage|flood",stage:"inspection",kw:"מד לחות,פרקט"},
+  {ch:2,code:"2.14",title:"איתור רטיבות תת-רצפתית — מיפוי מלא",unit:"קומפ'",dt:"subfloor_moisture|flood",stage:"inspection",kw:"רטיבות תת רצפתית"},
+  {ch:2,code:"2.15",title:"בדיקת מקור חדירת גשם — ניסיוני ומפורט",unit:"קומפ'",dt:"rain_penetration|waterproofing_failure",stage:"inspection",kw:"חדירת גשם"},
+  {ch:2,code:"2.16",title:"בדיקת קונדנסציה — תנאי סביבה ומקורות לחות",unit:"קומפ'",dt:"condensation",stage:"inspection",kw:"קונדנסציה,עיבוי"},
+  {ch:2,code:"2.17",title:"בדיקת עשן וריח לאחר שריפה — ניתוח מוקד הנזק",unit:"קומפ'",dt:"fire_smoke_damage",stage:"inspection",kw:"עשן,ריח,שריפה"},
+  {ch:2,code:"2.18",title:"בדיקת בטיחות חשמל לאחר חשיפה לרטיבות",unit:"קומפ'",dt:"electrical_water_damage",stage:"inspection",kw:"חשמל,רטיבות,בטיחות"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 3 — עבודות אינסטלציה — תיקון מקור
+  // ═══════════════════════════════════════════════
+  {ch:3,code:"3.01",title:"החלפת קטע צנרת מים — פולימר / מתכת / PEX",unit:"מא",dt:"water_leak",stage:"directRepair",kw:"צנרת,מים,החלפה"},
+  {ch:3,code:"3.02",title:"תיקון נקודת נזילה בצנרת — אטימה ותיקון מקומי",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נזילה,צנרת,תיקון"},
+  {ch:3,code:"3.03",title:"החלפת מחברי צנרת — כולל הרכבה ובדיקת לחץ",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מחבר,צנרת"},
+  {ch:3,code:"3.04",title:"החלפת ברזי ניתוק / כדוריים",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז ניתוק,החלפה"},
+  {ch:3,code:"3.05",title:"החלפת סיפון / שסתום פליטה",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"סיפון,כיור"},
+  {ch:3,code:"3.06",title:"החלפת ברז / בטריה למטבח — כולל חיבורים",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מטבח,בטריה"},
+  {ch:3,code:"3.07",title:"החלפת ברז / בטריה למקלחת — כולל חיבורים",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ברז,מקלחת"},
+  {ch:3,code:"3.08",title:"פירוק והרכבת אסלה — ניקיון וחיבורים",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אסלה,פירוק,הרכבה"},
+  {ch:3,code:"3.09",title:"פירוק והרכבת כיור — כולל חיבורי ניקוז",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"כיור,פירוק,הרכבה"},
+  {ch:3,code:"3.10",title:"החלפת קו ביוב — כולל בדיקת ניקוז",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"ביוב,קו,החלפה"},
+  {ch:3,code:"3.11",title:"פתיחת סתימה בקו ביוב — מכאנית / הידראולית",unit:"קומפ'",dt:"sewage_leak",stage:"directRepair",kw:"סתימה,ביוב"},
+  {ch:3,code:"3.12",title:"התקנת נקודת מים חדשה — כולל ניסיון גלוי",unit:"נק'",dt:"water_leak",stage:"directRepair",kw:"נקודת מים,התקנה"},
+  {ch:3,code:"3.13",title:"החלפת צנרת דלוחין / ניקוז",unit:"מא",dt:"sewage_leak",stage:"directRepair",kw:"דלוחין,צנרת"},
+  {ch:3,code:"3.14",title:"החלפת אביזרי אינסטלציה — כלים, מחברים, שסתומים",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"אביזרים,אינסטלציה"},
+  {ch:3,code:"3.15",title:"החלפת מכל הדחה — גלוי / סמוי",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"מכל הדחה,אסלה"},
+  {ch:3,code:"3.16",title:"פירוק והרכבת מקלחון לצורך ביצוע עבודות",unit:"יח'",dt:"water_leak",stage:"access",kw:"מקלחון,פירוק,הרכבה"},
+  {ch:3,code:"3.17",title:"פירוק והרכבת אמבטיה / אגנית — כולל איטום",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אמבטיה,אגנית"},
+  {ch:3,code:"3.18",title:"החלפת קופסת ביקורת לניקוז",unit:"יח'",dt:"sewage_leak",stage:"directRepair",kw:"קופסת ביקורת,ביוב"},
+  {ch:3,code:"3.19",title:"תיקון ושיקום קו ניקוז — כולל ניסיון",unit:"מא",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"ניקוז,תיקון"},
+  {ch:3,code:"3.20",title:"החלפת סעפת / מחלק מים ראשי",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"סעפת,מחלק מים"},
+  {ch:3,code:"3.21",title:"החלפת ניאגרה סמויה — כולל התאמת גובה",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"ניאגרה סמויה"},
+  {ch:3,code:"3.22",title:"החלפת אינטרפוץ / ברז בטיחות",unit:"יח'",dt:"water_leak",stage:"directRepair",kw:"אינטרפוץ"},
+  {ch:3,code:"3.23",title:"תיקון חיבורי גיבריט / פוליפרופילן",unit:"יח'",dt:"water_leak|sewage_leak",stage:"directRepair",kw:"גיבריט,חיבורים"},
+  {ch:3,code:"3.24",title:"החלפת מחסום רצפה / מנעול תיעול",unit:"יח'",dt:"sewage_leak|water_leak",stage:"directRepair",kw:"מחסום רצפה"},
+  {ch:3,code:"3.25",title:"פירוק והרכבת דוד חשמל / שמש לצורך עבודות",unit:"יח'",dt:"water_leak|combined_damage",stage:"access",kw:"דוד,פירוק,הרכבה"},
+  {ch:3,code:"3.26",title:"בדיקת לחץ צנרת לאחר תיקון — פרוטוקול לחץ",unit:"קומפ'",dt:"water_leak",stage:"inspection",kw:"לחץ,צנרת,בדיקה"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 4 — עבודות אטימה, איטום וחדירות גשם
+  // ═══════════════════════════════════════════════
+  {ch:4,code:"4.01",title:"ריסוס קיר / תקרה בחומר אטימה — שכבה כפולה",unit:"מר",dt:"rain_penetration|waterproofing_failure|ongoing_dampness",stage:"directRepair",kw:"אטימה,ריסוס,קיר"},
+  {ch:4,code:"4.02",title:"ציפוי אטום לרצפה / מרפסת — פוליאוריאה / ביטומן",unit:"מר",dt:"waterproofing_failure|rain_penetration",stage:"directRepair",kw:"ציפוי אטום,רצפה,מרפסת"},
+  {ch:4,code:"4.03",title:"סגירת סדקים בקיר ובתשתית — חומרי הזרקה",unit:"מא",dt:"rain_penetration|ongoing_dampness|waterproofing_failure",stage:"directRepair",kw:"סדקים,סגירה,הזרקה"},
+  {ch:4,code:"4.04",title:"איטום היקפי לחלון / דלת / ויטרינה — סיליקון ומסטיק",unit:"מא",dt:"rain_penetration|aluminum_damage",stage:"directRepair",kw:"איטום היקפי,חלון,סיליקון"},
+  {ch:4,code:"4.05",title:"איטום חריצים / פגיות בחדירות גשם",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"directRepair",kw:"חריצים,פגיות,גשם"},
+  {ch:4,code:"4.06",title:"הוצאת / החלפת קופינג / אדן חוץ — כולל איטום",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"קופינג,אדן חוץ,החלפה"},
+  {ch:4,code:"4.07",title:"עבודות איטום גג — ממברנה / ביטומן",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"directRepair",kw:"איטום גג,ממברנה,ביטומן"},
+  {ch:4,code:"4.08",title:"החלפת שכבת איטום — הסרת ישן + יציקה חדשה",unit:"מר",dt:"waterproofing_failure|rain_penetration",stage:"restoration",kw:"שכבת איטום,החלפה"},
+  {ch:4,code:"4.09",title:"טיפול בחדירת לחות מתת-קרקע / ריצוף",unit:"מר",dt:"subfloor_moisture|ongoing_dampness",stage:"directRepair",kw:"לחות,תת קרקע,חדירה"},
+  {ch:4,code:"4.10",title:"ניסיון מים לאחר איטום — תיעוד ואישור",unit:"קומפ'",dt:"waterproofing_failure|rain_penetration",stage:"inspection",kw:"ניסיון מים,איטום"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 5 — עבודות בנייה, גבס וסגירת פתחים
+  // ═══════════════════════════════════════════════
+  {ch:5,code:"5.01",title:"סגירת פתחים בקיר בלוקים — כולל חיזוק ותפרים",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"סגירת פתחים,בלוקים"},
+  {ch:5,code:"5.02",title:"סגירת קיר גבס / גבס עמיד במים — כולל ניסוך",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"קיר גבס,סגירה"},
+  {ch:5,code:"5.03",title:"תיקוני בטון מקומיים — ריסוס, חיזוק ויציקה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בטון,תיקון"},
+  {ch:5,code:"5.04",title:"יציקת בטון מקומית לתיקון תשתית",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"יציקה,בטון"},
+  {ch:5,code:"5.05",title:"תיקון סדקים בקיר / תקרה — ממלא אלסטי או מסיר",unit:"מא",dt:"rain_penetration|ongoing_dampness|waterproofing_failure",stage:"restoration",kw:"סדקים,קיר,תיקון"},
+  {ch:5,code:"5.06",title:"בניית קיר בלוקים חדש — כולל מסגרות ועיגון",unit:"מר",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"קיר חדש,בלוקים"},
+  {ch:5,code:"5.07",title:"תיקון תקרה פגומה — טיח, שפכטל וצבע",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה,תיקון"},
+  {ch:5,code:"5.08",title:"השלמת תשתית ריצוף לאחר פירוק — מצע, ישור ויישוב",unit:"מר",dt:"water_leak|sewage_leak|combined_damage",stage:"restoration",kw:"תשתית,השלמה"},
+  {ch:5,code:"5.09",title:"תיקון נישות / פתחים בקיר — גמר ישוב",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"נישה,פתחים"},
+  {ch:5,code:"5.10",title:"הכנת משטחים לפני עבודות גמר — שיוף, ניקוי ויישור",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"ancillary",kw:"הכנה,גמר"},
+  {ch:5,code:"5.11",title:"בניית מחיצת גבס חדשה — כולל פרופילים ובידוד",unit:"מר",dt:"combined_damage",stage:"restoration",kw:"מחיצת גבס"},
+  {ch:5,code:"5.12",title:"תיקון חגורת בטון מקומית — רזין / יציקה",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"חגורת בטון"},
+  {ch:5,code:"5.13",title:"מילוי תעלות בקיר לאחר צנרת — בטון / גבס",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"מילוי תעלות"},
+  {ch:5,code:"5.14",title:"יישור קיר לאחר סגירה — שפכטל ניסוח",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"יישור קיר"},
+  {ch:5,code:"5.15",title:"תיקון פינת קיר — חיזוק ועיגון",unit:"יח'",dt:"combined_damage|water_leak",stage:"restoration",kw:"פינת קיר"},
+  {ch:5,code:"5.16",title:"בניית אדן פנימי / מדרגה — בטון / גבס",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"אדן פנימי"},
+  {ch:5,code:"5.17",title:"יציקת מצע לריצוף — כולל ישור ויישוב",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"מצע,ריצוף"},
+  {ch:5,code:"5.18",title:"שיקום קיר לאחר פריצה — בלוקים / גבס / טיח",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"קיר,פריצה,שיקום"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 6 — עבודות ריצוף, חיפוי ופרקט
+  // ═══════════════════════════════════════════════
+  {ch:6,code:"6.01",title:"אספקה והתקנת ריצוף קרמיקה כולל מילוי מישקים ורובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"ריצוף,קרמיקה,רובה"},
+  {ch:6,code:"6.02",title:"אספקה והתקנת ריצוף גרניט פורצלן כולל רובה",unit:"מר",dt:"water_leak|sewage_leak|subfloor_moisture",stage:"restoration",kw:"גרניט פורצלן,ריצוף,רובה"},
+  {ch:6,code:"6.03",title:"אספקה והתקנת חיפוי קיר קרמיקה / גרניט",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"חיפוי,קרמיקה,גרניט"},
+  {ch:6,code:"6.04",title:"התאמות וחיתוכים לאריחים סביב אביזרים ופינות",unit:"מא",dt:"water_leak|sewage_leak",stage:"restoration",kw:"חיתוך אריחים,התאמות"},
+  {ch:6,code:"6.05",title:"השלמת ריצוף מקומית לאחר פתיחת תוואי צנרת",unit:"מר",dt:"water_leak",stage:"restoration",kw:"השלמת ריצוף,תוואי"},
+  {ch:6,code:"6.06",title:"אספקה והתקנת פרקט למינציה — כולל תשתית",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"פרקט למינציה"},
+  {ch:6,code:"6.07",title:"אספקה והתקנת פרקט פולימרי SPC — עמיד לחות",unit:"מר",dt:"flood|parquet_damage",stage:"restoration",kw:"SPC,פרקט פולימרי"},
+  {ch:6,code:"6.08",title:"אספקה והתקנת פרקט עץ רב-שכבתי — כולל תשתית",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ רב שכבתי"},
+  {ch:6,code:"6.09",title:"אספקה והתקנת פרקט עץ מלא — כולל גימור",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פרקט עץ טבעי"},
+  {ch:6,code:"6.10",title:"התקנת ספוג / שכבת בידוד לפרקט",unit:"מר",dt:"parquet_damage|flood",stage:"restoration",kw:"תשתית לפרקט,ספוג"},
+  {ch:6,code:"6.11",title:"פירוק והתקנה מחדש של פרקט קיים — ככל שניתן",unit:"מר",dt:"parquet_damage",stage:"restoration",kw:"פירוק והתקנה מחדש,פרקט"},
+  {ch:6,code:"6.12",title:"החלפת לוחות פרקט פגומים — נקודתי",unit:"יח'",dt:"parquet_damage|flood",stage:"restoration",kw:"לוחות פרקט,החלפה"},
+  {ch:6,code:"6.13",title:"רובה אפוקסית — ריצוף או חיפוי",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה אפוקסית"},
+  {ch:6,code:"6.14",title:"פירוק רובה פגומה והחלפה בחומר תואם",unit:"מר",dt:"water_leak|sewage_leak",stage:"restoration",kw:"רובה,החלפה"},
+  {ch:6,code:"6.15",title:"יישור תשתית לריצוף — מצע עם שכבת ישור",unit:"מר",dt:"subfloor_moisture|water_leak",stage:"restoration",kw:"יישור תשתית"},
+  {ch:6,code:"6.16",title:"מעבר פרופיל / חיתום בין פרקט לריצוף",unit:"מא",dt:"parquet_damage|combined_damage",stage:"restoration",kw:"פרופיל מעבר"},
+  {ch:6,code:"6.17",title:"ריצוף מוזאיקה / פסיפס — כולל רובה",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"מוזאיקה,פסיפס"},
+  {ch:6,code:"6.18",title:"חידוש ספי דלת / מפתני כניסה לאחר ריצוף",unit:"יח'",dt:"water_leak|combined_damage",stage:"restoration",kw:"סף דלת,ריצוף"},
+  {ch:6,code:"6.19",title:"פירוק שטיח מקיר לקיר — כולל בסיס",unit:"מר",dt:"flood|combined_damage",stage:"access",kw:"שטיח,פירוק"},
+  {ch:6,code:"6.20",title:"אספקה והתקנת שטיח מקיר לקיר — כולל ריפוד",unit:"מר",dt:"combined_damage|flood",stage:"restoration",kw:"שטיח,התקנה"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 7 — עבודות טיח, שפכטל וצבע
+  // ═══════════════════════════════════════════════
+  {ch:7,code:"7.01",title:"תיקוני טיח מקומיים — קירות ותקרות",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"טיח,תיקון"},
+  {ch:7,code:"7.02",title:"טיח ייעודי — לאחר הסרת מבנה ישן",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"טיח,ייעודי"},
+  {ch:7,code:"7.03",title:"טיח אנטי-עובש / פניטריי",unit:"מר",dt:"ongoing_dampness|condensation|rain_penetration",stage:"directRepair",kw:"טיח,עובש,פניטריי"},
+  {ch:7,code:"7.04",title:"עבודות שפכטל — הכנה לפני צביעה",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"שפכטל"},
+  {ch:7,code:"7.05",title:"צביעה מקומית — תיאום גוון לסביבה קיימת",unit:"מר",dt:"water_leak|flood|ongoing_dampness",stage:"restoration",kw:"צביעה מקומית"},
+  {ch:7,code:"7.06",title:"צביעה מלאה של חדר / פנים — שתי שכבות",unit:"מר",dt:"water_leak|rain_penetration|fire_smoke_damage",stage:"restoration",kw:"צביעה מלאה"},
+  {ch:7,code:"7.07",title:"צבע מיוחד נגד עובש — כולל טיפול מקדים",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,צבע"},
+  {ch:7,code:"7.08",title:"פריימר / יסוד חוסם לחות לפני צביעה",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"פריימר,יסוד"},
+  {ch:7,code:"7.09",title:"טיפול בקילופי צבע — הסרה + הכנה + צביעה",unit:"מר",dt:"water_leak|fire_smoke_damage|ongoing_dampness",stage:"restoration",kw:"קילופי צבע"},
+  {ch:7,code:"7.10",title:"תיקון תקרה לאחר רטיבות — טיח + שפכטל + צבע",unit:"מר",dt:"water_leak|rain_penetration",stage:"restoration",kw:"תקרה,רטיבות"},
+  {ch:7,code:"7.11",title:"צביעת תקרה — שתי שכבות",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"צביעת תקרה"},
+  {ch:7,code:"7.12",title:"צביעת משקופים, דלתות ומסגרות מעץ",unit:"מא",dt:"burglary_theft_damage|fire_smoke_damage|carpentry_damage",stage:"restoration",kw:"צביעת משקופים,דלת"},
+  {ch:7,code:"7.13",title:"צבע חוסם כתמים — לאחר נזקי מים / עשן",unit:"מר",dt:"water_leak|fire_smoke_damage|sewage_leak",stage:"restoration",kw:"חוסם כתמים"},
+  {ch:7,code:"7.14",title:"שפכטל מלא לקיר — גימור חלק",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"שפכטל מלא"},
+  {ch:7,code:"7.15",title:"יישום בונדרול / חומר חיזוק לפני טיח",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"בונדרול"},
+  {ch:7,code:"7.16",title:"צביעת קיר חוץ — צבע עמיד קרינה ומים",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"קיר חוץ"},
+  {ch:7,code:"7.17",title:"צבע אלסטי לקיר חוץ — הגנה מחדירת גשם",unit:"מר",dt:"rain_penetration|waterproofing_failure",stage:"restoration",kw:"צבע אלסטי"},
+  {ch:7,code:"7.18",title:"טיפול בעובש ופטריות — חומרי נגד + ניקוי",unit:"מר",dt:"ongoing_dampness|condensation",stage:"restoration",kw:"עובש,פטריות"},
+  {ch:7,code:"7.19",title:"הסרת פיח מקירות / תקרה לפני צבע",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קיר"},
+  {ch:7,code:"7.20",title:"גמר חלק לקיר לאחר תיקון — ניסוח סופי",unit:"מר",dt:"water_leak|combined_damage",stage:"restoration",kw:"גמר חלק"},
+  {ch:7,code:"7.21",title:"תיקון צבע בתקרה אקוסטית",unit:"מר",dt:"water_leak|fire_smoke_damage",stage:"restoration",kw:"תקרה אקוסטית"},
+  {ch:7,code:"7.22",title:"צביעת סורג / מסגרת מתכת — ציפוי נגד חלודה",unit:"מא",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג,מתכת"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 8 — עבודות נגרות — דלתות, משקופים וארונות מובנים
+  // ═══════════════════════════════════════════════
+  {ch:8,code:"8.01",title:"פירוק והרכבת ארון מטבח עליון / תחתון לצורך עבודות",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון מטבח,פירוק,הרכבה"},
+  {ch:8,code:"8.02",title:"תיקון ארון מטבח — דלתות, מסגרות וחיזוקים",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"ארון מטבח,תיקון"},
+  {ch:8,code:"8.03",title:"החלפת תחתית ארון — עמידה לחות",unit:"יח'",dt:"water_leak|flood|carpentry_damage",stage:"restoration",kw:"תחתית ארון,החלפה"},
+  {ch:8,code:"8.04",title:"החלפת צירי ארון / דלת — רגילים / רכים",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"צירים,ארון"},
+  {ch:8,code:"8.05",title:"החלפת מסילות מגירות — פלדה / פולימר",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מסילות,מגירות"},
+  {ch:8,code:"8.06",title:"תיקון / ישור דלתות ארון — עץ / MDF",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"דלתות ארון,תיקון"},
+  {ch:8,code:"8.07",title:"החלפת חלקי נגרות MDF / סנדוויץ' פגומים",unit:"מר",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"MDF,סנדוויץ"},
+  {ch:8,code:"8.08",title:"פירוק והרכבת ארון אמבטיה — כולל ניתוק",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"access",kw:"ארון אמבטיה"},
+  {ch:8,code:"8.09",title:"החלפת חזיתות ארון — MDF / סנדוויץ' / עץ",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"חזיתות,ארון"},
+  {ch:8,code:"8.10",title:"החלפת מדפים / קורות בארון מובנה",unit:"יח'",dt:"carpentry_damage",stage:"restoration",kw:"מדפים,החלפה"},
+  {ch:8,code:"8.11",title:"התאמות נגרות לאחר צנרת / קירות — חיתוך ועיגון",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"התאמות נגרות"},
+  {ch:8,code:"8.12",title:"החלפת סוקל רצף — עץ / MDF",unit:"מא",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"סוקל,נגרות"},
+  {ch:8,code:"8.13",title:"שיקום נגרות שנפגעה מנפיחות / רטיבות",unit:"יח'",dt:"water_leak|ongoing_dampness|flood",stage:"restoration",kw:"נפיחות,רטיבות,נגרות"},
+  {ch:8,code:"8.14",title:"ייבוש ושיקום ארון קיים — יבוש + טיפול + לכה",unit:"יח'",dt:"water_leak|flood",stage:"restoration",kw:"ייבוש ארון"},
+  {ch:8,code:"8.15",title:"התאמת נגרות לאחר החלפת משטח שיש",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"נגרות,שיש"},
+  {ch:8,code:"8.16",title:"שיקום ארון קיר מובנה — כולל ציפוי",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"ארון קיר"},
+  {ch:8,code:"8.17",title:"החלפת ידיות ופרזול נגרות — סט מלא",unit:"יח'",dt:"carpentry_damage|burglary_theft_damage",stage:"restoration",kw:"ידיות,פרזול"},
+  {ch:8,code:"8.18",title:"החלפת גב ארון / תחתית — כולל חיזוק",unit:"יח'",dt:"carpentry_damage|water_leak",stage:"restoration",kw:"גב ארון"},
+  {ch:8,code:"8.19",title:"תיקון / החלפת מזנון סלון / ספרייה מובנית",unit:"יח'",dt:"carpentry_damage|combined_damage",stage:"restoration",kw:"מזנון,ספרייה"},
+  // דלתות ומשקופים — מבנה
+  {ch:8,code:"8.20",title:"אספקה והתקנת דלת פנים מעץ — כולל פרזול",unit:"יח'",dt:"fire_smoke_damage|burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"דלת פנים,עץ"},
+  {ch:8,code:"8.21",title:"אספקה והתקנת משקוף עץ תואם — כולל ציפוי מגן",unit:"יח'",dt:"burglary_theft_damage|carpentry_damage|fire_smoke_damage",stage:"restoration",kw:"משקוף עץ,אספקה,התקנה"},
+  {ch:8,code:"8.22",title:"תיקון משקוף עץ פגום — שיוף, שמירה ולכה",unit:"יח'",dt:"burglary_theft_damage|carpentry_damage",stage:"restoration",kw:"משקוף עץ,תיקון"},
+  {ch:8,code:"8.23",title:"החלפת סף דלת עץ / MDF — כולל עיגון לרצפה",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"סף דלת"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 9 — עבודות אלומיניום, זכוכית ותריסים
+  // ═══════════════════════════════════════════════
+  {ch:9,code:"9.01",title:"תיקון תריס גלילה ידני — מסילות, שלבים ועיגון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס ידני"},
+  {ch:9,code:"9.02",title:"תיקון תריס גלילה חשמלי — מוטור + בקר",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"תריס חשמלי"},
+  {ch:9,code:"9.03",title:"החלפת מנוע תריס חשמלי — כולל תכנות",unit:"יח'",dt:"aluminum_damage",stage:"directRepair",kw:"מנוע תריס"},
+  {ch:9,code:"9.04",title:"החלפת שלבי תריס פגומים",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"שלבי תריס"},
+  {ch:9,code:"9.05",title:"החלפת ארגז תריס — כולל קיבוע",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ארגז תריס"},
+  {ch:9,code:"9.06",title:"החלפת מסילות / פרופילי תריס",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"מסילות תריס"},
+  {ch:9,code:"9.07",title:"פירוק והרכבת חלון אלומיניום — כולל איטום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"access",kw:"חלון אלומיניום"},
+  {ch:9,code:"9.08",title:"פירוק והרכבת ויטרינה / חזית אלומיניום",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"access",kw:"ויטרינה"},
+  {ch:9,code:"9.09",title:"תיקון / יישור מסגרת אלומיניום",unit:"יח'",dt:"aluminum_damage|rain_penetration",stage:"restoration",kw:"מסגרת אלומיניום"},
+  {ch:9,code:"9.10",title:"החלפת גלגלים לחלון הזזה — כולל כיוון",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"גלגלים,חלון הזזה"},
+  {ch:9,code:"9.11",title:"תיקון / החלפת נעילת חלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"נעילה,חלון"},
+  {ch:9,code:"9.12",title:"החלפת זכוכית לחלון — רגילה / מחוסמת / בטיחות",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
+  {ch:9,code:"9.13",title:"החלפת זכוכית ויטרינה — כולל הרכבה מחדש",unit:"מר",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
+  {ch:9,code:"9.14",title:"התקנת זכוכית מחוסמת / בטיחות",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"זכוכית מחוסמת"},
+  {ch:9,code:"9.15",title:"החלפת / תיקון תריס ונציאני / רולר פנימי",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"תריס ונציאני,רולר"},
+  {ch:9,code:"9.16",title:"תיקון / החלפת פרופיל אלומיניום פגום",unit:"מא",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"פרופיל אלומיניום"},
+  {ch:9,code:"9.17",title:"החלפת ויטרינה שלמה — אספקה + התקנה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת ויטרינה"},
+  {ch:9,code:"9.18",title:"החלפת חלון אלומיניום שלם — אספקה + התקנה",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
+  {ch:9,code:"9.19",title:"תיקון אטמי גומי ואטמי סיליקון לחלון",unit:"מא",dt:"rain_penetration|condensation|aluminum_damage",stage:"directRepair",kw:"אטמים,אלומיניום"},
+  {ch:9,code:"9.20",title:"תיקון / ייישור מסגרת כנף שנפגעה בפריצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת,כנף,פריצה"},
+  {ch:9,code:"9.21",title:"החלפת ידית / פרזול לחלון",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"restoration",kw:"ידית חלון"},
+  {ch:9,code:"9.22",title:"כיוון כנף חלון / דלת הזזה — ישור ומתיחה",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"כיוון כנף"},
+  {ch:9,code:"9.23",title:"איטום היקפי לחלון / ויטרינה — סיליקון מקצועי",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"directRepair",kw:"איטום היקפי"},
+  {ch:9,code:"9.24",title:"החלפת / תיקון סורג מתכת / אלומיניום",unit:"מר",dt:"burglary_theft_damage|combined_damage",stage:"restoration",kw:"סורג"},
+  {ch:9,code:"9.25",title:"התקנת רשת חרקים לחלון — פרופיל וקיבוע",unit:"יח'",dt:"aluminum_damage",stage:"restoration",kw:"רשת,חלון"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 10 — עבודות שיש, אבן וגרניט
+  // ═══════════════════════════════════════════════
+  {ch:10,code:"10.01",title:"פירוק משטח שיש / גרניט — כולל ניתוק חיבורים",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"access",kw:"פירוק שיש"},
+  {ch:10,code:"10.02",title:"אספקה והתקנת משטח שיש / גרניט חדש — כולל ניסוח",unit:"מא",dt:"water_leak|carpentry_damage|combined_damage",stage:"restoration",kw:"משטח שיש חדש"},
+  {ch:10,code:"10.03",title:"חיתוך והתאמת שיש לכיור / ברז",unit:"יח'",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"שיש,כיור,חיתוך"},
+  {ch:10,code:"10.04",title:"פירוק והחזרת שיש קיים — שמירה מלאה",unit:"מא",dt:"water_leak|carpentry_damage",stage:"restoration",kw:"החזרת שיש"},
+  {ch:10,code:"10.05",title:"תיקון סדקים בשיש — ממלא אפוקסי",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"סדקים,שיש"},
+  {ch:10,code:"10.06",title:"התקנת קנטים / גמרי שיש — ריסוף ועיגון",unit:"מא",dt:"combined_damage|water_leak",stage:"restoration",kw:"קנטים,שיש"},
+  {ch:10,code:"10.07",title:"החלפת אדן חלון מאבן / שיש — כולל איטום",unit:"מא",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"אדן חלון,שיש"},
+  {ch:10,code:"10.08",title:"החלפת סף שיש לדלת",unit:"יח'",dt:"combined_damage|burglary_theft_damage",stage:"restoration",kw:"סף שיש"},
+  {ch:10,code:"10.09",title:"ליטוש שיש מקומי — שחזור ברק",unit:"מא",dt:"combined_damage",stage:"restoration",kw:"ליטוש שיש"},
+  {ch:10,code:"10.10",title:"הדבקת / שיחזור חלק שיש שנשבר",unit:"יח'",dt:"combined_damage",stage:"restoration",kw:"הדבקת שיש"},
+  {ch:10,code:"10.11",title:"החלפת משטח שיש באמבטיה — כולל ניסוח",unit:"מא",dt:"water_leak|combined_damage",stage:"restoration",kw:"שיש אמבטיה"},
+  {ch:10,code:"10.12",title:"החלפת / הוספת חיפוי אבן — כולל רובה",unit:"מר",dt:"rain_penetration|combined_damage",stage:"restoration",kw:"חיפוי אבן"},
+  {ch:10,code:"10.13",title:"פירוק וסילוק אבן קופינג / אדן חוץ",unit:"מא",dt:"rain_penetration|waterproofing_failure",stage:"access",kw:"קופינג,אדן חוץ"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 11 — עבודות חשמל ותאורה משלימות
+  // ═══════════════════════════════════════════════
+  {ch:11,code:"11.01",title:"פירוק והרכבת גוף תאורה — כולל חיבורים",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"גוף תאורה,פירוק,הרכבה"},
+  {ch:11,code:"11.02",title:"החלפת גוף תאורה פגום — תואם",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"החלפת גוף תאורה"},
+  {ch:11,code:"11.03",title:"החלפת מפסק / מוצא חשמל",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"מפסק חשמל,שקע"},
+  {ch:11,code:"11.04",title:"החלפת שקע חשמל — כולל קופסה",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"שקע חשמל"},
+  {ch:11,code:"11.05",title:"תיקון חיווט מקומי — גלוי / קופסאות",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"directRepair",kw:"חיווט,תיקון"},
+  {ch:11,code:"11.06",title:"התקנת נקודת חשמל חדשה — כולל קופסה",unit:"נק'",dt:"combined_damage|electrical_water_damage",stage:"restoration",kw:"נקודת חשמל"},
+  {ch:11,code:"11.07",title:"בדיקת תקינות חשמל ובטיחות לאחר חשיפה לנזק",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת חשמל"},
+  {ch:11,code:"11.08",title:"בדיקת בידוד ומעגלים חשמליים",unit:"קומפ'",dt:"electrical_water_damage|fire_smoke_damage",stage:"inspection",kw:"בדיקת בידוד"},
+  {ch:11,code:"11.09",title:"החלפת קטע כבל שנפגע — כולל הגנה",unit:"מא",dt:"electrical_water_damage|fire_smoke_damage",stage:"restoration",kw:"כבל,החלפה"},
+  {ch:11,code:"11.10",title:"עבודות חשמל נלוות — תריס חשמלי / מפסק",unit:"יח'",dt:"aluminum_damage|burglary_theft_damage",stage:"ancillary",kw:"תריס חשמלי,חשמל"},
+  {ch:11,code:"11.11",title:"החלפת לוחון / לוח חשמל — חלקי",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"לוחון חשמל"},
+  {ch:11,code:"11.12",title:"החלפת מפסק פחת / RCD",unit:"יח'",dt:"fire_smoke_damage|electrical_water_damage",stage:"restoration",kw:"מפסק פחת"},
+  {ch:11,code:"11.13",title:"ייבוש ושיקום נקודת חשמל — כולל בדיקה",unit:"יח'",dt:"electrical_water_damage",stage:"restoration",kw:"ייבוש נקודת חשמל"},
+  {ch:11,code:"11.14",title:"פירוק והרכבת מאוורר / אוורור לצורך עבודות",unit:"יח'",dt:"electrical_water_damage|fire_smoke_damage",stage:"access",kw:"מאוורר תקרה"},
+  {ch:11,code:"11.15",title:"החלפת גלאי עשן / חום — תואם תקן",unit:"יח'",dt:"fire_smoke_damage|combined_damage",stage:"restoration",kw:"גלאי עשן"},
+  {ch:11,code:"11.16",title:"החלפת / תיקון פסי לד / תאורה נסתרת",unit:"מא",dt:"electrical_water_damage|combined_damage",stage:"restoration",kw:"פס לד"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 12 — עבודות פריצה, גניבה, דלתות כניסה ומיגון
+  // ═══════════════════════════════════════════════
+  {ch:12,code:"12.01",title:"אספקה והתקנת דלת כניסה — מחוסמת / ביטחון",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת כניסה"},
+  {ch:12,code:"12.02",title:"תיקון דלת כניסה שנפרצה — יישור, ריתוך, פרזול",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון דלת כניסה"},
+  {ch:12,code:"12.03",title:"אספקה והתקנת משקוף דלת כניסה חדש",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת משקוף"},
+  {ch:12,code:"12.04",title:"תיקון משקוף דלת כניסה שנפרץ",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תיקון משקוף"},
+  {ch:12,code:"12.05",title:"החלפת מנעול ביטחון — רב-נעל / בריח",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול,החלפה"},
+  {ch:12,code:"12.06",title:"החלפת צילינדר ביטחון — כולל מפתחות",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"צילינדר,החלפה"},
+  {ch:12,code:"12.07",title:"התקנת מנעול ביטחון נוסף / מוסיף",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מנעול חדש,מיגון"},
+  {ch:12,code:"12.08",title:"החלפת זכוכית לחלון שנפרץ — מחוסמת / ביטחות",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית חלון"},
+  {ch:12,code:"12.09",title:"תיקון חלון אלומיניום שנפרץ — יישור + פרזול",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"חלון אלומיניום,תיקון"},
+  {ch:12,code:"12.10",title:"תיקון / החלפת מסגרת חלון שנפרצה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת חלון"},
+  {ch:12,code:"12.11",title:"החלפת חלון שנפרץ — אספקה + התקנה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"החלפת חלון"},
+  {ch:12,code:"12.12",title:"תיקון / החלפת תריס גלילה שנפרץ",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"תריס גלילה"},
+  {ch:12,code:"12.13",title:"החלפת זכוכית ויטרינה שנפרצה",unit:"מר",dt:"burglary_theft_damage",stage:"restoration",kw:"זכוכית ויטרינה"},
+  {ch:12,code:"12.14",title:"תיקון / החלפת מסגרת ויטרינה",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"מסגרת ויטרינה"},
+  {ch:12,code:"12.15",title:"התקנת פרזול מיגון משלים — בריחים, שרשרת",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"פרזול,מיגון"},
+  {ch:12,code:"12.16",title:"תיקון דלת פנים שנפרצה — יישור, צירים, פרזול",unit:"יח'",dt:"burglary_theft_damage",stage:"restoration",kw:"דלת שנפרצה"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 13 — שיקום נזקי אש, עשן וחום
+  // ═══════════════════════════════════════════════
+  {ch:13,code:"13.01",title:"ניקוי פיח מקירות — כימי + מכאני",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,קירות"},
+  {ch:13,code:"13.02",title:"ניקוי פיח מתקרות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,תקרה"},
+  {ch:13,code:"13.03",title:"ניקוי פיח ממשטחים שונים — ריהוט / נגרות",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"פיח,משטחים"},
+  {ch:13,code:"13.04",title:"ניקוי ריח עשן מרווחים — חומרי ניטרול ייעודיים",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"ריח עשן,ניקוי"},
+  {ch:13,code:"13.05",title:"ניקוי ושיקום מערכות אוורור פגועות מעשן",unit:"קומפ'",dt:"fire_smoke_damage",stage:"cleaning",kw:"אוורור,פתחים"},
+  {ch:13,code:"13.06",title:"קילוף צבע פגום מחום / עשן — הכנה לציפוי מחדש",unit:"מר",dt:"fire_smoke_damage",stage:"access",kw:"קילוף צבע"},
+  {ch:13,code:"13.07",title:"תיקוני טיח לאחר חום / פיח — כולל שיוף",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"טיח,חום,פיח"},
+  {ch:13,code:"13.08",title:"פריימר חוסם פיח — כולל שכבת בידוד",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"פריימר,פיח"},
+  {ch:13,code:"13.09",title:"צביעה מלאה לאחר נזקי אש — שתי שכבות",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"צביעה,אש,עשן"},
+  {ch:13,code:"13.10",title:"צבע / ציפוי חוסם ריחות עשן",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"חוסם ריחות"},
+  {ch:13,code:"13.11",title:"פירוק נגרות שנפגעה מאש / עשן",unit:"יח'",dt:"fire_smoke_damage",stage:"access",kw:"נגרות,שריפה"},
+  {ch:13,code:"13.12",title:"החלפת דלתות / ארונות שנפגעו מאש",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"דלתות,ארונות"},
+  {ch:13,code:"13.13",title:"החלפת חיווט / אביזרי חשמל שנפגעו מאש",unit:"יח'",dt:"fire_smoke_damage",stage:"restoration",kw:"חיווט,אביזרי חשמל"},
+  {ch:13,code:"13.14",title:"פינוי פסולת שריפה לאתר מורשה",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"פסולת שריפה"},
+  {ch:13,code:"13.15",title:"פינוי תכולה פגומה מאש / עשן",unit:"קומפ'",dt:"fire_smoke_damage",stage:"ancillary",kw:"תכולה,פינוי"},
+  {ch:13,code:"13.16",title:"ניקוי תקרה אקוסטית מפיח",unit:"מר",dt:"fire_smoke_damage",stage:"cleaning",kw:"תקרה אקוסטית,פיח"},
+  {ch:13,code:"13.17",title:"החלפת לוחות תקרה אקוסטית שנפגעו מאש",unit:"מר",dt:"fire_smoke_damage",stage:"restoration",kw:"לוחות תקרה"},
+  {ch:13,code:"13.18",title:"ניקוי מסגרות אלומיניום מפיח ועשן",unit:"מא",dt:"fire_smoke_damage",stage:"cleaning",kw:"אלומיניום,פיח"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 14 — ניקיון, פינוי סופי ועבודות נלוות
+  // ═══════════════════════════════════════════════
+  {ch:14,code:"14.01",title:"פינוי פסולת בניין לאתר מורשה — כולל מיון",unit:"קומפ'",dt:"water_leak|flood|fire_smoke_damage|burglary_theft_damage",stage:"ancillary",kw:"פסולת,בניין"},
+  {ch:14,code:"14.02",title:"ניקיון סיום עבודות — כולל פינוי שאריות וחומרים",unit:"קומפ'",dt:"water_leak|flood|combined_damage",stage:"cleaning",kw:"ניקיון לאחר עבודות"},
+  {ch:14,code:"14.03",title:"ניקוי יסודי לאחר נזקי ביוב / שטפון",unit:"קומפ'",dt:"sewage_leak|fire_smoke_damage|flood",stage:"cleaning",kw:"ניקוי יסודי"},
+  {ch:14,code:"14.04",title:"חיטוי ואנטיספציס לאחר נזקי ביוב",unit:"קומפ'",dt:"sewage_leak",stage:"cleaning",kw:"חיטוי,ביוב"},
+  {ch:14,code:"14.05",title:"כיסוי והגנת ריהוט / נכס לפני ביצוע",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנת ריהוט,כיסוי"},
+  {ch:14,code:"14.06",title:"פינוי תכולה זמני לצורך שיקום",unit:"קומפ'",dt:"flood|fire_smoke_damage|combined_damage",stage:"ancillary",kw:"תכולה זמנית"},
+  {ch:14,code:"14.07",title:"שאיבת מים ראשונית — לאחר אירוע שטפון",unit:"קומפ'",dt:"flood|water_leak",stage:"ancillary",kw:"שאיבת מים"},
+  {ch:14,code:"14.08",title:"הובלות קטנות — ריהוט ותכולה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הובלות קטנות"},
+  {ch:14,code:"14.09",title:"ניקוי חלונות ומסגרות לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"חלונות,ניקיון"},
+  {ch:14,code:"14.10",title:"פוליש / הברקה לאחר עבודות",unit:"קומפ'",dt:"combined_damage",stage:"cleaning",kw:"פוליש"},
+  {ch:14,code:"14.11",title:"עבודות הגנה — ניילון, קרטון ושטיחי הגנה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"הגנה,כיסוי"},
+
+  // ═══════════════════════════════════════════════
+  // פרק 15 — סעיפים מותנים, מיוחדים וכלליים
+  // ═══════════════════════════════════════════════
+  {ch:15,code:"15.01",title:"סעיף מותנה בכפוף לחשיפה ממצאים נוספים",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"מותנה,חשיפה"},
+  {ch:15,code:"15.02",title:"סעיף מותנה — ככל שיתגלה נזק נוסף בביצוע",unit:"קומפ'",dt:"combined_damage",stage:"conditionalWork",kw:"נזק נוסף,מותנה"},
+  {ch:15,code:"15.03",title:"עבודה מיוחדת לפי תנאי אתר ייחודיים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"תנאי אתר,עבודה מיוחדת"},
+  {ch:15,code:"15.04",title:"עבודה בגישה מוגבלת / מרפסת גבוהה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"גישה מוגבלת"},
+  {ch:15,code:"15.05",title:"תוספת בגין פירוק והרכבה מורכבים",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"פירוק מורכב,הרכבה מורכבת"},
+  {ch:15,code:"15.06",title:"התאמות מיוחדות לעבודות משולבות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודות משולבות,התאמות"},
+  {ch:15,code:"15.07",title:"סעיף כללי — עבודה שאינה משויכת לפרק ספציפי",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"סעיף כללי"},
+  {ch:15,code:"15.08",title:"תוספת עבור עבודה דחופה / חירום",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"עבודה דחופה"},
+  {ch:15,code:"15.09",title:"תוספת עבור עבודה בשעות חריגות / לילה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"שעות חריגות"},
+  {ch:15,code:"15.10",title:"תוספת עבור נגישות מורכבת / קומה גבוהה",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"נגישות מורכבת"},
+  {ch:15,code:"15.11",title:"פיקוח וניהול עבודות שיקום — 5% מסך העבודות",unit:"קומפ'",dt:"combined_damage",stage:"ancillary",kw:"פיקוח,ניהול,5%"},
 ];
 
 const BOQ_CHAPTER_TITLES = {
-  '1':'עבודות פירוק, הריסה ופינוי',
-  '2':'עבודות אינסטלציה',
-  '3':'עבודות איתור וייבוש',
-  '4':'עבודות בנייה, תיקונים וסגירת פתחים',
-  '5':'עבודות ריצוף, חיפוי ופרקט',
-  '6':'עבודות טיח, שפכטל וצבע',
-  '7':'עבודות נגרות',
-  '8':'עבודות אלומיניום, זכוכית ותריסים',
-  '9':'עבודות שיש ואבן',
-  '10':'עבודות חשמל משלימות',
-  '11':'ניקיון, פינוי סופי ועבודות נלוות',
-  '12':'עבודות ניקוי ושיקום נזקי אש ועשן',
-  '13':'עבודות פריצה, גניבה, דלתות ומיגון',
-  '14':'סעיפים מיוחדים / מותנים / כלליים'
+  '1': 'עבודות פירוק, הריסה ופינוי',
+  '2': 'עבודות איתור, בדיקה וייבוש',
+  '3': 'עבודות אינסטלציה — תיקון מקור',
+  '4': 'עבודות אטימה, איטום וחדירות גשם',
+  '5': 'עבודות בנייה, גבס וסגירת פתחים',
+  '6': 'עבודות ריצוף, חיפוי ופרקט',
+  '7': 'עבודות טיח, שפכטל וצבע',
+  '8': 'עבודות נגרות — דלתות, משקופים וארונות מובנים',
+  '9': 'עבודות אלומיניום, זכוכית ותריסים',
+  '10': 'עבודות שיש, אבן וגרניט',
+  '11': 'עבודות חשמל ותאורה משלימות',
+  '12': 'עבודות פריצה, גניבה, דלתות כניסה ומיגון',
+  '13': 'שיקום נזקי אש, עשן וחום',
+  '14': 'ניקיון, פינוי סופי ועבודות נלוות',
+  '15': 'סעיפים מותנים, מיוחדים וכלליים',
 };
 const BOQ_CH_SECTION = {
   '1':'structItems','2':'structItems','3':'structItems',
   '4':'structItems','5':'structItems','6':'structItems',
-  '7':'contentsItems','8':'structItems','9':'structItems',
-  '10':'structItems','11':'serviceItems','12':'serviceItems',
-  '13':'structItems','14':'serviceItems'
+  '7':'structItems','8':'structItems','9':'structItems',
+  '10':'structItems','11':'structItems','12':'structItems',
+  '13':'serviceItems','14':'serviceItems','15':'serviceItems'
 };
 const BOQ_DT_MAP = {
   water:['water_leak','sewage_leak','flood','subfloor_moisture','rain_penetration',
@@ -2235,13 +2277,15 @@ function renderCard7(){
   const grand = structTotal + contTotal + servTotal;
   const vat = boq.vat ? grand*0.18 : 0;
   const totalWithVat = grand + vat;
-  const shiput = Math.round(grand * 0.67);
+  // Shiput base excludes supervision / moveContents / rental
+  const shiputBase = calcShiputBase(boq.structItems) + calcShiputBase(boq.contentsItems) + calcShiputBase(boq.serviceItems);
+  const shiput = Math.round(shiputBase * 0.67);
   const deduct = parseCurrency(STATE.insurance.deductStruct)||0;
   const recPayout = Math.max(0, shiput - deduct);
 
   let html = `<div class="flex flex-wrap gap12 mb16 items-center">
     <button class="btn btn-primary" onclick="runBOQEngine()">⚡ ייצר כתב כמויות אוטומטי</button>
-    <button class="btn btn-secondary" onclick="openBOQLibrary()" style="display:flex;align-items:center;gap:6px;">📚 ספרייה (297)</button>
+    <button class="btn btn-secondary" onclick="openBOQLibrary()" style="display:flex;align-items:center;gap:6px;">📚 ספרייה (277)</button>
     <button class="chip ${boq.vat?'checked':''}" onclick="STATE.boq.vat=!STATE.boq.vat;renderCard(7)">מע"מ 18%</button>`;
   if(mode==='insurance'){
     html += `<button class="chip ${boq.hasClaim?'checked':''}" onclick="STATE.boq.hasClaim=!STATE.boq.hasClaim;renderCard(7)">תביעת שמאי פרטי</button>`;
@@ -2387,7 +2431,7 @@ function renderBOQSection(key, title, color){
       displayId = String(noAreaCounter);
     }
     const kinun = item.isRental?(item.rentalAmount||0):(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
-    const shiput = Math.round(kinun*0.67);
+    const shiput_val = (item.isSupervision||item.isRental||item.noShiput) ? null : Math.round(kinun*0.67);
 
     if(isIns){
       html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
@@ -2397,7 +2441,7 @@ function renderBOQSection(key, title, color){
         <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
         <td><input class="boq-input num" type="number" value="${item.isSupervision?item.price:esc(item.price)}" ${item.zeroPrice||item.isRental?'disabled':''} ${item.isSupervision?'disabled title="מחושב אוטומטית 5%"':''} oninput="updateBOQItem('${key}','${item.id}','price',this.value)"></td>
         <td class="ta-l" style="background:rgba(59,130,246,.04);color:${kinun>0?'var(--blue)':'var(--subtle)'};font-weight:700;font-size:12px;" data-total="${key}_${item.id}">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
-        <td class="ta-l" style="background:rgba(16,185,129,.04);color:${shiput>0?'var(--green)':'var(--subtle)'};font-size:12px;" data-shiput="${key}_${item.id}">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>
+        <td class="ta-l" style="background:rgba(16,185,129,.04);color:${shiput_val>0?'var(--green)':'var(--subtle)'};font-size:12px;" data-shiput="${key}_${item.id}">${item.zeroPrice?'—':shiput_val!=null&&shiput_val>0?'₪'+fmtNum(shiput_val):'—'}</td>
         <td style="background:${STATE.boq.hasClaim?'rgba(252,211,77,.04)':'rgba(0,0,0,.2)'};"><input class="boq-input num" type="number" placeholder="₪" style="width:70px;color:#FCD34D;${STATE.boq.hasClaim?'':'opacity:.25;pointer-events:none;'}" value="${esc(item.claim||'')}" ${STATE.boq.hasClaim?'':'disabled'} oninput="updateBOQItem('${key}','${item.id}','claim',this.value)" title="תביעת השמאי הפרטי לסעיף זה"></td>
         <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
       </tr>`;
@@ -2415,7 +2459,7 @@ function renderBOQSection(key, title, color){
   });
 
   if(isIns && totalSec>0){
-    const totalShiput = Math.round(totalSec*0.67);
+    const totalShiput = Math.round(calcShiputBase(items.filter(i=>!i.isRental))*0.67);
     html += `<tr class="row-subtotal">
       <td colspan="5" class="ta-r">סה"כ פרק</td>
       <td class="ta-l" style="color:var(--blue);">₪${fmtNum(totalSec)}</td>
@@ -2448,7 +2492,7 @@ function renderCard8(){
   const grand = struct+cont+serv;
   const vat = boq.vat ? grand*0.18 : 0;
   const totalWithVat = grand+vat;
-  const shiput = Math.round(grand*0.67);
+  const shiput = Math.round((calcShiputBase(boq.structItems)+calcShiputBase(boq.contentsItems)+calcShiputBase(boq.serviceItems))*0.67);
   const deduct = (parseFloat(String(STATE.insurance.deductStruct).replace(/,/g,'')))||0;
   const recPayout = Math.max(0,shiput-deduct);
   const f = STATE.findings;
@@ -2790,7 +2834,7 @@ function runBOQEngine(){
       }
       if(hasElec) struct.push({id:sn++,desc:`בדיקת חשמל מוסמך + תיקון – ${area.label}`,unit:"קומפ'",qty:'1',price:'',zeroPrice:false,roomHeader:area.label});
       if(hasKit) struct.push({id:sn++,desc:`תיקון/החלפת ארון מטבח (מבנה) – ${area.label}`,unit:"מ\"א",qty:'',price:'',zeroPrice:false,roomHeader:area.label});
-      if(hasFrame) cont.push({id:'C'+cn++,desc:`החלפת משקופים פנימיים שניזוקו – ${area.label}`,unit:"יח'",qty:'',price:'',zeroPrice:false,roomHeader:area.label});
+      if(hasFrame) struct.push({id:sn++,desc:`אספקה והתקנת משקוף עץ תואם – ${area.label}`,unit:"יח'",qty:'',price:'',zeroPrice:false,roomHeader:area.label});
     }
 
     if(et==='fire'){
@@ -2867,7 +2911,7 @@ function runBOQEngine(){
   let sv = 1;
   const hasContentsInsured = parseFloat(STATE.insurance.contentsSum)>0;
   if(!hasContentsInsured && mode!=='tax'){
-    serv.push({id:'S'+sv++,desc:"שינוע תכולה בתוך המבנה והחזרתה לצורך ביצוע עבודות",unit:"קומפ'",qty:'1',price:'1500',zeroPrice:false});
+    serv.push({id:'S'+sv++,desc:"שינוע תכולה בתוך המבנה והחזרתה לצורך ביצוע עבודות",unit:"קומפ'",qty:'1',price:'1500',zeroPrice:false,noShiput:true});
   }
   if(et==='water'&&STATE.event.plumberType==='arrangement'){
     serv.push({id:'S'+sv++,desc:'תיקון מקור הנזק ע"י שרברב הסדר – ללא תמחור (בטיפול חברת הביטוח)',unit:"קומפ'",qty:'1',price:'0',zeroPrice:true});
@@ -2879,7 +2923,7 @@ function runBOQEngine(){
   if(struct.length+cont.length>=6){
     const repairTotalForSupervision = struct.reduce((s,i)=>s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0),0)+cont.reduce((s,i)=>s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0),0);
     const supervisionAmt = repairTotalForSupervision>0?Math.round(repairTotalForSupervision*0.05):0;
-    serv.push({id:'S'+sv++,desc:'פיקוח וניהול עבודות (5% מעלויות תיקון)',unit:"קומפ'",qty:'1',price:'__SUPERVISION__',zeroPrice:false,isSupervision:true});
+    serv.push({id:'S'+sv++,desc:'פיקוח וניהול עבודות (5% מעלויות תיקון)',unit:"קומפ'",qty:'1',price:'__SUPERVISION__',zeroPrice:false,isSupervision:true,noShiput:true});
   }
 
   STATE.boq.structItems = struct;
@@ -2933,7 +2977,7 @@ function _doGenerateReport(){
   const grand = struct+cont+serv;
   const vat = boq.vat ? grand*0.18 : 0;
   const totalWithVat = grand+vat;
-  const shiput = Math.round(grand*0.67);
+  const shiput = Math.round((calcShiputBase(boq.structItems)+calcShiputBase(boq.contentsItems)+calcShiputBase(boq.serviceItems))*0.67);
   const deduct = parseCurrency(ins.deductStruct)||0;
   const recPayout = Math.max(0,shiput-deduct);
 
@@ -2941,7 +2985,7 @@ function _doGenerateReport(){
   const mkBOQSection = (items, title) => {
     if(!items.length) return '';
     const sec = calcSectionTotal(items);
-    const secShiput = Math.round(sec*0.67);
+    const secShiput = Math.round(calcShiputBase(items)*0.67);
     const secClaim = items.reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
     const isInsRpt = (mode === 'insurance');
     let h = `<div style="margin-bottom:20px;"><h4 style="font-size:13px;font-weight:800;color:#1F2937;margin-bottom:8px;">${title}</h4>
@@ -3508,7 +3552,7 @@ function genExplanationsText(){
     const cont = calcSectionTotal(boq.contentsItems);
     const serv = calcSectionTotal(boq.serviceItems);
     const grandAll = struct+cont+serv;
-    const shiput = Math.round(grandAll*0.67);
+    const shiput = Math.round((calcShiputBase(boq.structItems)+calcShiputBase(boq.contentsItems)+calcShiputBase(boq.serviceItems))*0.67);
     if(grand>0) add(`הערכתנו נקבעה בערכי כינון בסכום ₪${fmtNum(Math.round(grandAll))} ובמקביל בערכי שיפוי (2/3 מהכינון) בסכום ₪${fmtNum(shiput)} בהתאם לתנאי הפוליסה.`);
 
     // תת-ביטוח
@@ -3743,6 +3787,13 @@ function fmtCurrency(v){const n=parseFloat(String(v).replace(/,/g,''))||0;return
 function parseCurrency(v){return parseFloat(String(v||'').replace(/,/g,'').replace(/[^\d.]/g,''))||0;}
 function formatPhone(v){const d=v.replace(/\D/g,'');if(d.length<=3)return d;return d.slice(0,3)+'-'+d.slice(3,10);}
 function calcSectionTotal(items){return(items||[]).reduce((s,i)=>s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0),0);}
+// Shiput base excludes: supervision, rental, moveContents — kinun only for those
+function calcShiputBase(items){
+  return(items||[]).reduce((s,i)=>{
+    if(i.isSupervision||i.isRental||i.noShiput) return s;
+    return s+(parseFloat(i.qty)||0)*(parseFloat(i.price)||0);
+  },0);
+}
 function makePills(opts, curVal, onClickExpr){
   return opts.map(o=>{
     const isActive = curVal===o.v;
@@ -3833,7 +3884,7 @@ function updateBOQSummary(){
   const contTotal   = calcSectionTotal(boq.contentsItems);
   const servTotal   = calcSectionTotal(boq.serviceItems);
   const grand = structTotal + contTotal + servTotal;
-  const shiput = Math.round(grand*0.67);
+  const shiput = Math.round((calcShiputBase(boq.structItems)+calcShiputBase(boq.contentsItems)+calcShiputBase(boq.serviceItems))*0.67);
   const deduct = parseCurrency(STATE.insurance.deductStruct)||0;
   const setEl = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
   setEl('sumStruct', structTotal>0?'₪'+fmtNum(structTotal):'—');
@@ -3864,13 +3915,17 @@ function updateBOQItem(section, id, field, val){
         t.textContent=tot>0?'₪'+fmtNum(tot):'';
         t.style.color=tot>0?'var(--blue)':'var(--subtle)';
       }
-      // Update inline shiput cell (×0.67)
+      // Update inline shiput cell (×0.67) — excluded for supervision/rental/noShiput
       const sh = document.querySelector(`[data-shiput="${section}_${id}"]`);
       if(sh){
         const tot=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
-        const shiputVal=Math.round(tot*0.67);
-        sh.textContent=shiputVal>0?'₪'+fmtNum(shiputVal):'';
-        sh.style.color=shiputVal>0?'var(--green)':'var(--subtle)';
+        if(item.isSupervision||item.isRental||item.noShiput){
+          sh.textContent='—'; sh.style.color='var(--subtle)';
+        } else {
+          const shiputVal=Math.round(tot*0.67);
+          sh.textContent=shiputVal>0?'₪'+fmtNum(shiputVal):'';
+          sh.style.color=shiputVal>0?'var(--green)':'var(--subtle)';
+        }
       }
       // Recalculate section subtotal row
       const boq = STATE.boq;
@@ -3880,7 +3935,8 @@ function updateBOQItem(section, id, field, val){
       const grand       = structTotal + contTotal + servTotal;
       const vat         = boq.vat ? grand*0.18 : 0;
       const totalWithVat= grand + vat;
-      const shiput      = Math.round(grand*0.67);
+      const shiputBase = calcShiputBase(boq.structItems) + calcShiputBase(boq.contentsItems) + calcShiputBase(boq.serviceItems);
+      const shiput      = Math.round(shiputBase*0.67);
       const deduct      = parseCurrency(STATE.insurance.deductStruct)||0;
       const recPayout   = Math.max(0, shiput - deduct);
       // Update summary elements if they exist on screen
