@@ -1844,7 +1844,7 @@ function renderCard1(){
     <div class="field span2"><label class="label">דואל</label><input type="email" value="${esc(b.email)}" oninput="STATE.base.email=this.value"></div>
     <div class="divider span2"></div>
     <div class="field"><label class="label">תאריך האירוע *</label><input type="date" value="${esc(b.eventDate)}" oninput="STATE.base.eventDate=this.value"></div>
-    <div class="field"><label class="label">תאריך ביקור *</label><input type="date" value="${esc(b.visitDate)}" oninput="STATE.base.visitDate=this.value"></div>
+    <div class="field"><label class="label">תאריך ביקור *</label><input type="date" value="${esc(b.visitDate)}" min="${STATE.base.eventDate||''}" oninput="STATE.base.visitDate=this.value"></div>
     <div class="divider span2"></div>
     <div class="field"><label class="label">עיר *</label><input type="text" value="${esc(b.city)}" oninput="STATE.base.city=this.value"></div>
     <div class="field"><label class="label">רחוב *</label><input type="text" value="${esc(b.street)}" oninput="STATE.base.street=this.value"></div>
@@ -1929,8 +1929,8 @@ function renderCard3(){
     </div>
     ${isIns?`<div class="field"><label class="label">מספר פוליסה *</label><input type="text" value="${esc(ins.policyNum)}" oninput="STATE.insurance.policyNum=this.value"></div>
     <div class="field"><label class="label">מספר תביעה *</label><input type="text" value="${esc(ins.claimNum)}" oninput="STATE.insurance.claimNum=this.value"></div>
-    <div class="field"><label class="label">📅 תאריך קבלת הודעת האירוע ע"י חברת הביטוח</label><input type="date" value="${esc(ins.eventReportDate||'')}" oninput="STATE.insurance.eventReportDate=this.value" title="מתי חברת הביטוח קיבלה הודעה מהמבוטח"></div>
-    <div class="field"><label class="label">📅 תאריך מינוי השמאי</label><input type="date" value="${esc(ins.appointmentDate||'')}" oninput="STATE.insurance.appointmentDate=this.value"></div>`:''}
+    <div class="field"><label class="label">📅 תאריך קבלת הודעת האירוע ע"י חברת הביטוח</label><input type="date" value="${esc(ins.eventReportDate||'')}" min="${STATE.base.eventDate||''}" oninput="STATE.insurance.eventReportDate=this.value" title="מתי חברת הביטוח קיבלה הודעה מהמבוטח"></div>
+    <div class="field"><label class="label">📅 תאריך מינוי השמאי</label><input type="date" value="${esc(ins.appointmentDate||'')}" min="${STATE.base.eventDate||''}" oninput="STATE.insurance.appointmentDate=this.value"></div>`:''}
     <div class="divider span2"></div>
     <div class="span2">
       <div class="label" style="color:var(--accent);font-size:12px;margin-bottom:8px;">📋 סוג כיסוי</div>
@@ -1963,7 +1963,7 @@ function renderCard3(){
     ${contSum>0&&contActual>0&&!contUnder?`<div class="span2"><span class="under-badge under-ok">✓ אין תת-ביטוח תכולה</span></div>`:''}
     <div class="field"><label class="label">השתתפות עצמית תכולה (₪)</label><input type="text" value="${fmtCurrency(ins.deductContents)}" oninput="STATE.insurance.deductContents=parseCurrency(this.value);this.value=fmtCurrency(this.value)" placeholder="0"></div>`:''}
     <div class="divider span2"></div>
-    <div class="field span2"><label class="label">📅 תאריך קבלת מסמך אחרון</label><input type="date" value="${esc(ins.lastDocDate)}" oninput="STATE.insurance.lastDocDate=this.value"></div>
+    <div class="field span2"><label class="label">📅 תאריך קבלת מסמך אחרון</label><input type="date" value="${esc(ins.lastDocDate)}" min="${STATE.base.eventDate||''}" oninput="STATE.insurance.lastDocDate=this.value"></div>
     <div class="span2 flex gap12 flex-wrap mt8">
       <button class="chip ${ins.vatBiz?'checked':''}" onclick="STATE.insurance.vatBiz=!STATE.insurance.vatBiz;this.classList.toggle('checked')">עסק מקזז מע"מ</button>
       ${isIns?`<button class="chip ${ins.arrangementPlumber?'checked':''}" onclick="STATE.insurance.arrangementPlumber=!STATE.insurance.arrangementPlumber;renderCard(3)">שרברב הסדר</button>`:''}
@@ -2087,7 +2087,7 @@ function renderCard5(){
       </select></div>
     <div class="field"><label class="label">שם מוסר המידע</label><input type="text" value="${esc(c.infoName)}" oninput="STATE.circ.infoName=this.value"></div>
     <div class="divider span2"></div>
-    <div class="field"><label class="label">תאריך גילוי הנזק</label><input type="date" value="${esc(c.discDate)}" oninput="STATE.circ.discDate=this.value"></div>
+    <div class="field"><label class="label">תאריך גילוי הנזק</label><input type="date" value="${esc(c.discDate)}" min="${STATE.base.eventDate||''}" oninput="STATE.circ.discDate=this.value"></div>
     <div class="field"><label class="label">שעת גילוי (אם ידוע)</label><input type="time" value="${esc(c.discTime)}" oninput="STATE.circ.discTime=this.value"></div>
     <div class="field"><label class="label">הנכס היה מאוכלס?</label><div class="pill-group" id="occPills">
       ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא'}], c.wasOccupied, "STATE.circ.wasOccupied=v;refreshPills('occPills',v)")}
@@ -3346,8 +3346,9 @@ function _doGenerateReport(){
       </div>
     </div>
     <h1 style="font-size:24px;font-weight:900;color:#111;margin-bottom:4px;">חוות דעת שמאית</h1>
-    <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:8px;">${modeLabels[mode]}</h2>
-    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}  </div>`;
+    <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:4px;">${modeLabels[mode]}</h2>
+    ${(STATE.event.visitPurpose||[]).length>0?`<div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:6px;">מטרת הביקור: ${STATE.event.visitPurpose.join(' · ')}</div>`:''}
+    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}</div>`;
 
   // ══ INSURANCE ONLY: structured data panel at top of report ══
   if(mode === 'insurance'){
