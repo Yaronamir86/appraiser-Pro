@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMDAN | מסלולים ומחירים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#030712;
+  --surface:#0d1117;
+  --card:#111827;
+  --border:rgba(255,255,255,.07);
+  --accent:#f59e0b;
+  --accent2:#fbbf24;
+  --green:#10b981;
+  --blue:#3b82f6;
+  --text:#f9fafb;
+  --muted:#9ca3af;
+  --subtle:#4b5563;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;inset-inline:0;z-index:100;padding:14px 6%;display:flex;align-items:center;justify-content:space-between;background:rgba(3,7,18,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:-.02em;}
+.nav-logo span{color:var(--accent);}
+.nav-links{display:flex;align-items:center;gap:24px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--text);}
+.btn-nav{background:var(--accent);color:#000;border:none;border-radius:10px;padding:8px 20px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .2s;}
+.btn-nav:hover{background:var(--accent2);}
+
+/* ── HERO ── */
+.hero{padding:120px 6% 60px;text-align:center;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--accent);font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:24px;letter-spacing:.05em;text-transform:uppercase;}
+.hero h1{font-size:clamp(28px,5vw,52px);font-weight:900;margin-bottom:14px;letter-spacing:-.03em;}
+.hero-sub{font-size:17px;color:var(--muted);max-width:500px;margin:0 auto 40px;}
+
+/* ── TOGGLE ── */
+.billing-toggle{display:inline-flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:6px;margin-bottom:56px;position:relative;}
+.toggle-btn{padding:8px 24px;border-radius:30px;border:none;background:transparent;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;position:relative;z-index:1;}
+.toggle-btn.active{background:var(--accent);color:#000;}
+.save-badge{background:rgba(16,185,129,.15);color:var(--green);font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;border:1px solid rgba(16,185,129,.3);}
+
+/* ── PRICING GRID ── */
+.pricing-section{padding:0 5% 80px;}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;margin:0 auto;}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;position:relative;transition:transform .2s,border-color .2s;}
+.plan-card:hover{transform:translateY(-3px);border-color:var(--subtle);}
+.plan-card.popular{border:2px solid var(--accent);background:linear-gradient(135deg,rgba(245,158,11,.04),var(--card));}
+.popular-badge{position:absolute;top:-14px;right:50%;transform:translateX(50%);background:var(--accent);color:#000;font-size:12px;font-weight:800;padding:4px 18px;border-radius:20px;white-space:nowrap;}
+.plan-icon{font-size:28px;margin-bottom:14px;}
+.plan-name{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.plan-name-he{font-size:18px;font-weight:900;color:var(--text);margin-bottom:20px;}
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:6px;}
+.price-num{font-size:42px;font-weight:900;color:var(--text);letter-spacing:-.03em;}
+.price-currency{font-size:18px;font-weight:700;color:var(--accent);}
+.price-period{font-size:13px;color:var(--muted);}
+.price-annual{font-size:13px;color:var(--green);margin-bottom:24px;height:20px;}
+.plan-divider{height:1px;background:var(--border);margin-bottom:22px;}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+.plan-features li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:800;font-size:13px;flex-shrink:0;}
+.plan-features li.highlight{color:var(--text);font-weight:700;}
+.btn-plan{width:100%;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .2s;}
+.btn-plan-primary{background:var(--accent);color:#000;}
+.btn-plan-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-plan-outline{background:transparent;color:var(--text);border:1px solid var(--border);}
+.btn-plan-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Trial card */
+.trial-card{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(16,185,129,.06));border:1px solid rgba(59,130,246,.2);border-radius:20px;padding:28px;max-width:1100px;margin:0 auto 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.trial-info{display:flex;align-items:center;gap:16px;}
+.trial-icon{font-size:36px;}
+.trial-title{font-size:18px;font-weight:800;}
+.trial-sub{font-size:14px;color:var(--muted);}
+.btn-trial{background:linear-gradient(135deg,var(--blue),#2563eb);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;white-space:nowrap;}
+.btn-trial:hover{opacity:.9;}
+
+/* FAQ */
+.faq-section{padding:60px 5% 80px;max-width:760px;margin:0 auto;}
+.faq-title{font-size:26px;font-weight:900;text-align:center;margin-bottom:32px;}
+.faq-item{border-bottom:1px solid var(--border);padding:18px 0;}
+.faq-q{font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.faq-q:hover{color:var(--accent);}
+.faq-icon{font-size:18px;transition:transform .2s;color:var(--muted);}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px;display:none;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:28px 6%;text-align:center;font-size:13px;color:var(--subtle);}
+footer a{color:var(--muted);text-decoration:none;}
+footer a:hover{color:var(--text);}
+
+@media(max-width:768px){
+  nav{padding:12px 4%;}
+  .hero{padding:90px 4% 40px;}
+  .pricing-section{padding:0 4% 60px;}
+  .trial-card{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="saas-landing.html"><span>OMDAN</span></a>
+  <div class="nav-links">
+    <a href="saas-landing.html#features">תכונות</a>
+    <a href="saas-landing.html#demo">דמו</a>
+    <a href="register.html" class="btn-nav">התחל ניסיון</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">💳 תמחור שקוף</div>
+  <h1>המסלול הנכון לך</h1>
+  <p class="hero-sub">14 ימי ניסיון חינם בכל מסלול. ביטול בכל עת.</p>
+
+  <div class="billing-toggle">
+    <button class="toggle-btn active" id="btnMonthly" onclick="setBilling('monthly')">חודשי</button>
+    <button class="toggle-btn" id="btnAnnual" onclick="setBilling('annual')">שנתי <span class="save-badge">חיסכון 30%+</span></button>
+  </div>
+</div>
+
+<div class="pricing-section">
+  <!-- Trial Banner -->
+  <div class="trial-card">
+    <div class="trial-info">
+      <div class="trial-icon">🎁</div>
+      <div>
+        <div class="trial-title">14 ימי ניסיון חינם — ללא כרטיס אשראי</div>
+        <div class="trial-sub">גישה מלאה לכל תכונות ה-Pro. מתחיל תוך שניות.</div>
+      </div>
+    </div>
+    <a href="register.html" class="btn-trial">התחל חינם ←</a>
+  </div>
+
+  <!-- Pricing Cards -->
+  <div class="pricing-grid">
+
+    <!-- Starter -->
+    <div class="plan-card">
+      <div class="plan-icon">🏠</div>
+      <div class="plan-name">Starter</div>
+      <div class="plan-name-he">שמאי עצמאי</div>
+      <div class="plan-price">
+        <span class="price-currency">₪</span>
+        <span class="price-num" id="price-starter">129</span>
+        <span class="price-period">/חודש</span>
+      </div>
+      <div class="price-annual" id="annual-starter"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">עד 20 דוחות בחודש</li>
+        <li>יצירת דוחות שמאות</li>
+        <li>העלאת תמונות</li>
+        <li>הפקת PDF</li>
+        <li>משתמש אחד</li>
+      </ul>
+      <button class="btn-plan btn-plan-outline" onclick="startCheckout('starter')">בחר Starter</button>
+    </div>
+
+    <!-- Pro -->
+    <div class="plan-card popular">
+      <div class="popular-badge">⭐ הכי פופולרי</div>
+      <div class="plan-icon">⚡</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-name-he">שמאי פעיל</div>
+      <div class="plan-price">
+        <span class="price-currency">₪</span>
+        <span class="price-num" id="price-pro">249</span>
+        <span class="price-period">/חודש</span>
+      </div>
+      <div class="price-annual" id="annual-pro"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">דוחות ללא הגבלה</li>
+        <li>BOQ ומחירונים</li>
+        <li>אחסון תמונות</li>
+        <li>חתימה דיגיטלית</li>
+        <li>ייצוא לאקסל</li>
+        <li>משתמש אחד</li>
+      </ul>
+      <button class="btn-plan btn-plan-primary" onclick="startCheckout('pro')">בחר Pro</button>
+    </div>
+
+    <!-- Office -->
+    <div class="plan-card">
+      <div class="plan-icon">🏢</div>
+      <div class="plan-name">Office</div>
+      <div class="plan-name-he">משרד שמאים</div>
+      <div class="plan-price">
+        <span class="price-currency">₪</span>
+        <span class="price-num" id="price-office">499</span>
+        <span class="price-period">/חודש</span>
+      </div>
+      <div class="price-annual" id="annual-office"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li class="highlight">5 משתמשים</li>
+        <li>ניהול תיקים</li>
+        <li>הרשאות עובדים</li>
+        <li>לוג פעילות</li>
+        <li>API חיבור למערכות</li>
+      </ul>
+      <button class="btn-plan btn-plan-outline" onclick="startCheckout('office')">בחר Office</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-title">שאלות נפוצות</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      <span>האם צריך כרטיס אשראי להתחלת הניסיון?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">לא. תקופת הניסיון ל-14 ימים לא דורשת כרטיס אשראי. תוסיף פרטי תשלום רק אם תחליט להמשיך.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      <span>האם ניתן לשנות מסלול?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">כן. אפשר לשדרג, לשנמך או לבטל בכל עת. שינוי מסלול נכנס לתוקף מחזור החיוב הבא.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      <span>מה קורה עם הנתונים שלי אם אני מבטל?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">הנתונים שלך נשמרים 30 ימים לאחר הביטול. תוכל לייצא את כל התיקים בכל עת לפני ביטול.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      <span>האם יש חוזה מחייב?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">לא. כל המסלולים הם חודש לחודש (או שנה לשנה אם בחרת שנתי). ביטול ללא קנסות.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      <span>מה הכוונה ב"מחירוני BOQ"?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a">ספריית 277 סעיפי שיקום בעברית, מאורגנת ב-15 פרקים לפי לוגיקת שמאות. כולל יצירת כתב כמויות אוטומטי מהממצאים.</div>
+  </div>
+
+</div>
+
+<footer>
+  OMDAN — מערכת שמאות מקצועית &nbsp;·&nbsp;
+  <a href="saas-landing.html">בית</a> &nbsp;·&nbsp;
+  <a href="#">תנאי שימוש</a> &nbsp;·&nbsp;
+  <a href="#">פרטיות</a>
+</footer>
+
+<script>
+let billingMode = 'monthly';
+const prices = {
+  starter: { monthly: 129, annual: 990 },
+  pro:     { monthly: 249, annual: 2190 },
+  office:  { monthly: 499, annual: 4500 },
+};
+
+function setBilling(mode) {
+  billingMode = mode;
+  document.getElementById('btnMonthly').classList.toggle('active', mode === 'monthly');
+  document.getElementById('btnAnnual').classList.toggle('active', mode === 'annual');
+
+  ['starter','pro','office'].forEach(plan => {
+    const p = prices[plan];
+    if (mode === 'annual') {
+      const monthly = Math.round(p.annual / 12);
+      document.getElementById('price-'+plan).textContent = monthly;
+      document.getElementById('annual-'+plan).textContent = `₪${p.annual.toLocaleString()} לשנה — חיסכון ₪${(p.monthly*12 - p.annual).toLocaleString()}`;
+    } else {
+      document.getElementById('price-'+plan).textContent = p.monthly;
+      document.getElementById('annual-'+plan).textContent = '';
+    }
+  });
+}
+
+function startCheckout(plan) {
+  // In production: Stripe Checkout redirect
+  // For now: redirect to register with plan param
+  window.location.href = `register.html?plan=${plan}&billing=${billingMode}`;
+}
+
+function toggleFaq(el) {
+  el.closest('.faq-item').classList.toggle('open');
+}
+
+// Check if user came from trial expiry
+const params = new URLSearchParams(window.location.search);
+if (params.get('reason') === 'trial_expired') {
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:14px 24px;text-align:center;font-size:14px;font-weight:600;';
+  banner.textContent = '⚠️ תקופת הניסיון שלך הסתיימה. בחר מסלול כדי להמשיך.';
+  document.querySelector('nav').after(banner);
+}
+</script>
+</body>
+</html>

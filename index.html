@@ -1049,20 +1049,7 @@ window.doForgotPassword = async () => {
         </div>
       </div>
 
-      <!-- Recent -->
-      <div class="widget" style="padding:0;">
-        <div style="padding:20px 20px 12px;">
-          <div class="widget-title">🕐 פעילות אחרונה</div>
-        </div>
-        <div class="activity-list" id="activityList" style="border:none;border-radius:0 0 var(--r) var(--r);">
-          <div class="activity-item">
-            <span class="activity-dot" style="background:var(--subtle)"></span>
-            <div class="activity-info">
-              <div class="activity-name" style="color:var(--subtle)">אין פעילות עדיין</div>
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </main>
@@ -1334,7 +1321,6 @@ async function renderCases() {
 async function render() {
   await renderCases();
   renderStats();
-  renderActivity();
 }
 
 // ══════════════════════════════════════════════════

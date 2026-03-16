@@ -3609,10 +3609,13 @@ function shareReport(){
 <div id="boqLibModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">
   <div style="background:#111827;border:1px solid #374151;border-radius:18px;width:100%;max-width:688px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
     <\!-- Header \-\->
-    <div style="padding:18px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div>
-        <div style="font-size:17px;font-weight:900;color:#F9FAFB;">📚 ספריית כתב כמויות</div>
-        <div style="font-size:12px;color:#9CA3AF;margin-top:2px;">297 סעיפים מקצועיים — בחר ולחץ "הוסף"</div>
+    <div style="padding:14px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="font-size:16px;font-weight:900;color:#F9FAFB;">כתב כמויות</div>
+        <div style="display:flex;gap:4px;background:#0F172A;border-radius:10px;padding:3px;">
+          <button id="boqTabLib" onclick="switchBOQTab('lib')" style="padding:5px 14px;border-radius:7px;border:none;background:#374151;color:#F9FAFB;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">📚 ספרייה</button>
+          <button id="boqTabBenarit" onclick="switchBOQTab('benarit')" style="padding:5px 14px;border-radius:7px;border:none;background:transparent;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">🔍 בנארית</button>
+        </div>
       </div>
       <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
@@ -3649,13 +3652,17 @@ function shareReport(){
     <\!-- Items list \-\->
     <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
     <\!-- Footer \-\->
-    <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+    <div id="boqFooterLib" style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
       <div style="display:flex;gap:8px;">
         <button onclick="boqLibSelectAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">בחר הכל</button>
         <button onclick="boqLibClearAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">נקה הכל</button>
         <button onclick="addLibraryItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
       </div>
+    </div>
+    <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;display:none;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+      <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
+      <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
     </div>
   </div>
 </div>
@@ -4356,6 +4363,148 @@ function closeBOQLibrary(){
   document.getElementById('boqLibModal').style.display = 'none';
 }
 
+// ── Tab switcher ──
+let _boqActiveTab = 'lib';
+function switchBOQTab(tab){
+  _boqActiveTab = tab;
+  const isLib = tab === 'lib';
+  // Tabs
+  document.getElementById('boqTabLib').style.background    = isLib ? '#374151' : 'transparent';
+  document.getElementById('boqTabLib').style.color         = isLib ? '#F9FAFB' : '#9CA3AF';
+  document.getElementById('boqTabBenarit').style.background = !isLib ? '#374151' : 'transparent';
+  document.getElementById('boqTabBenarit').style.color      = !isLib ? '#F9FAFB' : '#9CA3AF';
+  // Panels
+  document.getElementById('boqPanelLib').style.display     = isLib ? 'flex' : 'none';
+  document.getElementById('boqPanelBenarit').style.display  = isLib ? 'none' : 'flex';
+  // Footers
+  document.getElementById('boqFooterLib').style.display    = isLib ? 'flex' : 'none';
+  document.getElementById('boqFooterBenarit').style.display = isLib ? 'none' : 'flex';
+}
+
+// ── Benarit search ──
+let _benaritSelected = new Set();
+let _benaritItems = [];
+
+async function benaritLoadSubs(){
+  const ch = document.getElementById('benaritChapter').value;
+  const subSel = document.getElementById('benaritSub');
+  subSel.innerHTML = '<option value="">— בחר תת-פרק —</option>';
+  subSel.disabled = true;
+  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">טוען...</div>';
+  if(!ch) return;
+  try {
+    const res = await fetch(`https://mme.benarit.com/api/sub-chapter?chapterNum=${ch}&tatPerekMin=0`);
+    const subs = await res.json();
+    subs.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.TatPerekID;
+      opt.textContent = s.TatPerekName;
+      subSel.appendChild(opt);
+    });
+    subSel.disabled = false;
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר תת-פרק לצפייה בסעיפים</div>';
+  } catch(e) {
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;font-size:13px;">שגיאה בטעינה — בדוק חיבור לאינטרנט</div>';
+  }
+}
+
+async function benaritSearch(){
+  const ch = document.getElementById('benaritChapter').value;
+  const sub = document.getElementById('benaritSub').value;
+  if(!ch || !sub) return;
+  _benaritSelected.clear();
+  _benaritItems = [];
+  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען סעיפים...</div>';
+  document.getElementById('benaritStats').textContent = '';
+
+  try {
+    // Fetch up to 3 pages (150 items max)
+    const pages = [0,1,2];
+    const results = await Promise.all(
+      pages.map(p => fetch(`https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=${p}`).then(r=>r.json()))
+    );
+    results.forEach(r => { if(r.seifs?.length) _benaritItems.push(...r.seifs); });
+
+    // Deduplicate by TeurSeif
+    const seen = new Set();
+    _benaritItems = _benaritItems.filter(item => {
+      const key = item.TeurSeif?.trim();
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    document.getElementById('benaritStats').textContent = `${_benaritItems.length} סעיפים ייחודיים`;
+    renderBenaritList();
+  } catch(e) {
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;">שגיאת רשת — נסה שוב</div>';
+  }
+}
+
+function renderBenaritList(){
+  if(!_benaritItems.length){
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">לא נמצאו סעיפים</div>';
+    return;
+  }
+  let html = '';
+  _benaritItems.forEach((item, idx) => {
+    const desc = item.TeurSeif?.trim() || '';
+    const unit = item.UnitName?.trim() || '';
+    const id = 'bn_' + idx;
+    const checked = _benaritSelected.has(id);
+    html += `<label style="display:flex;align-items:flex-start;gap:10px;padding:8px 24px;cursor:pointer;border-radius:0;transition:background .12s;"
+      onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+      <input type="checkbox" data-bnid="${id}" data-desc="${desc.replace(/"/g,'&quot;')}" data-unit="${unit}"
+        ${checked?'checked':''}
+        onchange="benaritToggle('${id}',this.checked)"
+        style="width:15px;height:15px;flex-shrink:0;margin-top:2px;accent-color:#F59E0B;cursor:pointer;">
+      <span style="flex:1;font-size:12px;color:#E5E7EB;line-height:1.5;">${desc}</span>
+      <span style="font-size:11px;color:#9CA3AF;min-width:36px;text-align:center;margin-top:2px;">${unit}</span>
+    </label>`;
+  });
+  document.getElementById('benaritList').innerHTML = html;
+  updateBenaritCount();
+}
+
+function benaritToggle(id, checked){
+  if(checked) _benaritSelected.add(id);
+  else _benaritSelected.delete(id);
+  updateBenaritCount();
+}
+
+function updateBenaritCount(){
+  const n = _benaritSelected.size;
+  const el = document.getElementById('benaritCount');
+  if(el) el.textContent = n===0 ? 'לא נבחרו סעיפים' : `נבחרו ${n} סעיפים`;
+}
+
+function addBenaritItemsToBOQ(){
+  if(!_benaritSelected.size){ alert('לא נבחרו סעיפים'); return; }
+  let added = 0;
+  _benaritSelected.forEach(id => {
+    const cb = document.querySelector(`input[data-bnid="${id}"]`);
+    if(!cb) return;
+    const desc = cb.dataset.desc;
+    const unit = cb.dataset.unit || "קומפ'";
+    const newId = 'BN' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,5);
+    STATE.boq.structItems.push({
+      id: newId, desc, unit, qty:'1', price:'', zeroPrice:false, roomHeader:''
+    });
+    added++;
+  });
+  _benaritSelected.clear();
+  updateBenaritCount();
+  closeBOQLibrary();
+  renderCard(7);
+  setTimeout(()=>{
+    const toast = document.createElement('div');
+    toast.textContent = `✅ ${added} סעיפים מבנארית נוספו לכתב הכמויות`;
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#059669;color:#fff;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 3000);
+  }, 100);
+}
+
 function renderBOQLibList(){
   const search   = (document.getElementById('boqLibSearch')?.value||'').trim().toLowerCase();
   const chapter  = document.getElementById('boqLibChapter')?.value||'';
@@ -4557,37 +4706,71 @@ function showTrialBanner(daysLeft){
       <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <!-- Filters -->
-    <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <input id="boqLibSearch" type="text" placeholder="🔍 חפש סעיף..." oninput="renderBOQLibList()" 
-          style="flex:1;min-width:180px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;outline:none;">
-        <select id="boqLibChapter" onchange="renderBOQLibList()"
-          style="padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
-          <option value="">כל הפרקים</option>
-          <option value="1">פרק 1 – פירוק והריסה</option>
-          <option value="2">פרק 2 – אינסטלציה</option>
-          <option value="3">פרק 3 – איתור וייבוש</option>
-          <option value="4">פרק 4 – בנייה ותיקונים</option>
-          <option value="5">פרק 5 – ריצוף, חיפוי ופרקט</option>
-          <option value="6">פרק 6 – טיח, שפכטל וצבע</option>
-          <option value="7">פרק 7 – נגרות</option>
-          <option value="8">פרק 8 – אלומיניום, זכוכית ותריסים</option>
-          <option value="9">פרק 9 – שיש ואבן</option>
-          <option value="10">פרק 10 – חשמל משלים</option>
-          <option value="11">פרק 11 – ניקיון ופינוי</option>
-          <option value="12">פרק 12 – ניקוי נזקי אש</option>
-          <option value="13">פרק 13 – פריצה ומיגון</option>
-          <option value="14">פרק 14 – סעיפים כלליים</option>
-        </select>
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9CA3AF;cursor:pointer;white-space:nowrap;">
-          <input type="checkbox" id="boqLibFilter" onchange="renderBOQLibList()" style="accent-color:#F59E0B;width:14px;height:14px;">
-          סנן לפי סוג נזק
-        </label>
+    <!-- TAB: Library -->
+    <div id="boqPanelLib" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input id="boqLibSearch" type="text" placeholder="🔍 חפש סעיף..." oninput="renderBOQLibList()"
+            style="flex:1;min-width:180px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;outline:none;">
+          <select id="boqLibChapter" onchange="renderBOQLibList()"
+            style="padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
+            <option value="">כל הפרקים</option>
+            <option value="1">פרק 1 – פירוק והריסה</option>
+            <option value="2">פרק 2 – אינסטלציה</option>
+            <option value="3">פרק 3 – איתור וייבוש</option>
+            <option value="4">פרק 4 – אטימה ואיטום</option>
+            <option value="5">פרק 5 – בנייה וגבס</option>
+            <option value="6">פרק 6 – ריצוף וחיפוי</option>
+            <option value="7">פרק 7 – טיח וצבע</option>
+            <option value="8">פרק 8 – נגרות ודלתות</option>
+            <option value="9">פרק 9 – אלומיניום ותריסים</option>
+            <option value="10">פרק 10 – שיש ואבן</option>
+            <option value="11">פרק 11 – חשמל</option>
+            <option value="12">פרק 12 – פריצה ומיגון</option>
+            <option value="13">פרק 13 – אש ועשן</option>
+            <option value="14">פרק 14 – ניקיון</option>
+            <option value="15">פרק 15 – מותנים</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9CA3AF;cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="boqLibFilter" onchange="renderBOQLibList()" style="accent-color:#F59E0B;width:14px;height:14px;">
+            סנן לפי נזק
+          </label>
+        </div>
+        <div id="boqLibStats" style="font-size:11px;color:#6B7280;"></div>
       </div>
-      <div id="boqLibStats" style="font-size:11px;color:#6B7280;"></div>
+      <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
     </div>
-    <!-- Items list -->
-    <div id="boqLibList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
+
+    <!-- TAB: Benarit -->
+    <div id="boqPanelBenarit" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:12px;color:#9CA3AF;margin-bottom:2px;">חיפוש לפי קטגוריה מתוך מאגר מחירי האמת של בנארית — מלל בלבד, ללא מחירים</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <select id="benaritChapter" onchange="benaritLoadSubs()"
+            style="flex:1;min-width:160px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
+            <option value="">— בחר פרק —</option>
+            <option value="24">24 – הריסה ופירוק</option>
+            <option value="5">5 – איטום</option>
+            <option value="4">4 – עבודות בניה</option>
+            <option value="9">9 – טיח</option>
+            <option value="10">10 – ריצוף וחיפוי</option>
+            <option value="11">11 – צביעה</option>
+            <option value="12">12 – אלומיניום וזכוכית</option>
+            <option value="6">6 – נגרות אומן</option>
+            <option value="14">14 – עבודות אבן</option>
+            <option value="20">20 – נגרות חרש</option>
+          </select>
+          <select id="benaritSub" onchange="benaritSearch()"
+            style="flex:1;min-width:160px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;" disabled>
+            <option value="">— בחר תת-פרק —</option>
+          </select>
+        </div>
+        <div id="benaritStats" style="font-size:11px;color:#6B7280;"></div>
+      </div>
+      <div id="benaritList" style="overflow-y:auto;flex:1;padding:8px 0;">
+        <div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר פרק ותת-פרק כדי לראות סעיפים</div>
+      </div>
+    </div>
     <!-- Footer -->
     <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
