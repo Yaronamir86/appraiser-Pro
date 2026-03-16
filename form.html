@@ -4381,31 +4381,77 @@ function switchBOQTab(tab){
   document.getElementById('boqFooterBenarit').style.display = isLib ? 'none' : 'flex';
 }
 
-// ── Benarit search ──
+// ── Benarit static data (pre-fetched, no CORS needed) ──
+const BENARIT_CHAPTERS = {
+  24:{name:'הריסה ופירוק',subs:[
+    {id:'2403',name:'עבודות הריסה'},{id:'2404',name:'עבודות פירוק שונות'},
+    {id:'2405',name:'הריסות ופרוק רכיבים מבטון'},{id:'2406',name:'קידוחים'},
+    {id:'2407',name:'פירוק ריצוף, דלתות, סיתות טיח'},{id:'2408',name:'הריסה ופרוק בנייה'},
+    {id:'2409',name:'פריצת פתחים'},{id:'2410',name:'ניסורים'}]},
+  5:{name:'איטום',subs:[
+    {id:'0502',name:'איטום ובידוד גגות / תקרות'},{id:'0503',name:'איטום תפרי התפשטות'},
+    {id:'0505',name:'עבודות איטום'},{id:'0506',name:'איטום חדר רטוב'},
+    {id:'0507',name:'תיקוני איטום'},{id:'0508',name:'איטום רצפה / מדרגות'},
+    {id:'0509',name:'איטום מטבח'},{id:'0510',name:'איטום חצרות ומרפסות'},
+    {id:'0511',name:'איטום קירות וקורות'},{id:'0514',name:'בידוד קירות וקורות'},
+    {id:'0516',name:'בידוד רצפות חדרים רטובים'},{id:'0519',name:'בדיקות איטום'}]},
+  4:{name:'עבודות בנייה',subs:[
+    {id:'0402',name:'עבודות בניה - כללי'},{id:'0404',name:'בניה בבלוקים'},
+    {id:'0406',name:'בלוקי בטון'},{id:'0407',name:'בלוקי פומיס'},
+    {id:'0408',name:'בלוקי איטונג'},{id:'0409',name:'בלוקי גבס'},
+    {id:'0410',name:'פירוק והריסת קירות'}]},
+  9:{name:'טיח',subs:[
+    {id:'0902',name:'טיח גבס'},{id:'0903',name:'טיח חוץ'},
+    {id:'0904',name:'טיח פנים'},{id:'0905',name:'טיח צמנט'},
+    {id:'0906',name:'טיח תרמי'},{id:'0907',name:'עבודות טיח'},
+    {id:'0908',name:'עבודות תשתית'},{id:'0909',name:'תיקונים'}]},
+  10:{name:'ריצוף וחיפוי',subs:[
+    {id:'1001',name:'עבודות ריצוף'},{id:'1002',name:'עבודות חיפוי'},
+    {id:'1004',name:'עבודות ריצוף וחיפוי'},{id:'1005',name:'אביזרים'},
+    {id:'1008',name:'חיפוי קירות בחומרים שונים'},{id:'1009',name:'מדרגות ואדני חלונות'},
+    {id:'1010',name:'שטיחים, PVC ופרקט'},{id:'1011',name:'משטחי שיש'},
+    {id:'1012',name:'טרצו יצוק באתר'}]},
+  11:{name:'צביעה',subs:[
+    {id:'1101',name:'צבע פנים וחוץ'},{id:'1104',name:'בטון טיח וגבס'},
+    {id:'1105',name:'צביעת מוצרי נגרות אומן'},{id:'1106',name:'צביעת מוצרי מסגרות'},
+    {id:'1107',name:'עבודות שליכט'},{id:'1109',name:'עבודות צבע לשימור מבנים'}]},
+  12:{name:'אלומיניום וזכוכית',subs:[
+    {id:'1203',name:'חלונות ודלתות'},{id:'1204',name:'קירות מסך מאלומניום'},
+    {id:'1205',name:'חיפוי אלומיניום'},{id:'1206',name:'ויטרינות'},
+    {id:'1207',name:'רפפות תריסים ומעקות'},{id:'1208',name:'עבודות זכוכית'}]},
+  6:{name:'נגרות אומן',subs:[
+    {id:'0603',name:'עבודות נגרות'},{id:'0606',name:'דלתות'},
+    {id:'0607',name:'ארונות'},{id:'0608',name:'תריסים'},
+    {id:'0609',name:'מעקות וסורגים'},{id:'0610',name:'חלונות'}]},
+  14:{name:'עבודות אבן',subs:[
+    {id:'1401',name:'עבודות אבן - כללי'},{id:'1402',name:'נדבכי ראש (קופינג)'},
+    {id:'1404',name:'חיפוי קירות בלוחות אבן'},{id:'1405',name:'ריצוף משטחים באבן'},
+    {id:'1408',name:'ריצוף ומדרגות'},{id:'1409',name:'אדנים, חשפים, משקופים וספים'}]},
+  20:{name:'נגרות חרש',subs:[
+    {id:'2003',name:'כיסוי גגות'},{id:'2004',name:'קונסטרוקציות עץ'}]},
+};
+
+// ── Benarit search using proxy with fallback ──
 let _benaritSelected = new Set();
 let _benaritItems = [];
+const BENARIT_PROXY = 'https://api.allorigins.win/raw?url=';
 
 async function benaritLoadSubs(){
-  const ch = document.getElementById('benaritChapter').value;
+  const ch = parseInt(document.getElementById('benaritChapter').value);
   const subSel = document.getElementById('benaritSub');
   subSel.innerHTML = '<option value="">— בחר תת-פרק —</option>';
   subSel.disabled = true;
-  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">טוען...</div>';
+  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר תת-פרק לצפייה בסעיפים</div>';
   if(!ch) return;
-  try {
-    const res = await fetch(`https://mme.benarit.com/api/sub-chapter?chapterNum=${ch}&tatPerekMin=0`);
-    const subs = await res.json();
-    subs.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s.TatPerekID;
-      opt.textContent = s.TatPerekName;
-      subSel.appendChild(opt);
-    });
-    subSel.disabled = false;
-    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר תת-פרק לצפייה בסעיפים</div>';
-  } catch(e) {
-    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;font-size:13px;">שגיאה בטעינה — בדוק חיבור לאינטרנט</div>';
-  }
+  const data = BENARIT_CHAPTERS[ch];
+  if(!data) return;
+  data.subs.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    subSel.appendChild(opt);
+  });
+  subSel.disabled = false;
 }
 
 async function benaritSearch(){
@@ -4414,30 +4460,27 @@ async function benaritSearch(){
   if(!ch || !sub) return;
   _benaritSelected.clear();
   _benaritItems = [];
-  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען סעיפים...</div>';
+  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען סעיפים מבנארית...</div>';
   document.getElementById('benaritStats').textContent = '';
+  updateBenaritCount();
+
+  const baseUrl = `https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=`;
+  const proxyUrl = p => BENARIT_PROXY + encodeURIComponent(baseUrl + p);
 
   try {
-    // Fetch up to 3 pages (150 items max)
-    const pages = [0,1,2];
-    const results = await Promise.all(
-      pages.map(p => fetch(`https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=${p}`).then(r=>r.json()))
-    );
+    const results = await Promise.all([0,1,2].map(p => fetch(proxyUrl(p)).then(r=>r.json())));
     results.forEach(r => { if(r.seifs?.length) _benaritItems.push(...r.seifs); });
-
-    // Deduplicate by TeurSeif
+    // Deduplicate
     const seen = new Set();
     _benaritItems = _benaritItems.filter(item => {
       const key = item.TeurSeif?.trim();
       if(seen.has(key)) return false;
-      seen.add(key);
-      return true;
+      seen.add(key); return true;
     });
-
     document.getElementById('benaritStats').textContent = `${_benaritItems.length} סעיפים ייחודיים`;
     renderBenaritList();
   } catch(e) {
-    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;">שגיאת רשת — נסה שוב</div>';
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;font-size:13px;">⚠️ שגיאה בטעינה — בדוק חיבור לאינטרנט</div>';
   }
 }
 
@@ -4697,11 +4740,14 @@ function showTrialBanner(daysLeft){
 <!-- ══════════════════ BOQ LIBRARY MODAL ══════════════════ -->
 <div id="boqLibModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">
   <div style="background:#111827;border:1px solid #374151;border-radius:18px;width:100%;max-width:688px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
-    <!-- Header -->
-    <div style="padding:18px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div>
-        <div style="font-size:17px;font-weight:900;color:#F9FAFB;">📚 ספריית כתב כמויות</div>
-        <div style="font-size:12px;color:#9CA3AF;margin-top:2px;">297 סעיפים מקצועיים — בחר ולחץ "הוסף"</div>
+    <!-- Header with tabs -->
+    <div style="padding:14px 24px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="font-size:16px;font-weight:900;color:#F9FAFB;">כתב כמויות</div>
+        <div style="display:flex;gap:4px;background:#0F172A;border-radius:10px;padding:3px;">
+          <button id="boqTabLib" onclick="switchBOQTab('lib')" style="padding:5px 14px;border-radius:7px;border:none;background:#374151;color:#F9FAFB;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">📚 ספרייה</button>
+          <button id="boqTabBenarit" onclick="switchBOQTab('benarit')" style="padding:5px 14px;border-radius:7px;border:none;background:transparent;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">🔍 בנארית</button>
+        </div>
       </div>
       <button onclick="closeBOQLibrary()" style="background:rgba(255,255,255,.08);border:none;color:#9CA3AF;font-size:18px;cursor:pointer;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
@@ -4772,13 +4818,17 @@ function showTrialBanner(daysLeft){
       </div>
     </div>
     <!-- Footer -->
-    <div style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+    <div id="boqFooterLib" style="padding:14px 24px;border-top:1px solid #374151;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="boqLibCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו פריטים</span>
       <div style="display:flex;gap:8px;">
         <button onclick="boqLibSelectAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">בחר הכל</button>
         <button onclick="boqLibClearAll()" style="padding:8px 14px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">נקה הכל</button>
         <button onclick="addLibraryItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
       </div>
+    </div>
+    <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+      <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
+      <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
     </div>
   </div>
 </div>
