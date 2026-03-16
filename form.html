@@ -3680,7 +3680,7 @@ function shareReport(){
     <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
       <div style="display:flex;gap:8px;">
-        <button onclick="saveBenaritToCustomLibrary()" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;" title="שמור לספרייה האישית לשימוש עתידי">💾 שמור לספרייה שלי</button>
+        <button onclick="saveBenaritToCustomLibrary(this)" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;" title="שמור לספרייה האישית לשימוש עתידי">💾 שמור לספרייה שלי</button>
         <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
       </div>
     </div>
@@ -4572,11 +4572,10 @@ async function loadCustomLibrary() {
   } catch(e) { _customLibrary = []; }
 }
 
-async function saveBenaritToCustomLibrary(){
+async function saveBenaritToCustomLibrary(btn){
   if(!_benaritSelected.size){ alert('לא נבחרו סעיפים'); return; }
   if(!window._currentUser){ alert('יש להתחבר כדי לשמור לספרייה'); return; }
 
-  const btn = event.target;
   btn.textContent = '⏳ שומר...';
   btn.disabled = true;
 
@@ -4587,13 +4586,8 @@ async function saveBenaritToCustomLibrary(){
     if(!cb) return;
     const desc = cb.dataset.desc;
     const unit = cb.dataset.unit || "קומפ'";
-    // Skip duplicates
     if(_customLibrary.some(i => i.desc === desc)) return;
-    const item = {
-      desc, unit,
-      source: 'benarit',
-      ch: 16, // Custom Library chapter
-    };
+    const item = { desc, unit, source: 'benarit', ch: 16 };
     promises.push(window._FB.saveCustomLibItem(item).then(newId => {
       _customLibrary.push({...item, id: newId});
       saved++;
@@ -4603,8 +4597,9 @@ async function saveBenaritToCustomLibrary(){
   await Promise.all(promises);
   btn.textContent = '💾 שמור לספרייה שלי';
   btn.disabled = false;
+  _benaritSelected.clear();
+  updateBenaritCount();
 
-  // Show feedback
   const toast = document.createElement('div');
   toast.textContent = saved > 0
     ? `✅ ${saved} סעיפים נשמרו לספרייה האישית`
@@ -4971,7 +4966,7 @@ function showTrialBanner(daysLeft){
     <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
       <div style="display:flex;gap:8px;">
-        <button onclick="saveBenaritToCustomLibrary()" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">💾 שמור לספרייה שלי</button>
+        <button onclick="saveBenaritToCustomLibrary(this)" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">💾 שמור לספרייה שלי</button>
         <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
       </div>
     </div>
