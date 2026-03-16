@@ -4476,26 +4476,31 @@ async function benaritSearch(){
   if(!ch || !sub) return;
   _benaritSelected.clear();
   _benaritItems = [];
-  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען סעיפים מבנארית...</div>';
-  document.getElementById('benaritStats').textContent = '';
   updateBenaritCount();
+  document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען...</div>';
+  document.getElementById('benaritStats').textContent = '';
 
   try {
-    const results = await Promise.all(
-      [0,1,2].map(p => fetchWithProxy(`https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=${p}`))
-    );
-    results.forEach(r => { if(r.seifs?.length) _benaritItems.push(...r.seifs); });
-    // Deduplicate
-    const seen = new Set();
-    _benaritItems = _benaritItems.filter(item => {
-      const key = item.TeurSeif?.trim();
-      if(seen.has(key)) return false;
-      seen.add(key); return true;
-    });
-    document.getElementById('benaritStats').textContent = `${_benaritItems.length} סעיפים ייחודיים`;
+    if(!window._benaritCache) {
+      const r = await fetch('./benarit-data.json');
+      if(!r.ok) throw new Error('not found');
+      window._benaritCache = await r.json();
+    }
+    const items = window._benaritCache?.[ch]?.[sub] || [];
+    _benaritItems = items.map(s => ({TeurSeif: s.t, UnitName: s.u}));
+    document.getElementById('benaritStats').textContent = `${_benaritItems.length} סעיפים`;
     renderBenaritList();
   } catch(e) {
-    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#ef4444;font-size:13px;">⚠️ שגיאה בטעינה — בדוק חיבור לאינטרנט</div>';
+    document.getElementById('benaritList').innerHTML = `
+      <div style="padding:28px 24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:10px;">⚙️</div>
+        <div style="font-size:14px;color:#F9FAFB;font-weight:700;margin-bottom:8px;">נדרשת הכנה חד-פעמית</div>
+        <div style="font-size:12px;color:#9CA3AF;line-height:1.8;">
+          ממחשבך עם אינטרנט:<br>
+          <code style="background:#1F2937;padding:5px 12px;border-radius:8px;font-size:12px;display:inline-block;margin:6px 0;">node fetch-benarit.js</code><br>
+          ואז העלה את <strong style="color:#F59E0B;">benarit-data.json</strong> ל-GitHub
+        </div>
+      </div>`;
   }
 }
 
