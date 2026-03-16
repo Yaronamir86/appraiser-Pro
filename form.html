@@ -4434,7 +4434,23 @@ const BENARIT_CHAPTERS = {
 // ── Benarit search using proxy with fallback ──
 let _benaritSelected = new Set();
 let _benaritItems = [];
-const BENARIT_PROXY = 'https://api.allorigins.win/raw?url=';
+const BENARIT_PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+
+async function fetchWithProxy(url) {
+  for(const proxy of BENARIT_PROXIES) {
+    try {
+      const r = await fetch(proxy(url), {signal: AbortSignal.timeout(8000)});
+      if(!r.ok) continue;
+      const data = await r.json();
+      if(data && !data.error) return data;
+    } catch(e) { continue; }
+  }
+  throw new Error('כל ה-proxy נכשלו');
+}
 
 async function benaritLoadSubs(){
   const ch = parseInt(document.getElementById('benaritChapter').value);
@@ -4464,11 +4480,10 @@ async function benaritSearch(){
   document.getElementById('benaritStats').textContent = '';
   updateBenaritCount();
 
-  const baseUrl = `https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=`;
-  const proxyUrl = p => BENARIT_PROXY + encodeURIComponent(baseUrl + p);
-
   try {
-    const results = await Promise.all([0,1,2].map(p => fetch(proxyUrl(p)).then(r=>r.json())));
+    const results = await Promise.all(
+      [0,1,2].map(p => fetchWithProxy(`https://mme.benarit.com/api/seif?typeIds=2&chapterNum=${ch}&subChapterNum=${sub}&page=${p}`))
+    );
     results.forEach(r => { if(r.seifs?.length) _benaritItems.push(...r.seifs); });
     // Deduplicate
     const seen = new Set();
