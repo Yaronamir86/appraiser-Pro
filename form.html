@@ -4473,8 +4473,67 @@ async function fetchWithProxy(url) {
   throw new Error('כל ה-proxy נכשלו');
 }
 
-async function benaritLoadSubs(){
-  const ch = parseInt(document.getElementById('benaritChapter').value);
+async function benaritTextSearch(){
+  const query = (document.getElementById('benaritSearchText')?.value||'').trim();
+  const chFilter = document.getElementById('benaritChapter')?.value||'';
+
+  if(query.length < 2){
+    // Not enough chars — clear if no chapter selected
+    if(!chFilter){
+      _benaritItems = [];
+      document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">חפש לפי מלל או בחר פרק</div>';
+      document.getElementById('benaritStats').textContent = '';
+    }
+    return;
+  }
+
+  // Load cache if needed
+  if(!window._benaritCache){
+    document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#9CA3AF;font-size:13px;">⏳ טוען...</div>';
+    try {
+      const r = await fetch('./benarit-data.json');
+      if(!r.ok) throw new Error('not found');
+      window._benaritCache = await r.json();
+    } catch(e) {
+      document.getElementById('benaritList').innerHTML = '<div style="padding:28px 24px;text-align:center;"><div style="font-size:28px;margin-bottom:10px;">⚙️</div><div style="font-size:13px;color:#F9FAFB;font-weight:700;">נדרשת הכנה חד-פעמית</div><div style="font-size:12px;color:#9CA3AF;margin-top:8px;">הרץ: <code style="background:#1F2937;padding:3px 8px;border-radius:6px;">node fetch-benarit.js</code></div></div>';
+      return;
+    }
+  }
+
+  const lq = query.toLowerCase();
+  const results = [];
+
+  // Search across chapters (filtered if chapter selected)
+  Object.entries(window._benaritCache).forEach(([ch, subs]) => {
+    if(chFilter && ch !== chFilter) return;
+    Object.entries(subs).forEach(([subId, items]) => {
+      items.forEach(item => {
+        if(item.t?.toLowerCase().includes(lq)){
+          results.push({
+            TeurSeif: item.t,
+            UnitName: item.u,
+            _ch: ch, _sub: subId
+          });
+        }
+      });
+    });
+  });
+
+  _benaritItems = results;
+  _benaritSelected.clear();
+  updateBenaritCount();
+  document.getElementById('benaritStats').textContent =
+    results.length > 0 ? `${results.length} תוצאות עבור "${query}"` : `לא נמצאו תוצאות`;
+  renderBenaritList();
+}
+
+function benaritLoadSubs(){
+  // Clear text search when picking chapter
+  const searchEl = document.getElementById('benaritSearchText');
+  if(searchEl) searchEl.value = '';
+  _benaritItems = [];
+  _benaritSelected.clear();
+  updateBenaritCount();
   const subSel = document.getElementById('benaritSub');
   subSel.innerHTML = '<option value="">— בחר תת-פרק —</option>';
   subSel.disabled = true;
@@ -4936,11 +4995,15 @@ function showTrialBanner(daysLeft){
     <!-- TAB: Benarit -->
     <div id="boqPanelBenarit" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
       <div style="padding:14px 24px;border-bottom:1px solid #1F2937;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;color:#9CA3AF;margin-bottom:2px;">חיפוש לפי קטגוריה מתוך מאגר מחירי האמת של בנארית — מלל בלבד, ללא מחירים</div>
+        <div style="font-size:12px;color:#9CA3AF;margin-bottom:2px;">חיפוש מתוך מאגר מחירי האמת של בנארית — מלל בלבד, ללא מחירים</div>
+        <!-- Search bar -->
+        <input id="benaritSearchText" type="text" placeholder="🔍 חפש סעיף בכל הפרקים..." oninput="benaritTextSearch()"
+          style="width:100%;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;outline:none;">
+        <!-- Chapter + sub filters -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <select id="benaritChapter" onchange="benaritLoadSubs()"
             style="flex:1;min-width:160px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;">
-            <option value="">— בחר פרק —</option>
+            <option value="">— כל הפרקים —</option>
             <option value="24">24 – הריסה ופירוק</option>
             <option value="5">5 – איטום</option>
             <option value="4">4 – עבודות בניה</option>
@@ -4954,13 +5017,13 @@ function showTrialBanner(daysLeft){
           </select>
           <select id="benaritSub" onchange="benaritSearch()"
             style="flex:1;min-width:160px;padding:8px 14px;border-radius:10px;background:#1F2937;border:1px solid #374151;color:#F9FAFB;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;" disabled>
-            <option value="">— בחר תת-פרק —</option>
+            <option value="">— כל תתי-הפרקים —</option>
           </select>
         </div>
         <div id="benaritStats" style="font-size:11px;color:#6B7280;"></div>
       </div>
       <div id="benaritList" style="overflow-y:auto;flex:1;padding:8px 0;">
-        <div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר פרק ותת-פרק כדי לראות סעיפים</div>
+        <div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">חפש לפי מלל או בחר פרק</div>
       </div>
     </div>
     <!-- Footer -->
