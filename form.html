@@ -572,11 +572,12 @@ onAuthStateChanged(_auth, async user => {
       if(prof){
         window._profile = prof;
         // Populate APPRAISER object for report header
-        APPRAISER.nameHe    = prof.fullName  || '';
+        APPRAISER.nameHe    = prof.nameHe   || prof.fullName  || '';
         APPRAISER.title     = prof.title     || 'שמאי רכוש';
         APPRAISER.phone     = prof.phone     || '';
         APPRAISER.email     = prof.profEmail || prof.email || '';
         APPRAISER.city      = prof.city      || '';
+        APPRAISER.address   = prof.address   || '';
         APPRAISER.license   = prof.license   || '';
         APPRAISER.website   = prof.website   || '';
         APPRAISER.logoInitials  = prof.logoLetters || 'YA';
@@ -3344,28 +3345,72 @@ function _doGenerateReport(){
     logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="44" height="44"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="33" font-family="'Helvetica Neue',Arial,sans-serif" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" letter-spacing="-1">${letters}</text></svg>`;
   }
   let rpt = `<div class="rpt-header">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:20px;border-bottom:2px solid #E5E7EB;">
-      <div style="text-align:right;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-          ${logoSvg}
-          <div>
-            <div style="font-size:20px;font-weight:900;color:#111;">${APPRAISER.nameHe}</div>
-            <div style="font-size:12px;color:#6B7280;font-weight:600;">${APPRAISER.title}</div>
-          </div>
+
+    <!-- שורת פרטי שמאי — לוגו + כל הפרטים -->
+    <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:18px;margin-bottom:18px;border-bottom:2px solid #E5E7EB;">
+      ${logoSvg}
+      <div style="flex:1;">
+        <div style="font-size:18px;font-weight:900;color:#111;margin-bottom:2px;">${APPRAISER.nameHe}</div>
+        <div style="font-size:12px;color:#6B7280;font-weight:600;margin-bottom:6px;">${APPRAISER.title}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 20px;font-size:11px;color:#6B7280;line-height:1.8;">
+          ${APPRAISER.license?`<span>רישיון מס' <strong style="color:#374151;">${APPRAISER.license}</strong></span>`:''}
+          ${APPRAISER.phone?`<span>📞 ${APPRAISER.phone}</span>`:''}
+          ${APPRAISER.email?`<span>✉️ ${APPRAISER.email}</span>`:''}
+          ${APPRAISER.address?`<span>📍 ${APPRAISER.address}</span>`:APPRAISER.city?`<span>📍 ${APPRAISER.city}</span>`:''}
+          ${APPRAISER.website?`<span>🌐 ${APPRAISER.website}</span>`:''}
         </div>
-        ${APPRAISER.license?`<div style="font-size:11px;color:#9CA3AF;">רישיון מס' ${APPRAISER.license}</div>`:''}
-      </div>
-      <div style="text-align:left;font-size:12px;color:#6B7280;line-height:1.9;">
-        <div>📞 ${APPRAISER.phone}</div>
-        <div>✉️ ${APPRAISER.email}</div>
-        <div>📍 ${APPRAISER.city}</div>
-        ${APPRAISER.website?`<div>🌐 ${APPRAISER.website}</div>`:''}
       </div>
     </div>
-    <h1 style="font-size:24px;font-weight:900;color:#111;margin-bottom:4px;">חוות דעת שמאית</h1>
-    <h2 style="font-size:15px;font-weight:600;color:#6B7280;margin-bottom:4px;">${modeLabels[mode]}</h2>
-    ${(STATE.event.visitPurpose||[]).length>0?`<div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:6px;">מטרת הביקור: ${STATE.event.visitPurpose.join(' · ')}</div>`:''}
-    ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}</div>`;
+
+    <!-- כותרת ראשית -->
+    <div style="text-align:center;margin-bottom:18px;padding-bottom:18px;border-bottom:2px solid #E5E7EB;">
+      <h1 style="font-size:26px;font-weight:900;color:#111;margin-bottom:6px;letter-spacing:-.02em;">חוות דעת שמאית</h1>
+      <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:4px;">${modeLabels[mode]}</div>
+      ${(STATE.event.visitPurpose||[]).length>0?`<div style="font-size:13px;color:#6B7280;margin-bottom:4px;">מטרת הביקור: ${STATE.event.visitPurpose.join(' · ')}</div>`:''}
+      ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}
+    </div>
+
+    <!-- טבלת נתונים ראשית -->
+    <style>
+      .rpt-data-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0;}
+      .rpt-data-panel{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;}
+      .rpt-data-panel-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#374151;padding:9px 13px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;}
+      .rpt-data-panel table{width:100%;border-collapse:collapse;font-size:12px;}
+      .rpt-data-panel td{padding:6px 12px;border-bottom:1px solid #F3F4F6;line-height:1.5;}
+      .rpt-data-panel td:first-child{color:#6B7280;font-weight:600;width:45%;}
+      .rpt-data-panel td:last-child{font-weight:700;color:#111;}
+    </style>
+    <div class="rpt-data-grid">
+      <!-- פרטי המזמין — כותרת לפי מסלול -->
+      <div class="rpt-data-panel">
+        <div class="rpt-data-panel-title">
+          ${mode==='tax' ? '🏛️ פרטי המזמין — מס רכוש' : mode==='insurance' ? '👤 פרטי המבוטח / המזמין' : '👤 פרטי המזמין'}
+        </div>
+        <table><tbody>
+          ${b.fullName?`<tr><td>שם מלא</td><td>${b.fullName}</td></tr>`:''}
+          ${b.idNum?`<tr><td>ת.ז / ח.פ</td><td>${b.idNum}</td></tr>`:''}
+          ${b.phone?`<tr><td>טלפון</td><td>${b.phone}</td></tr>`:''}
+          ${b.email?`<tr><td>דוא"ל</td><td>${b.email}</td></tr>`:''}
+          ${[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).length?`<tr><td>כתובת הנכס</td><td>${[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' ')}</td></tr>`:''}
+          ${mode==='insurance' && ins.company?`<tr><td>חברת ביטוח</td><td>${ins.company}</td></tr>`:''}
+          ${mode==='insurance' && ins.policyNum?`<tr><td>מספר פוליסה</td><td>${ins.policyNum}</td></tr>`:''}
+          ${mode==='insurance' && ins.claimNum?`<tr><td>מספר תביעה</td><td>${ins.claimNum}</td></tr>`:''}
+        </tbody></table>
+      </div>
+      <!-- פרטי האירוע -->
+      <div class="rpt-data-panel">
+        <div class="rpt-data-panel-title">📅 פרטי האירוע</div>
+        <table><tbody>
+          ${b.eventDate?`<tr><td>תאריך האירוע</td><td>${fmtDate(b.eventDate)}</td></tr>`:''}
+          ${b.visitDate?`<tr><td>תאריך ביקור</td><td>${fmtDate(b.visitDate)}</td></tr>`:''}
+          ${STATE.event.eventType?`<tr><td>סוג האירוע</td><td>${STATE.event.eventSubType||STATE.event.eventType}</td></tr>`:''}
+          ${APPRAISER.nameHe?`<tr><td>שמאי</td><td>${APPRAISER.nameHe}${APPRAISER.license?' | רישיון '+APPRAISER.license:''}</td></tr>`:''}
+          <tr><td>תאריך הפקה</td><td>${new Date().toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'})}</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+  </div>`;
 
   // ══ INSURANCE ONLY: structured data panel at top of report ══
   if(mode === 'insurance'){
@@ -3379,13 +3424,13 @@ function _doGenerateReport(){
 
     const appraiserCompany = (window._profile||{}).company || APPRAISER.company || '';
 
-    rpt = `
+    rpt += `
     <style>
       .data-panel{background:#fff;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:0;}
       .data-panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#374151;padding:10px 14px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;}
       .data-panel table{width:100%;border-collapse:collapse;font-size:13px;}
     </style>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;direction:rtl;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;direction:rtl;margin-top:16px;">
 
       <!-- פרטי המבוטח -->
       <div class="data-panel">
@@ -3436,23 +3481,14 @@ function _doGenerateReport(){
       </div>
 
     </div>
-    ` + rpt;
+    `;
   }
 
   // ── Photos moved to end of report ──
 
-  // ── For private/tax: standard info sections ──
-  // ── For insurance: skip (already in the data panel above) ──
+  // ── For private/tax: client details already in header ──
   if(mode !== 'insurance'){
-    rpt += `<div class="rpt-section"><h3>פרטי המזמין</h3>
-      <table class="rpt-table"><tbody>
-        ${mkInfoRow('שם',b.fullName)}
-        ${mkInfoRow('ת.ז/ח.פ',b.idNum)}
-        ${mkInfoRow('טלפון',b.phone)}
-        ${mkInfoRow('כתובת',[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' '))}
-        ${mkInfoRow('תאריך אירוע',fmtDate(b.eventDate))}
-        ${mkInfoRow('תאריך ביקור',fmtDate(b.visitDate))}
-      </tbody></table></div>`;
+    // Skip duplicate client table — already shown in header
   }
 
   if(opening) rpt += `<div class="rpt-section"><h3>מהות הבקשה ומטרת הביקור</h3><p class="rpt-p">${esc(opening).replace(/\n/g,'<br>')}</p></div>`;
