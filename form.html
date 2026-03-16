@@ -668,7 +668,23 @@ window._FB = {
   },
   saveProfile: async (uid, data) => {
     await setDoc(doc(_db,'users',uid), data, {merge:true});
-  }
+  },
+  // ── Custom Library ──
+  getCustomLibrary: async () => {
+    if(!window._currentUser) return [];
+    const snap = await getDocs(collection(_db,'users',window._currentUser.uid,'customLibrary'));
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  },
+  saveCustomLibItem: async (item) => {
+    if(!window._currentUser) throw new Error('לא מחובר');
+    const id = item.id || 'cl_'+Date.now().toString(36);
+    await setDoc(doc(_db,'users',window._currentUser.uid,'customLibrary',id), {...item, id, createdAt:serverTimestamp()}, {merge:true});
+    return id;
+  },
+  deleteCustomLibItem: async (id) => {
+    if(!window._currentUser) return;
+    await deleteDoc(doc(_db,'users',window._currentUser.uid,'customLibrary',id));
+  },
 };
 
 // ── Login / logout (called from HTML) ──
@@ -1259,13 +1275,14 @@ const BOQ_CHAPTER_TITLES = {
   '13': 'שיקום נזקי אש, עשן וחום',
   '14': 'ניקיון, פינוי סופי ועבודות נלוות',
   '15': 'סעיפים מותנים, מיוחדים וכלליים',
+  '16': 'ספרייה אישית',
 };
 const BOQ_CH_SECTION = {
   '1':'structItems','2':'structItems','3':'structItems',
   '4':'structItems','5':'structItems','6':'structItems',
   '7':'structItems','8':'structItems','9':'structItems',
   '10':'structItems','11':'structItems','12':'structItems',
-  '13':'serviceItems','14':'serviceItems','15':'serviceItems'
+  '13':'serviceItems','14':'serviceItems','15':'serviceItems','16':'structItems'
 };
 const BOQ_DT_MAP = {
   water:['water_leak','sewage_leak','flood','subfloor_moisture','rain_penetration',
@@ -3660,9 +3677,12 @@ function shareReport(){
         <button onclick="addLibraryItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
       </div>
     </div>
-    <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;display:none;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
+    <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
-      <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="saveBenaritToCustomLibrary()" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;" title="שמור לספרייה האישית לשימוש עתידי">💾 שמור לספרייה שלי</button>
+        <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      </div>
     </div>
   </div>
 </div>
@@ -4347,6 +4367,7 @@ let _boqLibSelected = new Set(); // stores item codes
 
 function openBOQLibrary(){
   _boqLibSelected.clear();
+  loadCustomLibrary(); // async load from Firestore
   // Auto-check damage filter if eventType set
   const hasEvent = ['water','fire','burglary'].includes(STATE.event.eventType);
   const cb = document.getElementById('boqLibFilter');
@@ -4541,8 +4562,66 @@ function updateBenaritCount(){
   if(el) el.textContent = n===0 ? 'לא נבחרו סעיפים' : `נבחרו ${n} סעיפים`;
 }
 
-function addBenaritItemsToBOQ(){
+// ── Custom Library ──
+let _customLibrary = []; // loaded from Firestore
+
+async function loadCustomLibrary() {
+  if(!window._FB || !window._currentUser) return;
+  try {
+    _customLibrary = await window._FB.getCustomLibrary();
+  } catch(e) { _customLibrary = []; }
+}
+
+async function saveBenaritToCustomLibrary(){
   if(!_benaritSelected.size){ alert('לא נבחרו סעיפים'); return; }
+  if(!window._currentUser){ alert('יש להתחבר כדי לשמור לספרייה'); return; }
+
+  const btn = event.target;
+  btn.textContent = '⏳ שומר...';
+  btn.disabled = true;
+
+  let saved = 0;
+  const promises = [];
+  _benaritSelected.forEach(id => {
+    const cb = document.querySelector(`input[data-bnid="${id}"]`);
+    if(!cb) return;
+    const desc = cb.dataset.desc;
+    const unit = cb.dataset.unit || "קומפ'";
+    // Skip duplicates
+    if(_customLibrary.some(i => i.desc === desc)) return;
+    const item = {
+      desc, unit,
+      source: 'benarit',
+      ch: 16, // Custom Library chapter
+    };
+    promises.push(window._FB.saveCustomLibItem(item).then(newId => {
+      _customLibrary.push({...item, id: newId});
+      saved++;
+    }));
+  });
+
+  await Promise.all(promises);
+  btn.textContent = '💾 שמור לספרייה שלי';
+  btn.disabled = false;
+
+  // Show feedback
+  const toast = document.createElement('div');
+  toast.textContent = saved > 0
+    ? `✅ ${saved} סעיפים נשמרו לספרייה האישית`
+    : '⚠️ כל הסעיפים כבר קיימים בספרייה';
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e3a5f;color:#93c5fd;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;border:1px solid #3b82f6;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 3000);
+}
+
+async function deleteCustomLibItem(id){
+  if(!confirm('למחוק סעיף זה מהספרייה האישית?')) return;
+  await window._FB.deleteCustomLibItem(id).catch(()=>{});
+  _customLibrary = _customLibrary.filter(i => i.id !== id);
+  renderBOQLibList();
+}
+
+function addBenaritItemsToBOQ(){
   let added = 0;
   _benaritSelected.forEach(id => {
     const cb = document.querySelector(`input[data-bnid="${id}"]`);
@@ -4576,7 +4655,7 @@ function renderBOQLibList(){
   const allowedDT = filtered && BOQ_DT_MAP[evtType] ? BOQ_DT_MAP[evtType] : null;
 
   let items = BOQ_LIBRARY.filter(item=>{
-    if(chapter && item.ch !== chapter) return false;
+    if(chapter && item.ch != chapter) return false;
     if(allowedDT && !allowedDT.some(dt => item.dt.includes(dt))) return false;
     if(search){
       const hay = (item.title + ' ' + item.kw + ' ' + item.code).toLowerCase();
@@ -4627,6 +4706,36 @@ function renderBOQLibList(){
 
   if(!html) html = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:14px;">לא נמצאו פריטים לחיפוש זה</div>';
 
+  // Append custom library (ch16) — always shown unless filtered
+  const showCustom = !chapter || chapter === '16';
+  if(showCustom && _customLibrary.length > 0) {
+    const filteredCustom = _customLibrary.filter(item => {
+      if(search) return item.desc?.toLowerCase().includes(search);
+      return true;
+    });
+    if(filteredCustom.length > 0) {
+      html += `<div style="padding:6px 24px 2px;">
+        <div style="font-size:10px;font-weight:800;color:#3b82f6;text-transform:uppercase;letter-spacing:.08em;padding:8px 0 4px;border-bottom:1px solid #1F2937;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+          <span>⭐ ספרייה אישית <span style="font-weight:600;color:#4B5563;">(${filteredCustom.length} סעיפים)</span></span>
+        </div>`;
+      filteredCustom.forEach(item => {
+        const code = 'CL_' + item.id;
+        const checked = _boqLibSelected.has(code);
+        html += `<label style="display:flex;align-items:center;gap:10px;padding:7px 4px;cursor:pointer;border-radius:8px;transition:background .12s;"
+          onmouseover="this.style.background='rgba(59,130,246,.06)'" onmouseout="this.style.background='transparent'">
+          <input type="checkbox" data-code="${code}" ${checked?'checked':''}
+            onchange="boqLibToggle('${code}',this.checked)"
+            style="width:15px;height:15px;flex-shrink:0;accent-color:#3B82F6;cursor:pointer;">
+          <span style="flex:1;font-size:13px;color:#E5E7EB;font-weight:600;">${item.desc}</span>
+          <span style="font-size:11px;color:#9CA3AF;min-width:36px;text-align:center;">${item.unit||''}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(59,130,246,.15);color:#93c5fd;min-width:42px;text-align:center;">אישי</span>
+          <button onclick="event.stopPropagation();deleteCustomLibItem('${item.id}')" style="background:transparent;border:none;color:#4B5563;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px;" title="מחק מהספרייה">✕</button>
+        </label>`;
+      });
+      html += '</div>';
+    }
+  }
+
   document.getElementById('boqLibList').innerHTML = html;
   const statsEl = document.getElementById('boqLibStats');
   if(statsEl) statsEl.textContent = `מציג ${items.length} סעיפים מתוך 297`;
@@ -4663,6 +4772,18 @@ function addLibraryItemsToBOQ(){
   if(_boqLibSelected.size===0){ alert('לא נבחרו פריטים'); return; }
   let added = 0;
   _boqLibSelected.forEach(code=>{
+    // Custom library item
+    if(code.startsWith('CL_')){
+      const clId = code.slice(3);
+      const clItem = _customLibrary.find(i=>i.id===clId);
+      if(!clItem) return;
+      if(STATE.boq.structItems.some(i=>i.libCode===code)) return;
+      const newId = 'CL_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,5);
+      STATE.boq.structItems.push({id:newId,libCode:code,desc:clItem.desc,unit:clItem.unit||"קומפ'",qty:'1',price:'',zeroPrice:false,roomHeader:''});
+      added++;
+      return;
+    }
+    // Standard library item
     const libItem = BOQ_LIBRARY.find(i=>i.code===code);
     if(!libItem) return;
     const section = BOQ_CH_SECTION[libItem.ch]||'structItems';
@@ -4796,6 +4917,7 @@ function showTrialBanner(daysLeft){
             <option value="13">פרק 13 – אש ועשן</option>
             <option value="14">פרק 14 – ניקיון</option>
             <option value="15">פרק 15 – מותנים</option>
+          <option value="16">⭐ ספרייה אישית</option>
           </select>
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9CA3AF;cursor:pointer;white-space:nowrap;">
             <input type="checkbox" id="boqLibFilter" onchange="renderBOQLibList()" style="accent-color:#F59E0B;width:14px;height:14px;">
@@ -4848,7 +4970,10 @@ function showTrialBanner(daysLeft){
     </div>
     <div id="boqFooterBenarit" style="display:none;padding:14px 24px;border-top:1px solid #374151;align-items:center;justify-content:space-between;flex-shrink:0;background:#0F172A;border-radius:0 0 18px 18px;">
       <span id="benaritCount" style="font-size:13px;color:#9CA3AF;font-weight:700;">לא נבחרו סעיפים</span>
-      <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="saveBenaritToCustomLibrary()" style="padding:8px 16px;border-radius:10px;background:transparent;border:1px solid #374151;color:#9CA3AF;font-size:12px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;">💾 שמור לספרייה שלי</button>
+        <button onclick="addBenaritItemsToBOQ()" style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;">+ הוסף לכתב כמויות</button>
+      </div>
     </div>
   </div>
 </div>
