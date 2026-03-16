@@ -4367,7 +4367,6 @@ let _boqLibSelected = new Set(); // stores item codes
 
 function openBOQLibrary(){
   _boqLibSelected.clear();
-  loadCustomLibrary(); // async load from Firestore
   // Auto-check damage filter if eventType set
   const hasEvent = ['water','fire','burglary'].includes(STATE.event.eventType);
   const cb = document.getElementById('boqLibFilter');
@@ -4377,7 +4376,8 @@ function openBOQLibrary(){
   if(sel) sel.value = '';
   document.getElementById('boqLibSearch').value = '';
   document.getElementById('boqLibModal').style.display = 'flex';
-  renderBOQLibList();
+  // Load custom library first, then render
+  loadCustomLibrary().then(()=>renderBOQLibList());
 }
 
 function closeBOQLibrary(){
@@ -4607,6 +4607,15 @@ async function saveBenaritToCustomLibrary(btn){
   toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e3a5f;color:#93c5fd;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;border:1px solid #3b82f6;box-shadow:0 4px 20px rgba(0,0,0,.3);';
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(), 3000);
+
+  // Switch to library tab so user sees the saved items
+  if(saved > 0){
+    switchBOQTab('lib');
+    // Filter to show personal library
+    const sel = document.getElementById('boqLibChapter');
+    if(sel){ sel.value = '16'; }
+    renderBOQLibList();
+  }
 }
 
 async function deleteCustomLibItem(id){
