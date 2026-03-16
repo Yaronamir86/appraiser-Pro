@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMDAN | סיור אינטראקטיבי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#030712;
+  --surface:#0d1117;
+  --card:#111827;
+  --border:rgba(255,255,255,.07);
+  --accent:#f59e0b;
+  --accent2:#fbbf24;
+  --green:#10b981;
+  --blue:#3b82f6;
+  --red:#ef4444;
+  --purple:#8b5cf6;
+  --text:#f9fafb;
+  --muted:#9ca3af;
+  --subtle:#4b5563;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;inset-inline:0;z-index:100;padding:12px 5%;display:flex;align-items:center;justify-content:space-between;background:rgba(3,7,18,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.nav-logo{font-weight:900;font-size:17px;color:var(--text);text-decoration:none;letter-spacing:-.02em;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.btn-start{background:var(--accent);color:#000;border:none;border-radius:10px;padding:8px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{position:fixed;top:56px;inset-inline:0;z-index:99;height:3px;background:rgba(255,255,255,.06);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;width:0%;}
+
+/* ── STEP DOTS ── */
+.step-dots{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:99;display:flex;gap:8px;align-items:center;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--subtle);transition:all .3s;cursor:pointer;}
+.dot.active{background:var(--accent);width:24px;border-radius:4px;}
+.dot.done{background:var(--green);}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 5% 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(245,158,11,.07),transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--accent);font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:24px;letter-spacing:.05em;text-transform:uppercase;animation:fadeUp .6s ease both;}
+.hero h1{font-size:clamp(32px,6vw,60px);font-weight:900;line-height:1.1;margin-bottom:18px;letter-spacing:-.03em;animation:fadeUp .6s .1s ease both;}
+.hero h1 em{font-style:normal;color:var(--accent);}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:520px;margin:0 auto 40px;animation:fadeUp .6s .2s ease both;}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#d97706);color:#000;border:none;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .2s,opacity .2s;}
+.btn-primary:hover{transform:translateY(-2px);opacity:.92;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:13px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text);}
+.hero-stats{display:flex;gap:40px;justify-content:center;margin-top:56px;flex-wrap:wrap;animation:fadeUp .6s .4s ease both;}
+.stat{text-align:center;}
+.stat-n{font-size:28px;font-weight:900;color:var(--accent);}
+.stat-l{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── SECTION BASE ── */
+.section{padding:90px 5%;max-width:1200px;margin:0 auto;}
+.section-tag{font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.section-title{font-size:clamp(26px,4vw,44px);font-weight:900;margin-bottom:14px;letter-spacing:-.02em;line-height:1.2;}
+.section-sub{font-size:16px;color:var(--muted);max-width:540px;margin-bottom:48px;line-height:1.7;}
+
+/* ── STEP SECTION ── */
+.step-section{padding:90px 5%;position:relative;}
+.step-section::before{content:'';position:absolute;right:10%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--border) 20%,var(--border) 80%,transparent);}
+
+.step-container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.step-container.reverse{direction:ltr;}
+.step-container.reverse>*{direction:rtl;}
+
+.step-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;}
+.step-title{font-size:clamp(22px,3vw,34px);font-weight:900;margin-bottom:14px;letter-spacing:-.02em;line-height:1.2;}
+.step-desc{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:24px;}
+.step-features{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.step-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text);}
+.step-features li::before{content:'✓';color:var(--green);font-weight:800;font-size:13px;flex-shrink:0;margin-top:2px;}
+
+/* ── MOCKUP SCREENS ── */
+.mockup{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5);}
+.mockup-bar{background:var(--card);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.mockup-dot{width:10px;height:10px;border-radius:50%;}
+.mockup-title{font-size:11px;color:var(--muted);font-weight:700;margin-right:auto;}
+.mockup-body{padding:20px;}
+
+/* Mode cards mockup */
+.mode-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.mode-card{background:var(--card);border-radius:12px;padding:16px 12px;text-align:center;border:2px solid transparent;transition:border-color .2s;}
+.mode-card.ins{border-color:rgba(245,158,11,.4);}
+.mode-card-icon{font-size:24px;margin-bottom:8px;}
+.mode-card-name{font-size:12px;font-weight:800;margin-bottom:4px;}
+.mode-card-sub{font-size:10px;color:var(--muted);}
+.mode-card.ins .mode-card-name{color:var(--accent);}
+
+/* Form mockup */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-field{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.form-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.form-value{font-size:12px;font-weight:600;}
+.form-field.span2{grid-column:span 2;}
+.form-field.highlight{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04);}
+
+/* BOQ mockup */
+.boq-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;}
+.boq-num{color:var(--accent);font-weight:800;min-width:24px;}
+.boq-desc{flex:1;color:var(--text);}
+.boq-unit{color:var(--muted);min-width:32px;text-align:center;}
+.boq-section-head{font-size:10px;font-weight:800;color:var(--blue);padding:8px 0 4px;text-transform:uppercase;letter-spacing:.06em;}
+.boq-auto-badge{background:rgba(245,158,11,.15);color:var(--accent);font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+
+/* Library mockup */
+.lib-item{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.04);}
+.lib-cb{width:13px;height:13px;border:1px solid var(--subtle);border-radius:3px;flex-shrink:0;}
+.lib-cb.checked{background:var(--accent);border-color:var(--accent);}
+.lib-text{flex:1;font-size:11px;}
+.lib-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.lib-badge.struct{background:rgba(59,130,246,.15);color:#93c5fd;}
+.lib-badge.service{background:rgba(139,92,246,.15);color:#c4b5fd;}
+.lib-badge.personal{background:rgba(245,158,11,.15);color:var(--accent);}
+
+/* Report mockup */
+.report-mock{background:#fff;border-radius:12px;padding:16px;color:#111;}
+.report-header{border-bottom:2px solid #E5E7EB;padding-bottom:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;}
+.report-logo{font-size:14px;font-weight:900;color:#111;}
+.report-title{font-size:16px;font-weight:900;text-align:center;margin-bottom:4px;}
+.report-sub{font-size:11px;color:#6B7280;text-align:center;margin-bottom:12px;}
+.report-row{display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid #F3F4F6;}
+.report-row span:first-child{color:#6B7280;font-weight:600;}
+.report-row span:last-child{font-weight:700;}
+.report-section{margin-top:10px;}
+.report-section-title{font-size:10px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.report-text{font-size:10px;color:#4B5563;line-height:1.6;}
+
+/* Animated typing */
+.typing{overflow:hidden;white-space:nowrap;border-left:2px solid var(--accent);animation:typing 3s steps(60) 1s both, blink .7s infinite 4s;}
+@keyframes typing{from{width:0}to{width:100%}}
+@keyframes blink{0%,100%{border-color:transparent}50%{border-color:var(--accent)}}
+
+/* Pulse animation */
+.pulse{animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* CTA section */
+.cta-section{padding:80px 5%;text-align:center;position:relative;}
+.cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(245,158,11,.05),transparent);pointer-events:none;}
+.cta-box{max-width:600px;margin:0 auto;background:var(--card);border:1px solid rgba(245,158,11,.2);border-radius:24px;padding:48px 40px;}
+.cta-title{font-size:clamp(24px,4vw,40px);font-weight:900;margin-bottom:12px;letter-spacing:-.02em;}
+.cta-sub{font-size:16px;color:var(--muted);margin-bottom:32px;line-height:1.7;}
+.cta-features{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.cta-feat{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);}
+.cta-feat::before{content:'✓';color:var(--green);font-weight:800;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+/* Divider */
+.divider{max-width:1100px;margin:0 auto;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+@media(max-width:768px){
+  .step-container,.step-container.reverse{grid-template-columns:1fr;}
+  .step-section::before{display:none;}
+  .mode-cards{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .form-field.span2{grid-column:span 1;}
+  .hero-stats{gap:24px;}
+  nav{padding:12px 4%;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="saas-landing.html"><span>OMDAN</span></a>
+  <div class="nav-right">
+    <span style="font-size:12px;color:var(--muted);">סיור אינטראקטיבי</span>
+    <a href="register.html" class="btn-start">התחל חינם →</a>
+  </div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="step0">
+  <div>
+    <div class="hero-badge">🎬 סיור מודרך — 3 דקות</div>
+    <h1>תראה איך OMDAN<br>עובד <em>בשבילך</em></h1>
+    <p class="hero-sub">גלול למטה וגלה איך תוך דקות מקבלים דוח שמאות מקצועי — מממצאים לכתב כמויות לדוח מוכן.</p>
+    <div class="hero-cta">
+      <a href="#step1" class="btn-primary">🚀 התחל סיור</a>
+      <a href="register.html" class="btn-ghost">התחל ניסיון חינם →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n">3</div><div class="stat-l">סוגי שמאות</div></div>
+      <div class="stat"><div class="stat-n">277</div><div class="stat-l">סעיפי BOQ</div></div>
+      <div class="stat"><div class="stat-n">14</div><div class="stat-l">ימי ניסיון חינם</div></div>
+      <div class="stat"><div class="stat-n">∞</div><div class="stat-l">תיקים</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 1: 3 מסלולי שמאות ══ -->
+<section class="step-section reveal" id="step1">
+  <div class="step-container">
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(245,158,11,.15);color:var(--accent);">1</div>
+        <span style="color:var(--accent);">שלב ראשון</span>
+      </div>
+      <h2 class="step-title">3 מסלולי שמאות — כל אחד שונה</h2>
+      <p class="step-desc">OMDAN מותאם לשלושה סוגי שמאות שונים לחלוטין. כשאתה בוחר מסלול — הטופס, הדוח, וה-BOQ מותאמים אוטומטית.</p>
+      <ul class="step-features">
+        <li><strong>שמאות ביטוח</strong> — כולל פרטי פוליסה, תת-ביטוח, מינוי שמאי, שרברב הסדר. הדוח כולל פנל ביטוח מבנה מול תכולה.</li>
+        <li><strong>שמאות פרטית</strong> — לחיזוק תביעה מול ביטוח. ממוקד בהיקף נזק ועדויות, ללא שדות ביטוח.</li>
+        <li><strong>מס רכוש</strong> — קריטריונים ממשלתיים, סיווגי פגיעה (רקטה/טיל/נזק עקיף), טופס מותאם לרשויות.</li>
+      </ul>
+    </div>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">בחר סוג שמאות</div>
+      </div>
+      <div class="mockup-body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;text-align:center;">בחר את סוג השומה להתחיל</div>
+        <div class="mode-cards">
+          <div class="mode-card ins">
+            <div class="mode-card-icon">🏢</div>
+            <div class="mode-card-name">שומה מטעם ביטוח</div>
+            <div class="mode-card-sub">בדיקה ואימות תביעה</div>
+          </div>
+          <div class="mode-card" style="border-color:rgba(59,130,246,.3);">
+            <div class="mode-card-icon">👤</div>
+            <div class="mode-card-name" style="color:#93c5fd;">שומה פרטית</div>
+            <div class="mode-card-sub">לחיזוק תביעת המבוטח</div>
+          </div>
+          <div class="mode-card" style="border-color:rgba(16,185,129,.3);">
+            <div class="mode-card-icon">🏛️</div>
+            <div class="mode-card-name" style="color:var(--green);">מס רכוש</div>
+            <div class="mode-card-sub">קריטריונים ממשלתיים</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:6px;">⚡ ההבדל המרכזי</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">כל מסלול מציג שדות שונים, מייצר דוח בפורמט שונה, ומתאים את ה-BOQ לסוג הנזק. בחירת מסלול היא הצעד הראשון.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 2: מילוי טופס חכם ══ -->
+<section class="step-section reveal" id="step2">
+  <div class="step-container reverse">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">נתוני בסיס ומאפייני הנכס</div>
+      </div>
+      <div class="mockup-body">
+        <div class="form-grid">
+          <div class="form-field highlight">
+            <div class="form-label">שם מלא *</div>
+            <div class="form-value">משה לוי</div>
+          </div>
+          <div class="form-field">
+            <div class="form-label">ת.ז / ח.פ *</div>
+            <div class="form-value">034521876</div>
+          </div>
+          <div class="form-field">
+            <div class="form-label">תאריך האירוע *</div>
+            <div class="form-value" style="color:var(--accent);">07/10/2024</div>
+          </div>
+          <div class="form-field">
+            <div class="form-label">תאריך ביקור *</div>
+            <div class="form-value">21/10/2024</div>
+          </div>
+          <div class="form-field span2">
+            <div class="form-label">כתובת</div>
+            <div class="form-value">שד' בן גוריון 14, שדרות</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px 10px;">
+          <div style="font-size:10px;color:var(--green);font-weight:700;">✓ תאריכים מסונכרנים — לא ניתן לבחור תאריך קודם לאירוע</div>
+        </div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="form-field">
+            <div class="form-label">סוג נכס</div>
+            <div class="form-value">דירה</div>
+          </div>
+          <div class="form-field">
+            <div class="form-label">שטח (מ"ר)</div>
+            <div class="form-value">85</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(59,130,246,.15);color:var(--blue);">2</div>
+        <span style="color:var(--blue);">שלב שני</span>
+      </div>
+      <h2 class="step-title">טופס חכם — כל הפרטים במקום אחד</h2>
+      <p class="step-desc">הטופס מחולק לכרטיסיות לוגיות — נתוני בסיס, פרטי ביטוח, פרטי האירוע, ממצאים. כל שדה מקצועי ומדויק.</p>
+      <ul class="step-features">
+        <li>שני לוחות זמנים בכרטיסייה אחת — תאריך אירוע ותאריך ביקור. הגנה: לא ניתן לבחור תאריך לפני האירוע</li>
+        <li>שדות ביטוח חכמים — חישוב תת-ביטוח אוטומטי בזמן אמת</li>
+        <li>סוגי אירוע עם תת-סיווגים — מים, אש, פריצה, מס רכוש — כל אחד פותח שאלות ספציפיות</li>
+        <li>שמירה אוטומטית לענן בכל שינוי</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 3: ממצאים ← טקסט אוטומטי ══ -->
+<section class="step-section reveal" id="step3">
+  <div class="step-container">
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(139,92,246,.15);color:var(--purple);">3</div>
+        <span style="color:var(--purple);">הכי מרשים</span>
+      </div>
+      <h2 class="step-title">ממצאים → טקסט מנוסח אוטומטי</h2>
+      <p class="step-desc">מסמן חדרים, רמת נזק, וסיבת הנזק — המערכת כותבת את פסקאות הממצאים לדוח בעצמה. שפה מקצועית, מנוסחת נכון.</p>
+      <ul class="step-features">
+        <li>Quick Picks לפי סוג אירוע — בחירה מהירה של האזורים הנפוצים לכל סוג נזק</li>
+        <li>12 אזורי חוץ — חזית בניין, גג, חדר מדרגות, חניה, גדר/חומה ועוד</li>
+        <li>כל אזור מקבל: רמת חומרה, סיבת הנזק, סימני פגיעה, הערת שמאי</li>
+        <li>לחיצה אחת → פסקת ממצאים מנוסחת מקצועית לדוח</li>
+      </ul>
+    </div>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">ממצאים וסיבות לנזק</div>
+      </div>
+      <div class="mockup-body">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px;font-weight:700;">⚡ מוצע לאירוע זה (מס רכוש)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          <span style="background:rgba(245,158,11,.15);color:var(--accent);font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">✓ חזית בניין</span>
+          <span style="background:rgba(245,158,11,.15);color:var(--accent);font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">✓ גג</span>
+          <span style="background:var(--card);color:var(--muted);font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);">+ סלון</span>
+          <span style="background:var(--card);color:var(--muted);font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);">+ חדר שינה</span>
+        </div>
+        <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:800;color:var(--purple);margin-bottom:6px;">✨ טקסט אוטומטי — חזית בניין</div>
+          <div class="typing" style="font-size:10px;color:var(--muted);line-height:1.6;max-width:260px;">במהלך הביקורי בנכס נצפו נזקים בחזית הבניין הנובעים מגל ההדף — פגיעה במעטפת הבניין, רסיסים וסדקים. היקף הנזק: משמעותי.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 4: BOQ ══ -->
+<section class="step-section reveal" id="step4">
+  <div class="step-container reverse">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">כתב כמויות</div>
+      </div>
+      <div class="mockup-body" style="padding:14px;">
+        <div style="display:flex;gap:6px;margin-bottom:12px;">
+          <span style="background:rgba(245,158,11,.15);color:var(--accent);font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid rgba(245,158,11,.3);">⚡ יצר אוטומטית</span>
+          <span style="background:var(--card);color:var(--muted);font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);">📚 ספרייה</span>
+          <span style="background:var(--card);color:var(--muted);font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);">🔍 בנארית</span>
+        </div>
+        <div class="boq-section-head">פרק א' – עבודות מבנה</div>
+        <div class="boq-row">
+          <div class="boq-num">1.1</div>
+          <div class="boq-desc">פירוק ריצוף קרמיקה – חזית <span class="boq-auto-badge pulse">AUTO</span></div>
+          <div class="boq-unit">מ"ר</div>
+        </div>
+        <div class="boq-row">
+          <div class="boq-num">1.2</div>
+          <div class="boq-desc">אספקה והתקנת ריצוף חדש – חזית</div>
+          <div class="boq-unit">מ"ר</div>
+        </div>
+        <div class="boq-row">
+          <div class="boq-num">1.3</div>
+          <div class="boq-desc">תיקון טיח חוץ – פגיעות רסיסים <span class="boq-auto-badge pulse">AUTO</span></div>
+          <div class="boq-unit">מ"ר</div>
+        </div>
+        <div class="boq-section-head" style="color:var(--green);">פרק ג' – שירותים</div>
+        <div class="boq-row">
+          <div class="boq-num">S1</div>
+          <div class="boq-desc">ניקיון לאחר שיפוץ</div>
+          <div class="boq-unit">קומפ'</div>
+        </div>
+        <div class="boq-row">
+          <div class="boq-num">S2</div>
+          <div class="boq-desc">פיקוח וניהול עבודות (5%)</div>
+          <div class="boq-unit">—</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(16,185,129,.15);color:var(--green);">4</div>
+        <span style="color:var(--green);">ליבת המערכת</span>
+      </div>
+      <h2 class="step-title">BOQ — כתב כמויות בלחיצה אחת</h2>
+      <p class="step-desc">מהממצאים לכתב כמויות מלא תוך שניות. 277 סעיפים מקצועיים בספרייה הפנימית, וגישה ישירה למאגר בנארית.</p>
+      <ul class="step-features">
+        <li><strong>יצירה אוטומטית</strong> — לחץ "⚡ יצר כתב כמויות אוטומטי" — המערכת ממלאת לפי הממצאים</li>
+        <li><strong>ספרייה פנימית</strong> — 277 סעיפים ב-15 פרקים, מסוננים לפי סוג נזק</li>
+        <li><strong>מאגר בנארית</strong> — מלל מקצועי ממכרזי אמת, ישירות לתוך הBOQ</li>
+        <li><strong>ספרייה אישית</strong> — שמור סעיפים מבנארית לשימוש חוזר בתיקים עתידיים</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 5: ספרייה אישית ══ -->
+<section class="step-section reveal" id="step5">
+  <div class="step-container">
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(245,158,11,.15);color:var(--accent);">5</div>
+        <span style="color:var(--accent);">חדש</span>
+      </div>
+      <h2 class="step-title">ספרייה אישית — הידע שלך</h2>
+      <p class="step-desc">מצאת סעיף מושלם בבנארית שמשמש אותך שוב ושוב? שמור אותו לספרייה האישית — יהיה זמין בכל תיק.</p>
+      <ul class="step-features">
+        <li>שמור מבנארית ישירות לספרייה שלך בלחיצה אחת</li>
+        <li>הספרייה האישית מסונכרנת בענן — זמינה מכל מכשיר</li>
+        <li>סעיפים אישיים מופיעים בקטגוריה ⭐ נפרדת בתוך ספריית ה-BOQ</li>
+        <li>מחיקה וניהול — כל סעיף ניתן למחיקה בלחיצה</li>
+      </ul>
+    </div>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">📚 ספרייה — כתב כמויות</div>
+      </div>
+      <div class="mockup-body">
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <span style="background:var(--card);color:var(--muted);font-size:10px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);">📚 ספרייה</span>
+          <span style="background:rgba(245,158,11,.15);color:var(--accent);font-size:10px;font-weight:700;padding:4px 10px;border-radius:8px;border:1px solid rgba(245,158,11,.3);">🔍 בנארית</span>
+        </div>
+        <div style="font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">⭐ ספרייה אישית (3 סעיפים)</div>
+        <div class="lib-item">
+          <div class="lib-cb checked"></div>
+          <div class="lib-text">טיח פנים שתי שכבות, סרגל בשני כיוונים, ע"ג קירות מגולונים בהתאמה לרשת מצולות ...</div>
+          <span class="lib-badge personal">אישי</span>
+        </div>
+        <div class="lib-item">
+          <div class="lib-cb"></div>
+          <div class="lib-text">צבע סופרקריל על גבס כולל שבכת צבע יסוד "סופרפריים" לרבות שתי שכבות שטיח ...</div>
+          <span class="lib-badge personal">אישי</span>
+        </div>
+        <div style="font-size:9px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--border);">פרק 1 — פירוק והריסה</div>
+        <div class="lib-item">
+          <div class="lib-cb"></div>
+          <div class="lib-text">פירוק ריצוף קרמיקה / גרניט טבעי / גרניט פורצלן לצורך גישה לתשתיות</div>
+          <span class="lib-badge struct">מבנה</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 6: דוח מוכן ══ -->
+<section class="step-section reveal" id="step6">
+  <div class="step-container reverse">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ef4444;"></div>
+        <div class="mockup-dot" style="background:#f59e0b;"></div>
+        <div class="mockup-dot" style="background:#10b981;"></div>
+        <div class="mockup-title">חוות דעת שמאית — מס רכוש</div>
+      </div>
+      <div class="mockup-body" style="padding:0;">
+        <div class="report-mock">
+          <div class="report-header">
+            <div>
+              <div class="report-logo">YA שמאי רכוש</div>
+              <div style="font-size:9px;color:#6B7280;">רישיון מס' 123465</div>
+            </div>
+            <div style="text-align:left;font-size:9px;color:#6B7280;line-height:1.8;">
+              <div>📞 050-3292066</div>
+              <div>✉️ yaronamir86@gmail.com</div>
+            </div>
+          </div>
+          <div class="report-title">חוות דעת שמאית</div>
+          <div class="report-sub">שמאות מס רכוש · מטרת הביקור: הערכת נזק לצורך תביעה</div>
+          <div class="report-section">
+            <div class="report-section-title">פרטי המזמין</div>
+            <div class="report-row"><span>שם</span><span>משה לוי</span></div>
+            <div class="report-row"><span>כתובת</span><span>שד' בן גוריון 14, שדרות</span></div>
+            <div class="report-row"><span>תאריך אירוע</span><span>07/10/2024</span></div>
+          </div>
+          <div class="report-section" style="margin-top:8px;">
+            <div class="report-section-title">סיכום כספי</div>
+            <div class="report-row"><span>נזק מבנה</span><span style="color:#059669;font-weight:900;">₪3,340</span></div>
+            <div class="report-row"><span>שירותים</span><span>₪967</span></div>
+            <div style="background:#F0FDF4;border-radius:6px;padding:6px 8px;margin-top:6px;display:flex;justify-content:space-between;">
+              <span style="font-weight:800;color:#374151;font-size:11px;">סה"כ פיצוי:</span>
+              <span style="font-weight:900;color:#059669;font-size:13px;">₪4,307</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="step-label">
+        <div class="step-num" style="background:rgba(16,185,129,.15);color:var(--green);">6</div>
+        <span style="color:var(--green);">הסוף המושלם</span>
+      </div>
+      <h2 class="step-title">דוח מקצועי מוכן לשליחה</h2>
+      <p class="step-desc">לחיצה אחת מייצרת דוח מלא עם כל הפרטים — מבנה, ממצאים, כתב כמויות, סיכום, חתימה ולוגו.</p>
+      <ul class="step-features">
+        <li>מבנה הדוח מותאם לסוג השמאות — ביטוח, פרטי, ומס רכוש כל אחד בפורמט שלו</li>
+        <li>כותרת משנה אוטומטית לפי מטרת הביקור שהוגדרה</li>
+        <li>חישוב שיפוי / כינון אוטומטי — מבנה, תכולה, שירותים, פיקוח</li>
+        <li>שמירה ל-PDF, שיתוף, הדפסה — הכל בלחיצה אחת</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ CTA ══ -->
+<section class="cta-section reveal">
+  <div class="cta-box">
+    <div style="font-size:40px;margin-bottom:16px;">🚀</div>
+    <div class="cta-title">מוכן לנסות?</div>
+    <p class="cta-sub">14 יום ניסיון מלא — ללא כרטיס אשראי, ללא התחייבות. מתחיל תוך 30 שניות.</p>
+    <div class="cta-features">
+      <span class="cta-feat">14 יום חינם</span>
+      <span class="cta-feat">ללא כרטיס</span>
+      <span class="cta-feat">תיקים ללא הגבלה</span>
+      <span class="cta-feat">ביטול בכל עת</span>
+    </div>
+    <a href="register.html" class="btn-primary" style="font-size:16px;padding:16px 40px;">התחל ניסיון חינם ←</a>
+    <div style="margin-top:16px;">
+      <a href="saas-landing.html" style="font-size:13px;color:var(--muted);text-decoration:none;">חזרה לדף הבית</a>
+    </div>
+  </div>
+</section>
+
+<div class="step-dots" id="stepDots"></div>
+
+<script>
+// ── Steps config ──
+const STEPS = ['step0','step1','step2','step3','step4','step5','step6'];
+const TOTAL = STEPS.length;
+
+// ── Build dots ──
+const dotsEl = document.getElementById('stepDots');
+STEPS.forEach((id, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.title = `שלב ${i+1}`;
+  d.onclick = () => document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  dotsEl.appendChild(d);
+});
+
+// ── Progress + active dot ──
+function updateProgress(){
+  const scrolled = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, (scrolled/total)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+
+  // Find active step
+  let active = 0;
+  STEPS.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if(el){
+      const rect = el.getBoundingClientRect();
+      if(rect.top < window.innerHeight * 0.6) active = i;
+    }
+  });
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot' + (i===active?' active':i<active?' done':'');
+  });
+}
+window.addEventListener('scroll', updateProgress, {passive:true});
+
+// ── Scroll reveal ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, {threshold: 0.12});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
