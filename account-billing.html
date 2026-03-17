@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OMDAN | ניהול מנוי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#030712;--surface:#0d1117;--card:#111827;--border:rgba(255,255,255,.07);
+  --accent:#f59e0b;--green:#10b981;--red:#ef4444;--blue:#3b82f6;
+  --text:#f9fafb;--muted:#9ca3af;--subtle:#4b5563;
+}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── NAV ── */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:18px;font-weight:900;text-decoration:none;color:var(--text);}
+.nav-logo span{color:var(--accent);}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;transition:color .2s;}
+.nav-back:hover{color:var(--text);}
+
+/* ── LAYOUT ── */
+.page{max-width:720px;margin:0 auto;padding:40px 20px 80px;}
+.page-title{font-size:24px;font-weight:900;margin-bottom:6px;}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:36px;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+
+/* ── PLAN STATUS ── */
+.plan-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.plan-name{font-size:22px;font-weight:900;}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;}
+.badge-active{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;}
+.badge-trial{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--accent);}
+.badge-canceled{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+.badge-expired{background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.3);color:var(--muted);}
+
+/* ── DETAILS GRID ── */
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.detail-item{padding:14px 18px;border-bottom:1px solid var(--border);}
+.detail-item:last-child,.detail-item:nth-last-child(2){border-bottom:none;}
+.detail-item:nth-child(odd){border-left:1px solid var(--border);}
+.detail-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.detail-value{font-size:14px;font-weight:700;color:var(--text);}
+.detail-value.green{color:var(--green);}
+.detail-value.yellow{color:var(--accent);}
+.detail-value.red{color:var(--red);}
+
+/* ── USAGE ── */
+.usage-bar-wrap{background:rgba(255,255,255,.05);border-radius:8px;height:8px;overflow:hidden;margin:10px 0 6px;}
+.usage-bar{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--accent));transition:width .6s ease;}
+
+/* ── ACTIONS ── */
+.actions{display:flex;flex-direction:column;gap:10px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:opacity .2s,transform .1s;text-decoration:none;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#d97706);color:#000;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-outline:hover{border-color:var(--accent);color:var(--text);}
+.btn-danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.btn-danger:hover{background:rgba(239,68,68,.15);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── HISTORY ── */
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.history-item:last-child{border-bottom:none;}
+.history-date{color:var(--muted);}
+.history-amount{font-weight:800;color:var(--green);}
+.history-plan{color:var(--muted);font-size:12px;}
+
+/* ── MODAL ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;max-width:420px;width:100%;text-align:center;}
+.modal h2{font-size:20px;font-weight:900;margin-bottom:10px;}
+.modal p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+.modal-actions{display:flex;gap:10px;justify-content:center;}
+
+/* ── LOADER ── */
+.loader{display:flex;align-items:center;justify-content:center;padding:60px;flex-direction:column;gap:12px;}
+.spin{width:32px;height:32px;border:3px solid rgba(245,158,11,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:48px;margin-bottom:16px;}
+.empty h3{font-size:18px;font-weight:800;margin-bottom:8px;}
+.empty p{font-size:14px;color:var(--muted);margin-bottom:24px;}
+
+@media(max-width:600px){
+  .details-grid{grid-template-columns:1fr;}
+  .detail-item:nth-child(odd){border-left:none;}
+  .detail-item:last-child{border-bottom:none;}
+  .detail-item{border-bottom:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><span>OMDAN</span></a>
+  <a class="nav-back" href="index.html">← חזרה לדשבורד</a>
+</nav>
+
+<div class="page">
+  <div class="page-title">ניהול מנוי</div>
+  <div class="page-sub">צפה ונהל את פרטי המנוי שלך</div>
+
+  <div id="content">
+    <div class="loader">
+      <div class="spin"></div>
+      <span style="font-size:13px;color:var(--muted);">טוען נתונים...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal-backdrop" id="cancelModal">
+  <div class="modal">
+    <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
+    <h2>ביטול מנוי</h2>
+    <p>
+      המנוי יישאר פעיל עד <strong id="cancelUntilDate" style="color:var(--accent);"></strong>.<br>
+      לאחר מכן לא יחויב כרטיסך ותאבד גישה למערכת.
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-danger" id="confirmCancelBtn" onclick="confirmCancel()">אישור ביטול מנוי</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, getDocs }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const app  = initializeApp({
+  apiKey:"AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+  authDomain:"yaron-appraiser.firebaseapp.com",
+  projectId:"yaron-appraiser",
+  storageBucket:"yaron-appraiser.firebasestorage.app",
+  messagingSenderId:"179370141848",
+  appId:"1:179370141848:web:d5843d9641dce3adabc8ed"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const PLANS = {
+  starter: { name:'Starter', monthly:129, annual:990 },
+  pro:     { name:'Pro',     monthly:249, annual:2190 },
+  office:  { name:'Office',  monthly:499, annual:4500 },
+  trial:   { name:'ניסיון חינמי', monthly:0, annual:0 },
+};
+const BILLING_LABELS = { monthly:'חודשי', annual:'שנתי' };
+
+let _user    = null;
+let _billing = null;
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('he-IL', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function fmtAmount(a) {
+  return a ? `₪${Number(a).toLocaleString('he-IL')}` : '—';
+}
+
+function statusBadge(status, cancelAtEnd) {
+  if(cancelAtEnd) return `<span class="plan-badge badge-canceled">🔴 בוטל — פעיל עד תום התקופה</span>`;
+  const map = {
+    active:  `<span class="plan-badge badge-active">✓ פעיל</span>`,
+    trial:   `<span class="plan-badge badge-trial">⏳ ניסיון</span>`,
+    canceled:`<span class="plan-badge badge-canceled">🔴 בוטל</span>`,
+    expired: `<span class="plan-badge badge-expired">פג תוקף</span>`,
+    renewal_failed:`<span class="plan-badge badge-canceled">⚠️ חיוב נכשל</span>`,
+  };
+  return map[status] || `<span class="plan-badge badge-expired">${status}</span>`;
+}
+
+async function loadPaymentHistory(uid) {
+  try {
+    const q = query(
+      collection(db, 'payments'),
+      where('uid','==', uid),
+      orderBy('processedAt','desc'),
+      limit(5)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+  } catch(e) {
+    return [];
+  }
+}
+
+async function render(user, billing) {
+  const plan = PLANS[billing?.plan] || PLANS.trial;
+  const isTrial    = !billing || billing.plan === 'trial';
+  const isActive   = billing?.status === 'active';
+  const isCanceled = billing?.cancelAtEnd === true;
+  const subEnd     = billing?.subscriptionEnd;
+  const trialEnd   = billing?.trialEnd;
+  const usage      = billing?.reportsThisMonth || 0;
+
+  // Usage limit by plan
+  const usageLimits = { trial:5, starter:30, pro:999, office:999 };
+  const usageLimit  = usageLimits[billing?.plan] || 5;
+  const usagePct    = Math.min(100, Math.round((usage/usageLimit)*100));
+
+  // Payment history
+  const history = isActive ? await loadPaymentHistory(user.uid) : [];
+
+  let html = '';
+
+  // ── Plan Status Card ──
+  html += `<div class="card">
+    <div class="card-title">📋 פרטי המנוי</div>
+    <div class="plan-row">
+      <div>
+        <div class="plan-name">מסלול ${plan.name}</div>
+        ${billing?.billingMode ? `<div style="font-size:13px;color:var(--muted);margin-top:2px;">${BILLING_LABELS[billing.billingMode]||''}</div>` : ''}
+      </div>
+      ${statusBadge(billing?.status || 'trial', isCanceled)}
+    </div>
+
+    <div class="details-grid">`;
+
+  if(isTrial) {
+    const end = trialEnd ? new Date(trialEnd) : null;
+    const daysLeft = end ? Math.max(0, Math.ceil((end-new Date())/(1000*60*60*24))) : 0;
+    html += `
+      <div class="detail-item">
+        <div class="detail-label">סטטוס</div>
+        <div class="detail-value yellow">ניסיון חינמי</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">ימים שנותרו</div>
+        <div class="detail-value ${daysLeft<=3?'red':'yellow'}">${daysLeft} ימים</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">תאריך סיום ניסיון</div>
+        <div class="detail-value">${end ? fmtDate({ toDate:()=>end }) : '—'}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">מחיר לאחר הניסיון</div>
+        <div class="detail-value">129₪/חודש</div>
+      </div>`;
+  } else {
+    const nextBilling = isCanceled ? null : subEnd;
+    html += `
+      <div class="detail-item">
+        <div class="detail-label">תאריך חידוש הבא</div>
+        <div class="detail-value ${isCanceled?'red':'green'}">${isCanceled ? 'בוטל' : fmtDate(nextBilling)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">תאריך סיום תקופה</div>
+        <div class="detail-value">${fmtDate(subEnd)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">תשלום אחרון</div>
+        <div class="detail-value green">${fmtAmount(billing?.lastPaymentAmount)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">תאריך תשלום אחרון</div>
+        <div class="detail-value">${fmtDate(billing?.lastPaymentAt)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">מחיר מסלול</div>
+        <div class="detail-value">${fmtAmount(billing?.billingMode==='annual' ? plan.annual : plan.monthly)} / ${BILLING_LABELS[billing?.billingMode]||'חודש'}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">פעיל מתאריך</div>
+        <div class="detail-value">${fmtDate(billing?.subscriptionStart)}</div>
+      </div>`;
+  }
+
+  html += `</div></div>`;
+
+  // ── Usage Card ──
+  html += `<div class="card">
+    <div class="card-title">📊 שימוש החודש</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+      <span style="font-size:14px;font-weight:600;">${usage} דוחות הופקו</span>
+      <span style="font-size:12px;color:var(--muted);">${usageLimit === 999 ? 'ללא הגבלה' : `מתוך ${usageLimit}`}</span>
+    </div>
+    ${usageLimit !== 999 ? `
+    <div class="usage-bar-wrap">
+      <div class="usage-bar" style="width:${usagePct}%;${usagePct>80?'background:linear-gradient(90deg,#f59e0b,#ef4444)':''}"></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);">איפוס ב-${fmtDate(billing?.reportsResetAt)}</div>` : ''}
+  </div>`;
+
+  // ── Actions Card ──
+  html += `<div class="card">
+    <div class="card-title">⚙️ פעולות</div>
+    <div class="actions">`;
+
+  if(isTrial || !isActive || isCanceled) {
+    // הצג שדרוג
+    html += `<a href="pricing.html" class="btn btn-primary">⚡ שדרג מסלול</a>`;
+  } else {
+    // החלף מסלול
+    html += `<a href="pricing.html" class="btn btn-outline">🔄 שנה מסלול</a>`;
+    // ביטול
+    html += `<button class="btn btn-danger" onclick="window._showCancelModal('${fmtDate(subEnd)}')">
+      ❌ בטל מנוי
+    </button>`;
+  }
+
+  html += `</div></div>`;
+
+  // ── Payment History ──
+  if(history.length > 0) {
+    html += `<div class="card">
+      <div class="card-title">🧾 היסטוריית תשלומים</div>`;
+    history.forEach(p => {
+      const d = p.processedAt?.toDate ? p.processedAt.toDate() : new Date();
+      const planName = PLANS[p.planId]?.name || p.planId;
+      html += `<div class="history-item">
+        <div>
+          <div style="font-weight:700;">מסלול ${planName}</div>
+          <div class="history-plan">${p.type === 'renewal' ? 'חידוש' : 'רכישה'}</div>
+        </div>
+        <div style="text-align:left;">
+          <div class="history-amount">${fmtAmount(p.amount)}</div>
+          <div class="history-date">${d.toLocaleDateString('he-IL')}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Account Info ──
+  html += `<div class="card">
+    <div class="card-title">👤 פרטי חשבון</div>
+    <div class="details-grid">
+      <div class="detail-item">
+        <div class="detail-label">אימייל</div>
+        <div class="detail-value" style="direction:ltr;text-align:right;">${user.email}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">מזהה משתמש</div>
+        <div class="detail-value" style="font-size:11px;color:var(--muted);">${user.uid.slice(0,16)}...</div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('content').innerHTML = html;
+}
+
+// ── Cancel Flow ──
+window._showCancelModal = function(dateStr) {
+  document.getElementById('cancelUntilDate').textContent = dateStr;
+  document.getElementById('cancelModal').classList.add('open');
+};
+
+window.closeModal = function() {
+  document.getElementById('cancelModal').classList.remove('open');
+};
+
+window.confirmCancel = async function() {
+  const btn = document.getElementById('confirmCancelBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ מבטל...';
+  try {
+    await updateDoc(doc(db, 'billing', _user.uid), {
+      cancelAtEnd: true,
+    });
+    closeModal();
+    // רענן את הדף
+    await loadBilling(_user);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'אישור ביטול מנוי';
+    alert('שגיאה: ' + e.message);
+  }
+};
+
+async function loadBilling(user) {
+  const snap = await getDoc(doc(db, 'billing', user.uid));
+  _billing = snap.exists() ? snap.data() : null;
+  await render(user, _billing);
+}
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
+  _user = user;
+  await loadBilling(user);
+});
+</script>
+
+</body>
+</html>

@@ -850,6 +850,45 @@ window._FB.getProfile = async (uid) => {
 onAuthStateChanged(_auth, async (user) => {
   if(user){
     window._currentUser = user;
+
+    // בדוק אם הגיע עם plan+billing — משתמש קיים שרוצה לשדרג
+    const urlParams = new URLSearchParams(window.location.search);
+    const pendingPlan    = urlParams.get('plan');
+    const pendingBilling = urlParams.get('billing') || 'monthly';
+    const VALID_PLANS    = ['starter','pro','office'];
+    const VALID_BILLING  = ['monthly','annual'];
+
+    if(pendingPlan && VALID_PLANS.includes(pendingPlan) && VALID_BILLING.includes(pendingBilling)){
+      // הסתר דשבורד, הצג loading
+      document.body.innerHTML = `<div style="font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+        <div style="width:40px;height:40px;border:3px solid rgba(245,158,11,.2);border-top-color:#f59e0b;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <div style="font-size:16px;font-weight:700;">מעביר לדף תשלום...</div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>`;
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch(
+          'https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ planId: pendingPlan, billingMode: pendingBilling }),
+          }
+        );
+        const data = await res.json();
+        if(data.url) {
+          window.location.href = data.url;
+        } else {
+          // כישלון — נקה params ופתח דשבורד רגיל
+          window.location.href = 'index.html';
+        }
+      } catch(e) {
+        console.error('Checkout from index error:', e);
+        window.location.href = 'index.html';
+      }
+      return;
+    }
+
     if(typeof render === 'function') await render();
     // Load profile and update header
     try{
@@ -940,6 +979,11 @@ window.doForgotPassword = async () => {
     <!-- Desktop Actions -->
     <div class="header-actions">
       <a href="settings.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">
+        ⚙️ הגדרות
+      </a>
+      <a href="account-billing.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">
+        💳 מנוי
+      </a>
         <span style="font-size:14px;">⚙️</span> הגדרות
       </a>
       <div class="header-sep"></div>
