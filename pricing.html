@@ -692,26 +692,30 @@
         document.querySelector("nav").after(banner);
       }
 
-      // startCheckout — מוגדר כ-async ויקרא מה-module לאחר שהAuth מוכן
-      let _firebaseUser = null; // יוגדר ע"י module לאחר auth resolve
-      window._pricingReady = false;
+      // startCheckout — ממתין לauth ואז מחליט
+      let _firebaseUser  = null;
+      let _authResolved  = false;
+      let _authPromise   = null; // Promise שיסתיים כשauth יתבהר
 
       async function startCheckout(planId) {
         const btn = event.currentTarget || event.target;
-        // אם auth עדיין טוען — המתן רגע
-        if(!window._pricingReady){
+        const origText = btn.textContent;
+
+        // המתן לauth אם עדיין לא הסתיים
+        if (!_authResolved) {
+          btn.disabled = true;
           btn.textContent = '⏳...';
-          await new Promise(r => setTimeout(r, 1200));
-          btn.textContent = btn.dataset.origText || 'בחר מסלול';
+          await _authPromise;
+          btn.disabled = false;
+          btn.textContent = origText;
         }
 
-        if(!_firebaseUser){
+        if (!_firebaseUser) {
           // לא מחובר — שלח ל-register עם params
           window.location.href = `register.html?plan=${planId}&billing=${billingMode}`;
           return;
         }
 
-        const origText = btn.textContent;
         btn.disabled = true;
         btn.textContent = '⏳ מעבד...';
 
@@ -726,7 +730,7 @@
             }
           );
           const data = await res.json();
-          if(data.url){
+          if (data.url) {
             window.location.href = data.url;
           } else {
             throw new Error(data.error || 'שגיאה ביצירת תשלום');
@@ -750,9 +754,13 @@
       });
       const auth = getAuth(app);
 
-      onAuthStateChanged(auth, user => {
-        window._firebaseUser   = user || null;
-        window._pricingReady   = true;
+      // צור Promise שמסתיים כשauth יתבהר — startCheckout ממתין לזה
+      window._authPromise = new Promise(resolve => {
+        onAuthStateChanged(auth, user => {
+          window._firebaseUser  = user || null;
+          window._authResolved  = true;
+          resolve(user);
+        });
       });
     </script>
   </body>
