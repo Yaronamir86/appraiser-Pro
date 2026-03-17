@@ -257,10 +257,18 @@ exports.cardcomWebhook = onRequest(
         headers: req.headers || null,
       });
 
-      const source = {
-        ...(req.query || {}),
-        ...(typeof req.body === "object" && req.body ? req.body : {}),
-      };
+      let bodyData = {};
+
+if (typeof req.body === "object" && req.body) {
+  bodyData = req.body;
+} else if (typeof req.body === "string" && req.body) {
+  bodyData = querystring.parse(req.body);
+}
+
+const source = {
+  ...(req.query || {}),
+  ...(bodyData || {}),
+};
 
       const terminalnumber =
         source.terminalnumber ||
