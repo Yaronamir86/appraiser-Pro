@@ -192,6 +192,14 @@ exports.cardcomCreatePayment = onRequest(
         ReturnValue: sessionId,
         InvoiceHeadOperation: "1",
         DocTypeToCreate: "400",
+        "InvoiceHead.CustName": productName,
+        "InvoiceHead.Email": email,
+        "InvoiceHead.SendByEmail": "true",
+        "InvoiceHead.Language": "he",
+
+        "InvoiceLines1.Description": productName,
+        "InvoiceLines1.Price": String(amount),
+        "InvoiceLines1.Quantity": "1",
         AutoRedirect: "false",
       };
 
