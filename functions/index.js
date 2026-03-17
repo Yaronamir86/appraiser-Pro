@@ -284,17 +284,54 @@ exports.cardcomWebhook = onRequest(
         ReturnValue,
       });
 
-      if (!lowprofilecode || !terminalnumber || !ReturnValue) {
-        logger.warn("Webhook missing params", {
-          terminalnumber,
-          lowprofilecode,
-          ReturnValue,
-          rawQuery: req.query || null,
-          rawBody: req.body || null,
-        });
-        res.status(200).send("ok");
-        return;
-      }
+      if (!lowprofilecode || !terminalnumber) {
+  logger.warn("Webhook missing critical params", {
+    terminalnumber,
+    lowprofilecode,
+    ReturnValue,
+    rawQuery: req.query || null,
+    rawBody: req.body || null,
+  });
+  res.status(200).send("ok");
+  return;
+}
+
+let sessionId = ReturnValue ? String(ReturnValue).trim() : null;
+let sessionRef = null;
+let sessionSnap = null;
+
+if (sessionId) {
+  sessionRef = db.collection("checkoutSessions").doc(sessionId);
+  sessionSnap = await sessionRef.get();
+}
+
+if ((!sessionSnap || !sessionSnap.exists) && lowprofilecode) {
+  const byLowProfile = await db
+    .collection("checkoutSessions")
+    .where("lowProfileCode", "==", lowprofilecode)
+    .limit(1)
+    .get();
+
+  if (!byLowProfile.empty) {
+    sessionSnap = byLowProfile.docs[0];
+    sessionRef = sessionSnap.ref;
+    sessionId = sessionSnap.id;
+    logger.info("Session resolved by lowProfileCode", {
+      sessionId,
+      lowprofilecode,
+    });
+  }
+}
+
+if (!sessionSnap || !sessionSnap.exists) {
+  logger.warn("Session not found", {
+    sessionId,
+    lowprofilecode,
+    ReturnValue,
+  });
+  res.status(200).send("ok");
+  return;
+}
 
       const sessionId = String(ReturnValue).trim();
       const sessionRef = db.collection("checkoutSessions").doc(sessionId);
