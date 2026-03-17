@@ -210,6 +210,9 @@ exports.cardcomCreatePayment = onRequest(
         amount,
         sessionId,
       });
+      
+      logger.info("Cardcom URLs", CARDCOM_URLS);
+      logger.info("Cardcom params", params);
 
       const raw = await httpPost(CARDCOM_URLS.lowProfile, params);
       const parsed = parseNV(raw);
@@ -247,18 +250,55 @@ exports.cardcomWebhook = onRequest(
   { region: "us-central1", secrets: [CARDCOM_TERMINAL, CARDCOM_USERNAME] },
   async (req, res) => {
     try {
-      const { terminalnumber, lowprofilecode, ReturnValue } = req.query;
-      logger.info("Webhook received", { lowprofilecode, ReturnValue });
+      logger.info("cardcomWebhook HIT", {
+        method: req.method,
+        query: req.query || null,
+        body: req.body || null,
+        headers: req.headers || null,
+      });
+
+      const source = {
+        ...(req.query || {}),
+        ...(typeof req.body === "object" && req.body ? req.body : {}),
+      };
+
+      const terminalnumber =
+        source.terminalnumber ||
+        source.TerminalNumber ||
+        source.terminalNumber;
+
+      const lowprofilecode =
+        source.lowprofilecode ||
+        source.LowProfileCode ||
+        source.lowProfileCode;
+
+      const ReturnValue =
+        source.ReturnValue ||
+        source.returnvalue ||
+        source.returnValue ||
+        source.session;
+
+      logger.info("Webhook normalized params", {
+        terminalnumber,
+        lowprofilecode,
+        ReturnValue,
+      });
 
       if (!lowprofilecode || !terminalnumber || !ReturnValue) {
+        logger.warn("Webhook missing params", {
+          terminalnumber,
+          lowprofilecode,
+          ReturnValue,
+          rawQuery: req.query || null,
+          rawBody: req.body || null,
+        });
         res.status(200).send("ok");
         return;
       }
 
-      const sessionId = ReturnValue;
+      const sessionId = String(ReturnValue).trim();
       const sessionRef = db.collection("checkoutSessions").doc(sessionId);
 
-      // ── שלב 1: בדוק session קיים ──
       const sessionSnap = await sessionRef.get();
       if (!sessionSnap.exists) {
         logger.warn("Session not found", { sessionId });
@@ -273,15 +313,26 @@ exports.cardcomWebhook = onRequest(
         return;
       }
 
-      // ── שלב 2: אמת מול קארדקום ──
       const username = CARDCOM_USERNAME.value();
-      const verifyUrl = `${CARDCOM_URLS.indicator}?terminalnumber=${terminalnumber}&username=${username}&lowprofilecode=${lowprofilecode}`;
+      const verifyUrl =
+        `${CARDCOM_URLS.indicator}?terminalnumber=${encodeURIComponent(terminalnumber)}` +
+        `&username=${encodeURIComponent(username)}` +
+        `&lowprofilecode=${encodeURIComponent(lowprofilecode)}`;
+
+      logger.info("Cardcom verify URL prepared", {
+        terminalnumber,
+        lowprofilecode,
+        sessionId,
+      });
+
       const verifyRaw = await httpGet(verifyUrl);
       const verified = parseNV(verifyRaw);
 
-      logger.info("Cardcom verify", {
+      logger.info("Cardcom verify response", {
         op: verified.OperationResponse,
         deal: verified.DealResponse,
+        internalDealNumber: verified.InternalDealNumber || null,
+        token: verified.Token || null,
       });
 
       if (verified.OperationResponse !== "0" || verified.DealResponse !== "0") {
@@ -300,7 +351,6 @@ exports.cardcomWebhook = onRequest(
 
       const payRef = db.collection("payments").doc(String(dealNumber));
 
-      // ── שלב 3: Atomic idempotency עם Firestore Transaction ──
       const DUPLICATE = "DUPLICATE_PAYMENT";
       try {
         await db.runTransaction(async (t) => {
@@ -335,10 +385,10 @@ exports.cardcomWebhook = onRequest(
         throw e;
       }
 
-      // ── שלב 4: עדכן billing ──
       const { uid, planId, billingMode } = session;
       const plan = PLANS[planId];
       if (!plan) {
+        logger.warn("Plan not found for billing", { uid, planId, sessionId });
         res.status(200).send("ok");
         return;
       }
@@ -346,39 +396,40 @@ exports.cardcomWebhook = onRequest(
       const now = new Date();
       const subEnd = calcEnd(billingMode, now);
 
-      await db
-        .collection("billing")
-        .doc(uid)
-        .set(
-          {
-            plan: planId,
-            billingMode,
-            status: "active",
-            subscriptionStart: admin.firestore.Timestamp.fromDate(now),
-            subscriptionEnd: admin.firestore.Timestamp.fromDate(subEnd),
-            lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
-            lastPaymentAmount:
-              billingMode === "annual" ? plan.annual : plan.monthly,
-            cardcomToken: verified.Token || null,
-            cardcomTokenExp: verified.TokenExDate || null,
-            cardcomDealNumber: dealNumber || null,
-            reportsThisMonth: 0,
-            reportsResetAt: admin.firestore.Timestamp.fromDate(subEnd),
-          },
-          { merge: true },
-        );
+      await db.collection("billing").doc(uid).set(
+        {
+          plan: planId,
+          billingMode,
+          status: "active",
+          subscriptionStart: admin.firestore.Timestamp.fromDate(now),
+          subscriptionEnd: admin.firestore.Timestamp.fromDate(subEnd),
+          lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastPaymentAmount:
+            billingMode === "annual" ? plan.annual : plan.monthly,
+          cardcomToken: verified.Token || null,
+          cardcomTokenExp: verified.TokenExDate || null,
+          cardcomDealNumber: dealNumber || null,
+          reportsThisMonth: 0,
+          reportsResetAt: admin.firestore.Timestamp.fromDate(subEnd),
+        },
+        { merge: true },
+      );
 
       logger.info("Payment processed OK", {
         uid,
         planId,
         billingMode,
         dealNumber,
+        sessionId,
       });
 
       res.status(200).send("ok");
     } catch (e) {
-      logger.error("cardcomWebhook error", e);
-      res.status(200).send("ok"); // תמיד 200 לקארדקום
+      logger.error("cardcomWebhook error", {
+        message: e?.message || String(e),
+        stack: e?.stack || null,
+      });
+      res.status(200).send("ok");
     }
   },
 );
