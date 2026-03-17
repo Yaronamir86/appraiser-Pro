@@ -341,7 +341,7 @@ if (!sessionSnap || !sessionSnap.exists) {
   return;
 }
 
-      const sessionId = String(ReturnValue).trim();
+    
       const sessionRef = db.collection("checkoutSessions").doc(sessionId);
 
       const sessionSnap = await sessionRef.get();
