@@ -164,27 +164,45 @@ async function proceedToCheckout(user) {
   if(msgs[2]) msgs[2].textContent = 'מעביר לדף תשלום מאובטח...';
   if(msgs[3]) msgs[3].textContent = '';
 
-  try {
-    const token = await user.getIdToken(true); // force refresh
-    const res = await fetch(
-      'https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ planId: pendingPlan, billingMode: pendingBilling }),
+  // נסה עד 3 פעמים עם token מרוענן
+  let lastError = null;
+  for(let attempt = 0; attempt < 3; attempt++){
+    try {
+      const token = await user.getIdToken(true); // force refresh כל פעם
+      const res = await fetch(
+        'https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ planId: pendingPlan, billingMode: pendingBilling }),
+        }
+      );
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+        return; // הצלחה
       }
-    );
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error(data.error || 'שגיאה ביצירת תשלום');
+      lastError = new Error(data.error || 'שגיאה ביצירת תשלום');
+    } catch(e) {
+      lastError = e;
+      console.warn(`Checkout attempt ${attempt+1} failed:`, e.message);
+      await new Promise(r => setTimeout(r, 1000)); // המתן שניה לפני ניסיון חוזר
     }
-  } catch(e) {
-    console.error('Checkout error:', e);
-    // כישלון — שלח לדשבורד
-    window.location.href = 'index.html';
   }
+
+  // כל הניסיונות נכשלו — הצג שגיאה ברורה (לא redirect שקט לדשבורד)
+  console.error('All checkout attempts failed:', lastError);
+  document.getElementById('successMsg').innerHTML = `
+    <div style="font-size:28px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:16px;font-weight:800;color:#fca5a5;margin-bottom:8px;">שגיאה ביצירת תשלום</div>
+    <div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">${lastError?.message || 'שגיאה לא ידועה'}</div>
+    <button onclick="window.location.href='pricing.html?plan=${pendingPlan}&billing=${pendingBilling}'"
+      style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#000;padding:10px 24px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:800;cursor:pointer;font-size:14px;">
+      נסה שוב
+    </button>
+    <br><br>
+    <a href="index.html" style="font-size:12px;color:#6b7280;">כניסה לדשבורד</a>
+  `;
 }
 
 // ── onAuthStateChanged — רק למשתמש שכבר מחובר לפני טעינת הדף ──
