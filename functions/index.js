@@ -1,15 +1,3 @@
-/**
- * OMDAN — Firebase Cloud Functions v2.1
- *
- * Secrets (הגדר פעם אחת):
- *   firebase functions:secrets:set CARDCOM_TERMINAL
- *   firebase functions:secrets:set CARDCOM_USERNAME
- *
- * Deploy:
- *   cd functions && npm install
- *   firebase deploy --only functions
- */
-
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
@@ -22,8 +10,6 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // ══ Secrets — credentials לא בקוד ══
-// API 10 (Name-to-Value) משתמש רק ב-TerminalNumber + UserName.
-// אין שדה Password ב-API 10. הסיסמה היא לפאנל הניהול בלבד.
 const CARDCOM_TERMINAL = defineSecret("CARDCOM_TERMINAL");
 const CARDCOM_USERNAME = defineSecret("CARDCOM_USERNAME");
 
@@ -51,6 +37,7 @@ function httpPost(url, params) {
   return new Promise((resolve, reject) => {
     const body = querystring.stringify(params);
     const u = new URL(url);
+
     const req = https.request(
       {
         hostname: u.hostname,
@@ -67,6 +54,7 @@ function httpPost(url, params) {
         res.on("end", () => resolve(d));
       },
     );
+
     req.on("error", reject);
     req.write(body);
     req.end();
@@ -87,10 +75,12 @@ function httpGet(url) {
 
 function parseNV(str) {
   const r = {};
-  str.split("&").forEach((p) => {
-    const [k, ...v] = p.split("=");
-    if (k) r[decodeURIComponent(k)] = decodeURIComponent(v.join("=") || "");
-  });
+  String(str || "")
+    .split("&")
+    .forEach((p) => {
+      const [k, ...v] = p.split("=");
+      if (k) r[decodeURIComponent(k)] = decodeURIComponent(v.join("=") || "");
+    });
   return r;
 }
 
@@ -103,7 +93,6 @@ function calcEnd(billingMode, from = new Date()) {
 
 // ════════════════════════════════════════════════════════
 //  Function 1: cardcomCreatePayment
-//  יוצר checkout session + דף תשלום בקארדקום
 // ════════════════════════════════════════════════════════
 exports.cardcomCreatePayment = onRequest(
   { region: "us-central1", secrets: [CARDCOM_TERMINAL, CARDCOM_USERNAME] },
@@ -123,14 +112,15 @@ exports.cardcomCreatePayment = onRequest(
     }
 
     try {
-      // אמת Firebase token
       const authHeader = req.headers.authorization || "";
       if (!authHeader.startsWith("Bearer ")) {
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
 
-      let uid, email;
+      let uid = "";
+      let email = "";
+
       try {
         const decoded = await admin
           .auth()
@@ -158,12 +148,12 @@ exports.cardcomCreatePayment = onRequest(
         billingMode === "annual" ? planData.annual : planData.monthly;
       const productName = planData.name;
 
-      // צור checkout session
       const sessionRef = db.collection("checkoutSessions").doc();
       const sessionId = sessionRef.id;
 
       await sessionRef.set({
         uid,
+        email,
         planId,
         billingMode,
         amount,
@@ -186,8 +176,8 @@ exports.cardcomCreatePayment = onRequest(
         SumToBill: String(amount),
         ProductName: productName,
         CardOwnerEmail: email,
-        SuccessRedirectUrl: `${CARDCOM_URLS.successUrl}?session=${sessionId}`,
-        ErrorRedirectUrl: `${CARDCOM_URLS.errorUrl}?session=${sessionId}`,
+        SuccessRedirectUrl: `${CARDCOM_URLS.successUrl}?session=${encodeURIComponent(sessionId)}`,
+        ErrorRedirectUrl: `${CARDCOM_URLS.errorUrl}?session=${encodeURIComponent(sessionId)}`,
         IndicatorUrl: CARDCOM_URLS.webhookUrl,
         ReturnValue: sessionId,
         InvoiceHeadOperation: "1",
@@ -196,7 +186,6 @@ exports.cardcomCreatePayment = onRequest(
         "InvoiceHead.Email": email,
         "InvoiceHead.SendByEmail": "true",
         "InvoiceHead.Language": "he",
-
         "InvoiceLines1.Description": productName,
         "InvoiceLines1.Price": String(amount),
         "InvoiceLines1.Quantity": "1",
@@ -210,18 +199,21 @@ exports.cardcomCreatePayment = onRequest(
         amount,
         sessionId,
       });
-      
+
       logger.info("Cardcom URLs", CARDCOM_URLS);
       logger.info("Cardcom params", params);
 
       const raw = await httpPost(CARDCOM_URLS.lowProfile, params);
       const parsed = parseNV(raw);
 
+      logger.info("Cardcom create response", parsed);
+
       if (parsed.ResponseCode !== "0") {
         await sessionRef.update({
           status: "failed",
           error: parsed.Description || parsed.ResponseCode || "Cardcom error",
         });
+
         throw new Error(
           `Cardcom: ${parsed.Description || parsed.ResponseCode || "Unknown error"}`,
         );
@@ -229,6 +221,7 @@ exports.cardcomCreatePayment = onRequest(
 
       await sessionRef.update({
         lowProfileCode: parsed.LowProfileCode || null,
+        cardcomUrl: parsed.Url || parsed.url || null,
       });
 
       res.json({
@@ -236,15 +229,17 @@ exports.cardcomCreatePayment = onRequest(
         sessionId,
       });
     } catch (e) {
-      logger.error("cardcomCreatePayment", e);
-      res.status(500).json({ error: e.message });
+      logger.error("cardcomCreatePayment", {
+        message: e?.message || String(e),
+        stack: e?.stack || null,
+      });
+      res.status(500).json({ error: e.message || "Server error" });
     }
   },
 );
 
 // ════════════════════════════════════════════════════════
 //  Function 2: cardcomWebhook
-//  מקבל אישור מקארדקום — idempotency אטומי עם Transaction
 // ════════════════════════════════════════════════════════
 exports.cardcomWebhook = onRequest(
   { region: "us-central1", secrets: [CARDCOM_TERMINAL, CARDCOM_USERNAME] },
@@ -258,100 +253,94 @@ exports.cardcomWebhook = onRequest(
       });
 
       let bodyData = {};
+      if (typeof req.body === "object" && req.body) {
+        bodyData = req.body;
+      } else if (typeof req.body === "string" && req.body) {
+        bodyData = querystring.parse(req.body);
+      }
 
-if (typeof req.body === "object" && req.body) {
-  bodyData = req.body;
-} else if (typeof req.body === "string" && req.body) {
-  bodyData = querystring.parse(req.body);
-}
-
-const source = {
-  ...(req.query || {}),
-  ...(bodyData || {}),
-};
+      const source = {
+        ...(req.query || {}),
+        ...(bodyData || {}),
+      };
 
       const terminalnumber =
         source.terminalnumber ||
         source.TerminalNumber ||
-        source.terminalNumber;
+        source.terminalNumber ||
+        null;
 
       const lowprofilecode =
         source.lowprofilecode ||
         source.LowProfileCode ||
-        source.lowProfileCode;
+        source.lowProfileCode ||
+        null;
 
-      const ReturnValue =
+      const returnValueRaw =
         source.ReturnValue ||
         source.returnvalue ||
         source.returnValue ||
-        source.session;
+        source.session ||
+        null;
 
       logger.info("Webhook normalized params", {
         terminalnumber,
         lowprofilecode,
-        ReturnValue,
+        ReturnValue: returnValueRaw,
       });
 
       if (!lowprofilecode || !terminalnumber) {
-  logger.warn("Webhook missing critical params", {
-    terminalnumber,
-    lowprofilecode,
-    ReturnValue,
-    rawQuery: req.query || null,
-    rawBody: req.body || null,
-  });
-  res.status(200).send("ok");
-  return;
-}
+        logger.warn("Webhook missing critical params", {
+          terminalnumber,
+          lowprofilecode,
+          ReturnValue: returnValueRaw,
+          rawQuery: req.query || null,
+          rawBody: req.body || null,
+        });
+        res.status(200).send("ok");
+        return;
+      }
 
-let sessionId = ReturnValue ? String(ReturnValue).trim() : null;
-let sessionRef = null;
-let sessionSnap = null;
+      let sessionId = returnValueRaw ? String(returnValueRaw).trim() : null;
+      let sessionDocRef = null;
+      let sessionSnap = null;
 
-if (sessionId) {
-  sessionRef = db.collection("checkoutSessions").doc(sessionId);
-  sessionSnap = await sessionRef.get();
-}
+      if (sessionId) {
+        sessionDocRef = db.collection("checkoutSessions").doc(sessionId);
+        sessionSnap = await sessionDocRef.get();
+      }
 
-if ((!sessionSnap || !sessionSnap.exists) && lowprofilecode) {
-  const byLowProfile = await db
-    .collection("checkoutSessions")
-    .where("lowProfileCode", "==", lowprofilecode)
-    .limit(1)
-    .get();
+      if ((!sessionSnap || !sessionSnap.exists) && lowprofilecode) {
+        const byLowProfile = await db
+          .collection("checkoutSessions")
+          .where("lowProfileCode", "==", lowprofilecode)
+          .limit(1)
+          .get();
 
-  if (!byLowProfile.empty) {
-    sessionSnap = byLowProfile.docs[0];
-    sessionRef = sessionSnap.ref;
-    sessionId = sessionSnap.id;
-    logger.info("Session resolved by lowProfileCode", {
-      sessionId,
-      lowprofilecode,
-    });
-  }
-}
+        if (!byLowProfile.empty) {
+          sessionSnap = byLowProfile.docs[0];
+          sessionDocRef = sessionSnap.ref;
+          sessionId = sessionSnap.id;
 
-if (!sessionSnap || !sessionSnap.exists) {
-  logger.warn("Session not found", {
-    sessionId,
-    lowprofilecode,
-    ReturnValue,
-  });
-  res.status(200).send("ok");
-  return;
-}
+          logger.info("Session resolved by lowProfileCode", {
+            sessionId,
+            lowprofilecode,
+          });
+        }
+      }
 
-    
-      const sessionRef = db.collection("checkoutSessions").doc(sessionId);
-
-      const sessionSnap = await sessionRef.get();
-      if (!sessionSnap.exists) {
-        logger.warn("Session not found", { sessionId });
+      if (!sessionSnap || !sessionSnap.exists || !sessionDocRef || !sessionId) {
+        logger.warn("Session not found", {
+          sessionId,
+          lowprofilecode,
+          ReturnValue: returnValueRaw,
+        });
         res.status(200).send("ok");
         return;
       }
 
       const session = sessionSnap.data();
+
       if (session.status === "paid") {
         logger.info("Duplicate webhook (session already paid)", { sessionId });
         res.status(200).send("ok");
@@ -378,10 +367,15 @@ if (!sessionSnap || !sessionSnap.exists) {
         deal: verified.DealResponse,
         internalDealNumber: verified.InternalDealNumber || null,
         token: verified.Token || null,
+        tokenExDate: verified.TokenExDate || null,
       });
 
       if (verified.OperationResponse !== "0" || verified.DealResponse !== "0") {
-        await sessionRef.update({ status: "failed" });
+        await sessionDocRef.update({
+          status: "failed",
+          verifyResponse: verified,
+        });
+
         logger.warn("Payment verification failed", verified);
         res.status(200).send("ok");
         return;
@@ -395,8 +389,8 @@ if (!sessionSnap || !sessionSnap.exists) {
       }
 
       const payRef = db.collection("payments").doc(String(dealNumber));
-
       const DUPLICATE = "DUPLICATE_PAYMENT";
+
       try {
         await db.runTransaction(async (t) => {
           const paySnap = await t.get(payRef);
@@ -409,21 +403,28 @@ if (!sessionSnap || !sessionSnap.exists) {
           t.set(payRef, {
             sessionId,
             uid: session.uid,
+            email: session.email || null,
             planId: session.planId,
+            billingMode: session.billingMode,
             amount: session.amount,
+            lowProfileCode: lowprofilecode,
+            cardcomDealNumber: dealNumber,
             processedAt: admin.firestore.FieldValue.serverTimestamp(),
+            type: "initial",
           });
 
-          t.update(sessionRef, {
+          t.update(sessionDocRef, {
             status: "paid",
             paidAt: admin.firestore.FieldValue.serverTimestamp(),
             planId: session.planId,
             billingMode: session.billingMode,
+            lowProfileCode: lowprofilecode,
+            cardcomDealNumber: dealNumber,
           });
         });
       } catch (e) {
         if (e.code === DUPLICATE || e.message === DUPLICATE) {
-          logger.info("Atomic duplicate detected", { dealNumber });
+          logger.info("Atomic duplicate detected", { dealNumber, sessionId });
           res.status(200).send("ok");
           return;
         }
@@ -432,6 +433,7 @@ if (!sessionSnap || !sessionSnap.exists) {
 
       const { uid, planId, billingMode } = session;
       const plan = PLANS[planId];
+
       if (!plan) {
         logger.warn("Plan not found for billing", { uid, planId, sessionId });
         res.status(200).send("ok");
@@ -480,9 +482,7 @@ if (!sessionSnap || !sessionSnap.exists) {
 );
 
 // ════════════════════════════════════════════════════════
-//  Function 3: cardcomRenewSubscriptions (Scheduled)
-//  חיוב מתחדש — Scheduler בלבד, לקוח לא יכול להפעיל
-//  רץ 09:00 כל יום (ישראל)
+//  Function 3: cardcomRenewSubscriptions
 // ════════════════════════════════════════════════════════
 exports.cardcomRenewSubscriptions = onSchedule(
   {
@@ -547,7 +547,6 @@ exports.cardcomRenewSubscriptions = onSchedule(
           const dealNum = parsed.InternalDealNumber;
           const newEnd = calcEnd(b.billingMode, b.subscriptionEnd.toDate());
 
-          // Atomic idempotency גם לחידושים
           const payRef = db.collection("payments").doc(String(dealNum));
           const DUPLICATE = "DUPLICATE_RENEWAL";
 
@@ -569,38 +568,38 @@ exports.cardcomRenewSubscriptions = onSchedule(
               });
             });
           } catch (e) {
-            if (e.code === DUPLICATE) {
+            if (e.code === DUPLICATE || e.message === DUPLICATE) {
               logger.info("Duplicate renewal skipped", { dealNum });
               continue;
             }
             throw e;
           }
 
-          await db
-            .collection("billing")
-            .doc(uid)
-            .update({
-              status: "active",
-              subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd),
-              lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
-              lastPaymentAmount: amount,
-              reportsThisMonth: 0,
-            });
+          await db.collection("billing").doc(uid).update({
+            status: "active",
+            subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd),
+            lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastPaymentAmount: amount,
+            reportsThisMonth: 0,
+          });
 
           logger.info("Renewal OK", { uid, newEnd });
         } else {
-          await db
-            .collection("billing")
-            .doc(uid)
-            .update({
-              status: "renewal_failed",
-              renewalError: parsed.Description || parsed.ResponseCode,
-            });
+          await db.collection("billing").doc(uid).update({
+            status: "renewal_failed",
+            renewalError: parsed.Description || parsed.ResponseCode,
+          });
 
-          logger.warn("Renewal failed", { uid, err: parsed.Description });
+          logger.warn("Renewal failed", {
+            uid,
+            err: parsed.Description || parsed.ResponseCode,
+          });
         }
       } catch (e) {
-        logger.error("Renewal error", { uid, err: e.message });
+        logger.error("Renewal error", {
+          uid,
+          err: e?.message || String(e),
+        });
       }
     }
   },
