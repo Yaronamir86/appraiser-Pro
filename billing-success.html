@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OMDAN | תשלום התקבל</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#111827;border-radius:24px;padding:52px 40px;max-width:480px;width:100%;text-align:center;}
+.card.success{border:1px solid rgba(16,185,129,.3);}
+.card.pending{border:1px solid rgba(245,158,11,.3);}
+.card.error{border:1px solid rgba(239,68,68,.3);}
+.icon{font-size:64px;margin-bottom:20px;}
+h1{font-size:28px;font-weight:900;margin-bottom:10px;}
+.sub{font-size:15px;color:#9ca3af;margin-bottom:28px;line-height:1.7;}
+.plan-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;font-size:13px;font-weight:700;padding:8px 20px;border-radius:20px;margin-bottom:28px;}
+.btn{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:800;font-size:15px;padding:14px 36px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;font-family:'Heebo',sans-serif;}
+.btn-ghost{background:transparent;border:1px solid #374151;color:#9ca3af;margin-top:12px;font-size:13px;padding:10px 24px;display:inline-block;text-decoration:none;border-radius:12px;}
+.loader{width:40px;height:40px;border:3px solid rgba(16,185,129,.15);border-top-color:#10b981;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+.pop{animation:pop .5s ease;}
+.note{margin-top:18px;font-size:12px;color:#6b7280;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="card pending" id="card">
+  <div class="loader"></div>
+  <h1>מאמת תשלום...</h1>
+  <p class="sub">מקבל אישור מקארדקום.<br>הדף יתעדכן אוטומטית.</p>
+</div>
+
+<script type="module">
+import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const app  = initializeApp({
+  apiKey:'AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw',
+  authDomain:'yaron-appraiser.firebaseapp.com',
+  projectId:'yaron-appraiser'
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const planNames     = { starter:'Starter', pro:'Pro', office:'Office' };
+const billingLabels = { monthly:'חודשי', annual:'שנתי' };
+
+const params    = new URLSearchParams(location.search);
+const sessionId = params.get('session');
+
+function showSuccess(planId, billingMode) {
+  const card = document.getElementById('card');
+  card.className = 'card success';
+  card.innerHTML = `
+    <div class="icon pop">🎉</div>
+    <h1>ברוך הבא ל-OMDAN!</h1>
+    <p class="sub">התשלום התקבל בהצלחה.<br>החשבון שלך מוכן לשימוש מלא.</p>
+    <div class="plan-badge">✓ מסלול ${planNames[planId]||planId} — ${billingLabels[billingMode]||billingMode}</div><br>
+    <a href="index.html" class="btn">🚀 כניסה למערכת</a>
+    <p class="note">חשבונית מס תישלח למייל שלך</p>`;
+}
+
+function showError(msg) {
+  const card = document.getElementById('card');
+  card.className = 'card error';
+  card.innerHTML = `
+    <div class="icon">⚠️</div>
+    <h1>לא ניתן לאמת תשלום</h1>
+    <p class="sub">${msg||'אנא פנה לתמיכה או נסה שוב.'}</p>
+    <a href="pricing.html" class="btn">נסה שוב</a><br>
+    <a href="index.html" class="btn-ghost">חזרה למערכת</a>`;
+}
+
+if (!sessionId) {
+  showError('קישור לא תקין — אין session ID.');
+} else {
+  // האזן ל-checkoutSessions/{sessionId} — לא ל-billing הכללי
+  const unsub = onSnapshot(doc(db, 'checkoutSessions', sessionId), (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data();
+    if (data.status === 'paid') {
+      unsub();
+      showSuccess(data.planId, data.billingMode);
+    } else if (data.status === 'failed') {
+      unsub();
+      showError('התשלום נדחה. לא בוצע חיוב.');
+    }
+    // pending → ממשיך להמתין
+  });
+
+  // timeout 40 שניות
+  setTimeout(() => {
+    unsub();
+    showError('אמות התשלום לוקחת יותר זמן מהרגיל.<br>אם שולמת — המנוי יופעל תוך מספר דקות.');
+  }, 40000);
+}
+</script>
+</body>
+</html>
