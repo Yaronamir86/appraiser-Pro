@@ -46,8 +46,8 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
   </div>
   <div class="subtitle">מערכת ניהול תיקי שמאות לשמאי רכוש</div>
 
-  <div style="text-align:center;margin-bottom:28px;">
-    <span class="trial-badge">✅ ניסיון חינמי 14 יום — ללא כרטיס אשראי</span>
+  <div style="text-align:center;margin-bottom:28px;" id="badgeArea">
+    <span class="trial-badge" id="trialBadge">✅ ניסיון חינמי 14 יום — ללא כרטיס אשראי</span>
   </div>
 
   <div class="success" id="successMsg">
@@ -101,12 +101,12 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 
     <button class="btn-register" id="regBtn" onclick="doRegister()">התחל ניסיון חינמי ←</button>
 
-    <div class="terms">
-      בלחיצה מסכים ל<a href="#">תנאי השימוש</a>. אחרי 14 יום — 99₪/חודש.
+    <div class="terms" id="termsText">
+      בלחיצה מסכים ל<a href="#">תנאי השימוש</a>. אחרי 14 יום — 129₪/חודש.
     </div>
   </div>
 
-  <div class="login-link">כבר יש לך חשבון? <a href="index.html">כניסה למערכת</a></div>
+  <div class="login-link">כבר יש לך חשבון? <a href="index.html" id="loginLink">כניסה למערכת</a></div>
 </div>
 
 <script type="module">
@@ -127,11 +127,85 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// Already logged in → go to dashboard
+// ── קרא plan+billing מה-URL ──
+const urlParams   = new URLSearchParams(window.location.search);
+const pendingPlan = urlParams.get('plan');    // 'starter' | 'pro' | 'office' | null
+const pendingBilling = urlParams.get('billing') || 'monthly'; // 'monthly' | 'annual'
+
+const PLAN_NAMES = { starter:'Starter', pro:'Pro', office:'Office' };
+const BILLING_LABELS = { monthly:'חודשי', annual:'שנתי' };
+
+// עדכן UI אם הגיע עם plan
+if (pendingPlan && PLAN_NAMES[pendingPlan]) {
+  const badge = document.getElementById('trialBadge');
+  if (badge) {
+    badge.textContent = `💳 רכישת מסלול ${PLAN_NAMES[pendingPlan]} — ${BILLING_LABELS[pendingBilling]}`;
+    badge.style.background = 'rgba(245,158,11,.12)';
+    badge.style.borderColor = 'rgba(245,158,11,.3)';
+    badge.style.color = '#fbbf24';
+  }
+  const btn = document.getElementById('regBtn');
+  if (btn) btn.textContent = 'הירשם ועבור לתשלום ←';
+  const terms = document.getElementById('termsText');
+  if (terms) terms.textContent = 'לאחר ההרשמה תועבר לדף תשלום מאובטח של קארדקום.';
+  const loginLink = document.getElementById('loginLink');
+  if (loginLink) loginLink.href = `index.html?plan=${pendingPlan}&billing=${pendingBilling}`;
+}
+
+// ── flag — מונע ריצה כפולה בין onAuthStateChanged ל-doRegister ──
+let _handlingAuth = false;
+
+// ── פונקציה מרכזית — יצירת checkout אחרי auth ──
+async function proceedToCheckout(user) {
+  document.getElementById('regForm').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+  const msgs = document.querySelectorAll('#successMsg div');
+  if(msgs[1]) msgs[1].textContent = '⏳';
+  if(msgs[2]) msgs[2].textContent = 'מעביר לדף תשלום מאובטח...';
+  if(msgs[3]) msgs[3].textContent = '';
+
+  try {
+    const token = await user.getIdToken(true); // force refresh
+    const res = await fetch(
+      'https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ planId: pendingPlan, billingMode: pendingBilling }),
+      }
+    );
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'שגיאה ביצירת תשלום');
+    }
+  } catch(e) {
+    console.error('Checkout error:', e);
+    // כישלון — שלח לדשבורד
+    window.location.href = 'index.html';
+  }
+}
+
+// ── onAuthStateChanged — רק למשתמש שכבר מחובר לפני טעינת הדף ──
+// _handlingAuth מונע התנגשות עם doRegister
+let _authInitialized = false;
 onAuthStateChanged(auth, user => {
-  if(user) window.location.href = 'index.html';
+  if (_handlingAuth) return; // doRegister מטפל — אל תתערב
+
+  if (!_authInitialized) {
+    _authInitialized = true;
+    if (!user) return; // לא מחובר — דף הרשמה רגיל
+    // מחובר כבר לפני שנכנס לדף — הפנה בהתאם
+    if (pendingPlan && PLAN_NAMES[pendingPlan]) {
+      proceedToCheckout(user);
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
 });
 
+// ── הרשמה ──
 window.doRegister = async function(){
   const firstName = document.getElementById('firstName').value.trim();
   const lastName  = document.getElementById('lastName').value.trim();
@@ -149,7 +223,8 @@ window.doRegister = async function(){
   if(pass.length < 8)        return showErr('הסיסמה חייבת להכיל לפחות 8 תווים');
   if(pass !== pass2)         return showErr('הסיסמאות אינן זהות');
 
-  btn.textContent='יוצר חשבון...'; btn.disabled=true;
+  btn.textContent = 'יוצר חשבון...'; btn.disabled = true;
+  _handlingAuth = true; // נעל את onAuthStateChanged
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -157,7 +232,7 @@ window.doRegister = async function(){
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 14);
 
-    // Write user profile
+    // כתוב פרופיל משתמש
     await setDoc(doc(db,'users',uid), {
       uid, firstName, lastName,
       fullName: firstName+' '+lastName,
@@ -168,7 +243,7 @@ window.doRegister = async function(){
       createdAt: serverTimestamp()
     });
 
-    // Write billing record (billing core)
+    // כתוב billing — trial
     await setDoc(doc(db,'billing',uid), {
       uid, email, plan: 'trial',
       products: ['appraiser-pro'],
@@ -176,20 +251,24 @@ window.doRegister = async function(){
       subscriptionEnd: null,
       reportsThisMonth: 0,
       reportsResetAt: new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toISOString(),
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
 
-    document.getElementById('regForm').style.display='none';
-    document.getElementById('successMsg').style.display='block';
-    setTimeout(()=>{ window.location.href='index.html'; }, 2000);
+    // אחרי הרשמה — checkout או דשבורד
+    if (pendingPlan && PLAN_NAMES[pendingPlan]) {
+      await proceedToCheckout(cred.user);
+    } else {
+      document.getElementById('regForm').style.display='none';
+      document.getElementById('successMsg').style.display='block';
+      setTimeout(()=>{ window.location.href='index.html'; }, 2000);
+    }
 
   } catch(e) {
-    btn.textContent='התחל ניסיון חינמי ←'; btn.disabled=false;
+    btn.textContent = pendingPlan ? 'הירשם ועבור לתשלום ←' : 'התחל ניסיון חינמי ←';
+    btn.disabled = false;
     const msgs = {
-      'auth/email-already-in-use': 'אימייל זה כבר רשום. <a href="index.html" style="color:#f59e0b">כניסה</a>',
+      'auth/email-already-in-use': 'אימייל זה כבר רשום. <a href="index.html' + (pendingPlan ? `?plan=${pendingPlan}&billing=${pendingBilling}` : '') + '" style="color:#f59e0b">כניסה</a>',
       'auth/invalid-email':        'כתובת האימייל אינה תקינה',
       'auth/weak-password':        'הסיסמה חלשה — השתמש ב-8 תווים עם מספרים'
     };
