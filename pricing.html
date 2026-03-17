@@ -686,48 +686,30 @@
         });
       }
 
-      async function startCheckout(plan) {
-        try {
-          const user = firebase.auth().currentUser;
+      async function startCheckout(planId) {
+        const token = await firebase.auth().currentUser.getIdToken();
 
-          if (!user) {
-            window.location.href = `register.html?plan=${plan}&billing=${billingMode}`;
-            return;
-          }
-
-          const idToken = await user.getIdToken();
-
-          const res = await fetch(
-            "https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
-              },
-              body: JSON.stringify({
-                planId: plan,
-                billingMode,
-              }),
+        const res = await fetch(
+          "https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
             },
-          );
+            body: JSON.stringify({
+              planId: planId,
+              billingMode: billingMode,
+            }),
+          },
+        );
 
-          const data = await res.json();
+        const data = await res.json();
 
-          if (!res.ok) {
-            alert(data.error || "שגיאה ביצירת תשלום");
-            return;
-          }
-
-          if (!data.url) {
-            alert("לא התקבל קישור תשלום");
-            return;
-          }
-
+        if (data.url) {
           window.location.href = data.url;
-        } catch (err) {
-          console.error(err);
-          alert("שגיאה ביצירת תשלום");
+        } else {
+          alert("Payment error");
         }
       }
 
