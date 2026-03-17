@@ -23,80 +23,165 @@ h1{font-size:28px;font-weight:900;margin-bottom:10px;}
 @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
 .pop{animation:pop .5s ease;}
 .note{margin-top:18px;font-size:12px;color:#6b7280;line-height:1.7;}
+.small{font-size:12px;color:#6b7280;line-height:1.7;margin-top:14px;word-break:break-word;}
 </style>
 </head>
 <body>
 <div class="card pending" id="card">
   <div class="loader"></div>
   <h1>מאמת תשלום...</h1>
-  <p class="sub">מקבל אישור מקארדקום.<br>הדף יתעדכן אוטומטית.</p>
+  <p class="sub">מקבל אישור מהמערכת.<br>הדף יתעדכן אוטומטית.</p>
 </div>
 
 <script type="module">
-import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-const app  = initializeApp({
-  apiKey:'AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw',
-  authDomain:'yaron-appraiser.firebaseapp.com',
-  projectId:'yaron-appraiser'
+const app = initializeApp({
+  apiKey: 'AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw',
+  authDomain: 'yaron-appraiser.firebaseapp.com',
+  projectId: 'yaron-appraiser'
 });
+
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db = getFirestore(app);
 
-const planNames     = { starter:'Starter', pro:'Pro', office:'Office' };
-const billingLabels = { monthly:'חודשי', annual:'שנתי' };
+const planNames = {
+  starter: 'Starter',
+  pro: 'Pro',
+  office: 'Office'
+};
 
-const params    = new URLSearchParams(location.search);
+const billingLabels = {
+  monthly: 'חודשי',
+  annual: 'שנתי'
+};
+
+const params = new URLSearchParams(location.search);
 const sessionId = params.get('session');
 
+const card = document.getElementById('card');
+
+function showPending(extra = '') {
+  card.className = 'card pending';
+  card.innerHTML = `
+    <div class="loader"></div>
+    <h1>מאמת תשלום...</h1>
+    <p class="sub">מקבל אישור מהמערכת.<br>הדף יתעדכן אוטומטית.</p>
+    ${extra ? `<div class="small">${extra}</div>` : ''}
+  `;
+}
+
 function showSuccess(planId, billingMode) {
-  const card = document.getElementById('card');
   card.className = 'card success';
   card.innerHTML = `
     <div class="icon pop">🎉</div>
     <h1>ברוך הבא ל-OMDAN!</h1>
     <p class="sub">התשלום התקבל בהצלחה.<br>החשבון שלך מוכן לשימוש מלא.</p>
-    <div class="plan-badge">✓ מסלול ${planNames[planId]||planId} — ${billingLabels[billingMode]||billingMode}</div><br>
+    <div class="plan-badge">✓ מסלול ${planNames[planId] || planId || 'פעיל'} — ${billingLabels[billingMode] || billingMode || 'פעיל'}</div><br>
     <a href="index.html" class="btn">🚀 כניסה למערכת</a>
-    <p class="note">חשבונית מס תישלח למייל שלך</p>`;
+    <p class="note">חשבונית מס תישלח למייל שלך</p>
+    <div class="small">Session: ${sessionId}</div>
+  `;
 }
 
 function showError(msg) {
-  const card = document.getElementById('card');
   card.className = 'card error';
   card.innerHTML = `
     <div class="icon">⚠️</div>
     <h1>לא ניתן לאמת תשלום</h1>
-    <p class="sub">${msg||'אנא פנה לתמיכה או נסה שוב.'}</p>
+    <p class="sub">${msg || 'אנא פנה לתמיכה או נסה שוב.'}</p>
     <a href="pricing.html" class="btn">נסה שוב</a><br>
-    <a href="index.html" class="btn-ghost">חזרה למערכת</a>`;
+    <a href="index.html" class="btn-ghost">חזרה למערכת</a>
+    <div class="small">Session: ${sessionId || 'missing'}</div>
+  `;
 }
 
-if (!sessionId) {
-  showError('קישור לא תקין — אין session ID.');
-} else {
-  // האזן ל-checkoutSessions/{sessionId} — לא ל-billing הכללי
-  const unsub = onSnapshot(doc(db, 'checkoutSessions', sessionId), (snap) => {
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (data.status === 'paid') {
-      unsub();
-      showSuccess(data.planId, data.billingMode);
-    } else if (data.status === 'failed') {
-      unsub();
-      showError('התשלום נדחה. לא בוצע חיוב.');
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function waitForAuthInit(timeoutMs = 10000) {
+  return new Promise((resolve) => {
+    let done = false;
+
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      resolve(auth.currentUser || null);
+    }, timeoutMs);
+
+    onAuthStateChanged(auth, (user) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(user || null);
+    }, () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(auth.currentUser || null);
+    });
+  });
+}
+
+async function verifySession() {
+  if (!sessionId) {
+    showError('קישור לא תקין — אין session ID.');
+    return;
+  }
+
+  showPending(`Session: ${sessionId}`);
+
+  await waitForAuthInit(10000);
+
+  const maxAttempts = 45; // 90 שניות
+  let lastStatus = null;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const snap = await getDoc(doc(db, 'checkoutSessions', sessionId));
+
+      if (snap.exists()) {
+        const data = snap.data();
+        lastStatus = data.status || null;
+
+        if (data.status === 'paid') {
+          showSuccess(data.planId, data.billingMode);
+          return;
+        }
+
+        if (data.status === 'failed') {
+          showError('התשלום נדחה או שנכשל באימות. לא בוצע חיוב פעיל.');
+          return;
+        }
+
+        showPending(`אימות תשלום... ניסיון ${attempt} מתוך ${maxAttempts}`);
+      } else {
+        showPending(`הסשן עדיין לא זמין במערכת... ניסיון ${attempt} מתוך ${maxAttempts}`);
+      }
+    } catch (err) {
+      lastError = err;
+      showPending(`ממתין לאימות... ניסיון ${attempt} מתוך ${maxAttempts}`);
     }
-    // pending → ממשיך להמתין
+
+    await sleep(2000);
+  }
+
+  console.error('Payment verification timeout', {
+    sessionId,
+    lastStatus,
+    lastError
   });
 
-  // timeout 40 שניות
-  setTimeout(() => {
-    unsub();
-    showError('אימות התשלום לוקח יותר זמן מהרגיל.<br>אם שילמת — המנוי יופעל תוך מספר דקות.');
-  }, 40000);
+  showError(
+    'אימות התשלום לוקח יותר זמן מהרגיל.<br>אם שילמת, המנוי בדרך כלל יופעל תוך זמן קצר.<br>ניתן לחזור למערכת ולרענן בעוד דקה.'
+  );
 }
+
+verifySession();
 </script>
 </body>
 </html>
