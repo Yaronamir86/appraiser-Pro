@@ -659,58 +659,24 @@
       let billingMode = "monthly";
       const prices = {
         starter: { monthly: 129, annual: 990 },
-        pro: { monthly: 249, annual: 2190 },
-        office: { monthly: 499, annual: 4500 },
+        pro:     { monthly: 249, annual: 2190 },
+        office:  { monthly: 499, annual: 4500 },
       };
 
       function setBilling(mode) {
         billingMode = mode;
-        document
-          .getElementById("btnMonthly")
-          .classList.toggle("active", mode === "monthly");
-        document
-          .getElementById("btnAnnual")
-          .classList.toggle("active", mode === "annual");
-
-        ["starter", "pro", "office"].forEach((plan) => {
+        document.getElementById("btnMonthly").classList.toggle("active", mode === "monthly");
+        document.getElementById("btnAnnual").classList.toggle("active", mode === "annual");
+        ["starter","pro","office"].forEach(plan => {
           const p = prices[plan];
-          if (mode === "annual") {
-            const monthly = Math.round(p.annual / 12);
-            document.getElementById("price-" + plan).textContent = monthly;
-            document.getElementById("annual-" + plan).textContent =
-              `₪${p.annual.toLocaleString()} לשנה — חיסכון ₪${(p.monthly * 12 - p.annual).toLocaleString()}`;
+          if(mode === "annual"){
+            document.getElementById("price-"+plan).textContent = Math.round(p.annual/12);
+            document.getElementById("annual-"+plan).textContent = `₪${p.annual.toLocaleString()} לשנה — חיסכון ₪${(p.monthly*12-p.annual).toLocaleString()}`;
           } else {
-            document.getElementById("price-" + plan).textContent = p.monthly;
-            document.getElementById("annual-" + plan).textContent = "";
+            document.getElementById("price-"+plan).textContent = p.monthly;
+            document.getElementById("annual-"+plan).textContent = "";
           }
         });
-      }
-
-      async function startCheckout(planId) {
-        const token = await firebase.auth().currentUser.getIdToken();
-
-        const res = await fetch(
-          "https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-            },
-            body: JSON.stringify({
-              planId: planId,
-              billingMode: billingMode,
-            }),
-          },
-        );
-
-        const data = await res.json();
-
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert("Payment error");
-        }
       }
 
       function toggleFaq(el) {
@@ -719,14 +685,75 @@
 
       // Check if user came from trial expiry
       const params = new URLSearchParams(window.location.search);
-      if (params.get("reason") === "trial_expired") {
+      if(params.get("reason") === "trial_expired"){
         const banner = document.createElement("div");
-        banner.style.cssText =
-          "background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:14px 24px;text-align:center;font-size:14px;font-weight:600;";
-        banner.textContent =
-          "⚠️ תקופת הניסיון שלך הסתיימה. בחר מסלול כדי להמשיך.";
+        banner.style.cssText = "background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:14px 24px;text-align:center;font-size:14px;font-weight:600;";
+        banner.textContent = "⚠️ תקופת הניסיון שלך הסתיימה. בחר מסלול כדי להמשיך.";
         document.querySelector("nav").after(banner);
       }
+
+      // startCheckout — מוגדר כ-async ויקרא מה-module לאחר שהAuth מוכן
+      let _firebaseUser = null; // יוגדר ע"י module לאחר auth resolve
+      window._pricingReady = false;
+
+      async function startCheckout(planId) {
+        const btn = event.currentTarget || event.target;
+        // אם auth עדיין טוען — המתן רגע
+        if(!window._pricingReady){
+          btn.textContent = '⏳...';
+          await new Promise(r => setTimeout(r, 1200));
+          btn.textContent = btn.dataset.origText || 'בחר מסלול';
+        }
+
+        if(!_firebaseUser){
+          // לא מחובר — שלח ל-register עם params
+          window.location.href = `register.html?plan=${planId}&billing=${billingMode}`;
+          return;
+        }
+
+        const origText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '⏳ מעבד...';
+
+        try {
+          const token = await _firebaseUser.getIdToken();
+          const res = await fetch(
+            "https://us-central1-yaron-appraiser.cloudfunctions.net/cardcomCreatePayment",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+              body: JSON.stringify({ planId, billingMode }),
+            }
+          );
+          const data = await res.json();
+          if(data.url){
+            window.location.href = data.url;
+          } else {
+            throw new Error(data.error || 'שגיאה ביצירת תשלום');
+          }
+        } catch(e) {
+          btn.disabled = false;
+          btn.textContent = origText;
+          alert('שגיאה: ' + e.message);
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+      const app  = initializeApp({
+        apiKey:"AIzaSyAepqvT-NRxTiVemkaxNJWpyAQ9ibxrkcw",
+        authDomain:"yaron-appraiser.firebaseapp.com",
+        projectId:"yaron-appraiser",
+      });
+      const auth = getAuth(app);
+
+      onAuthStateChanged(auth, user => {
+        window._firebaseUser   = user || null;
+        window._pricingReady   = true;
+      });
     </script>
   </body>
 </html>
