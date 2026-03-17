@@ -3383,8 +3383,8 @@ function _doGenerateReport(){
       ${b.visitDate?`<div style="font-size:12px;color:#9CA3AF;">תאריך ביקור: ${fmtDate(b.visitDate)}</div>`:''}
     </div>
 
-    <!-- טבלת נתונים ראשית -->
-    <style>
+    <!-- טבלת נתונים ראשית — רק לשומה פרטית ומס רכוש. ביטוח מציג 4 פנלים נפרדים -->
+    ${mode !== 'insurance' ? `<style>
       .rpt-data-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0;}
       .rpt-data-panel{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;}
       .rpt-data-panel-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#374151;padding:9px 13px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;}
@@ -3394,10 +3394,9 @@ function _doGenerateReport(){
       .rpt-data-panel td:last-child{font-weight:700;color:#111;}
     </style>
     <div class="rpt-data-grid">
-      <!-- פרטי המזמין — כותרת לפי מסלול -->
       <div class="rpt-data-panel">
         <div class="rpt-data-panel-title">
-          ${mode==='tax' ? '🏛️ פרטי המזמין — מס רכוש' : mode==='insurance' ? '👤 פרטי המבוטח / המזמין' : '👤 פרטי המזמין'}
+          ${mode==='tax' ? '🏛️ פרטי המזמין — מס רכוש' : '👤 פרטי המזמין'}
         </div>
         <table><tbody>
           ${b.fullName?`<tr><td>שם מלא</td><td>${b.fullName}</td></tr>`:''}
@@ -3405,12 +3404,8 @@ function _doGenerateReport(){
           ${b.phone?`<tr><td>טלפון</td><td>${b.phone}</td></tr>`:''}
           ${b.email?`<tr><td>דוא"ל</td><td>${b.email}</td></tr>`:''}
           ${[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).length?`<tr><td>כתובת הנכס</td><td>${[b.street,b.streetNum,b.apartment,b.city].filter(Boolean).join(' ')}</td></tr>`:''}
-          ${mode==='insurance' && ins.company?`<tr><td>חברת ביטוח</td><td>${ins.company}</td></tr>`:''}
-          ${mode==='insurance' && ins.policyNum?`<tr><td>מספר פוליסה</td><td>${ins.policyNum}</td></tr>`:''}
-          ${mode==='insurance' && ins.claimNum?`<tr><td>מספר תביעה</td><td>${ins.claimNum}</td></tr>`:''}
         </tbody></table>
       </div>
-      <!-- פרטי האירוע -->
       <div class="rpt-data-panel">
         <div class="rpt-data-panel-title">📅 פרטי האירוע</div>
         <table><tbody>
@@ -3421,7 +3416,7 @@ function _doGenerateReport(){
           <tr><td>תאריך הפקה</td><td>${new Date().toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'})}</td></tr>
         </tbody></table>
       </div>
-    </div>
+    </div>` : ''}
 
   </div>`;
 
