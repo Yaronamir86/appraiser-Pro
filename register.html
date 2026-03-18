@@ -101,8 +101,19 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 
     <button class="btn-register" id="regBtn" onclick="doRegister()">התחל ניסיון חינמי ←</button>
 
+    <div class="legal-agreement" style="margin-top:16px;">
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.6;color:#9ca3af;cursor:pointer;">
+        <input type="checkbox" id="acceptLegal" style="margin-top:3px;accent-color:#f59e0b;flex-shrink:0;">
+        <span>
+          קראתי ואני מסכים/ה ל<a href="legal/terms-of-service/terms-he.html" target="_blank" rel="noopener" style="color:#f59e0b;text-decoration:none;">תנאי השימוש</a>,
+          ל<a href="legal/privacy-policy/privacy-he.html" target="_blank" rel="noopener" style="color:#f59e0b;text-decoration:none;">מדיניות הפרטיות</a>
+          ול<a href="legal/refund-policy/refunds-he.html" target="_blank" rel="noopener" style="color:#f59e0b;text-decoration:none;">מדיניות ההחזרים</a>.
+        </span>
+      </label>
+    </div>
+
     <div class="terms" id="termsText">
-      בלחיצה מסכים ל<a href="#">תנאי השימוש</a>. אחרי 14 יום — 129₪/חודש.
+      אחרי 14 יום — 89₪/חודש.
     </div>
   </div>
 
@@ -241,6 +252,11 @@ window.doRegister = async function(){
   if(pass.length < 8)        return showErr('הסיסמה חייבת להכיל לפחות 8 תווים');
   if(pass !== pass2)         return showErr('הסיסמאות אינן זהות');
 
+  const legalCheckbox = document.getElementById('acceptLegal');
+  if(!legalCheckbox || !legalCheckbox.checked) {
+    return showErr('יש לאשר את תנאי השימוש ומדיניות הפרטיות לפני הרשמה.');
+  }
+
   btn.textContent = 'יוצר חשבון...'; btn.disabled = true;
   _handlingAuth = true; // נעל את onAuthStateChanged
 
@@ -319,5 +335,20 @@ function checkPW(v){
   hint.style.color=c[s-1]||'#6b7280';
 }
 </script>
+
+<style>
+.site-footer{margin-top:40px;padding:20px 5% 28px;text-align:center;font-size:12px;color:#6b7280;border-top:1px solid rgba(255,255,255,.06);}
+.site-footer a{color:#9ca3af;text-decoration:none;margin:0 6px;}
+.site-footer a:hover{color:#f59e0b;}
+</style>
+<footer class="site-footer">
+  <a href="legal/index.html">מסמכים משפטיים</a> |
+  <a href="legal/terms-of-service/terms-he.html">תנאי שימוש</a> |
+  <a href="legal/privacy-policy/privacy-he.html">פרטיות</a> |
+  <a href="legal/refund-policy/refunds-he.html">החזרים</a> |
+  <a href="legal/subscription-terms/subscription-he.html">תנאי מנוי</a>
+  <br><br>© 2025 OMDAN. כל הזכויות שמורות.
+</footer>
+
 </body>
 </html>

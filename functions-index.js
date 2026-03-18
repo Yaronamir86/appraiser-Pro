@@ -41,8 +41,8 @@ const CARDCOM_URLS = {
 };
 
 const PLANS = {
-  starter: { monthly: 129, annual: 990, name: "OMDAN Starter" },
-  pro: { monthly: 249, annual: 2190, name: "OMDAN Pro" },
+  starter: { monthly: 89, annual: 680, name: "OMDAN Starter" },
+  pro:     { monthly: 129, annual: 990, name: "OMDAN Pro" },
   office: { monthly: 499, annual: 4500, name: "OMDAN Office" },
 };
 
