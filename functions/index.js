@@ -1,3 +1,15 @@
+/**
+ * OMDAN — Firebase Cloud Functions v2.1
+ *
+ * Secrets (הגדר פעם אחת):
+ *   firebase functions:secrets:set CARDCOM_TERMINAL
+ *   firebase functions:secrets:set CARDCOM_USERNAME
+ *
+ * Deploy:
+ *   cd functions && npm install
+ *   firebase deploy --only functions
+ */
+
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
@@ -10,6 +22,8 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // ══ Secrets — credentials לא בקוד ══
+// API 10 (Name-to-Value) משתמש רק ב-TerminalNumber + UserName.
+// אין שדה Password ב-API 10. הסיסמה היא לפאנל הניהול בלבד.
 const CARDCOM_TERMINAL = defineSecret("CARDCOM_TERMINAL");
 const CARDCOM_USERNAME = defineSecret("CARDCOM_USERNAME");
 
@@ -27,8 +41,8 @@ const CARDCOM_URLS = {
 };
 
 const PLANS = {
-  starter: { monthly: 129, annual: 990, name: "OMDAN Starter" },
-  pro: { monthly: 249, annual: 2190, name: "OMDAN Pro" },
+  starter: { monthly: 89, annual: 680, name: "OMDAN Starter" },
+  pro:     { monthly: 129, annual: 990, name: "OMDAN Pro" },
   office: { monthly: 499, annual: 4500, name: "OMDAN Office" },
 };
 
@@ -37,7 +51,6 @@ function httpPost(url, params) {
   return new Promise((resolve, reject) => {
     const body = querystring.stringify(params);
     const u = new URL(url);
-
     const req = https.request(
       {
         hostname: u.hostname,
@@ -54,7 +67,6 @@ function httpPost(url, params) {
         res.on("end", () => resolve(d));
       },
     );
-
     req.on("error", reject);
     req.write(body);
     req.end();
@@ -75,12 +87,10 @@ function httpGet(url) {
 
 function parseNV(str) {
   const r = {};
-  String(str || "")
-    .split("&")
-    .forEach((p) => {
-      const [k, ...v] = p.split("=");
-      if (k) r[decodeURIComponent(k)] = decodeURIComponent(v.join("=") || "");
-    });
+  str.split("&").forEach((p) => {
+    const [k, ...v] = p.split("=");
+    if (k) r[decodeURIComponent(k)] = decodeURIComponent(v.join("=") || "");
+  });
   return r;
 }
 
@@ -93,6 +103,7 @@ function calcEnd(billingMode, from = new Date()) {
 
 // ════════════════════════════════════════════════════════
 //  Function 1: cardcomCreatePayment
+//  יוצר checkout session + דף תשלום בקארדקום
 // ════════════════════════════════════════════════════════
 exports.cardcomCreatePayment = onRequest(
   { region: "us-central1", secrets: [CARDCOM_TERMINAL, CARDCOM_USERNAME] },
@@ -112,15 +123,14 @@ exports.cardcomCreatePayment = onRequest(
     }
 
     try {
+      // אמת Firebase token
       const authHeader = req.headers.authorization || "";
       if (!authHeader.startsWith("Bearer ")) {
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
 
-      let uid = "";
-      let email = "";
-
+      let uid, email;
       try {
         const decoded = await admin
           .auth()
@@ -148,12 +158,12 @@ exports.cardcomCreatePayment = onRequest(
         billingMode === "annual" ? planData.annual : planData.monthly;
       const productName = planData.name;
 
+      // צור checkout session
       const sessionRef = db.collection("checkoutSessions").doc();
       const sessionId = sessionRef.id;
 
       await sessionRef.set({
         uid,
-        email,
         planId,
         billingMode,
         amount,
@@ -176,19 +186,12 @@ exports.cardcomCreatePayment = onRequest(
         SumToBill: String(amount),
         ProductName: productName,
         CardOwnerEmail: email,
-        SuccessRedirectUrl: `${CARDCOM_URLS.successUrl}?session=${encodeURIComponent(sessionId)}`,
-        ErrorRedirectUrl: `${CARDCOM_URLS.errorUrl}?session=${encodeURIComponent(sessionId)}`,
+        SuccessRedirectUrl: `${CARDCOM_URLS.successUrl}?session=${sessionId}`,
+        ErrorRedirectUrl: `${CARDCOM_URLS.errorUrl}?session=${sessionId}`,
         IndicatorUrl: CARDCOM_URLS.webhookUrl,
         ReturnValue: sessionId,
         InvoiceHeadOperation: "1",
         DocTypeToCreate: "400",
-        "InvoiceHead.CustName": productName,
-        "InvoiceHead.Email": email,
-        "InvoiceHead.SendByEmail": "true",
-        "InvoiceHead.Language": "he",
-        "InvoiceLines1.Description": productName,
-        "InvoiceLines1.Price": String(amount),
-        "InvoiceLines1.Quantity": "1",
         AutoRedirect: "false",
       };
 
@@ -200,20 +203,14 @@ exports.cardcomCreatePayment = onRequest(
         sessionId,
       });
 
-      logger.info("Cardcom URLs", CARDCOM_URLS);
-      logger.info("Cardcom params", params);
-
       const raw = await httpPost(CARDCOM_URLS.lowProfile, params);
       const parsed = parseNV(raw);
-
-      logger.info("Cardcom create response", parsed);
 
       if (parsed.ResponseCode !== "0") {
         await sessionRef.update({
           status: "failed",
           error: parsed.Description || parsed.ResponseCode || "Cardcom error",
         });
-
         throw new Error(
           `Cardcom: ${parsed.Description || parsed.ResponseCode || "Unknown error"}`,
         );
@@ -221,7 +218,6 @@ exports.cardcomCreatePayment = onRequest(
 
       await sessionRef.update({
         lowProfileCode: parsed.LowProfileCode || null,
-        cardcomUrl: parsed.Url || parsed.url || null,
       });
 
       res.json({
@@ -229,153 +225,59 @@ exports.cardcomCreatePayment = onRequest(
         sessionId,
       });
     } catch (e) {
-      logger.error("cardcomCreatePayment", {
-        message: e?.message || String(e),
-        stack: e?.stack || null,
-      });
-      res.status(500).json({ error: e.message || "Server error" });
+      logger.error("cardcomCreatePayment", e);
+      res.status(500).json({ error: e.message });
     }
   },
 );
 
 // ════════════════════════════════════════════════════════
 //  Function 2: cardcomWebhook
+//  מקבל אישור מקארדקום — idempotency אטומי עם Transaction
 // ════════════════════════════════════════════════════════
 exports.cardcomWebhook = onRequest(
   { region: "us-central1", secrets: [CARDCOM_TERMINAL, CARDCOM_USERNAME] },
   async (req, res) => {
     try {
-      logger.info("cardcomWebhook HIT", {
-        method: req.method,
-        query: req.query || null,
-        body: req.body || null,
-        headers: req.headers || null,
-      });
+      const { terminalnumber, lowprofilecode, ReturnValue } = req.query;
+      logger.info("Webhook received", { lowprofilecode, ReturnValue });
 
-      let bodyData = {};
-      if (typeof req.body === "object" && req.body) {
-        bodyData = req.body;
-      } else if (typeof req.body === "string" && req.body) {
-        bodyData = querystring.parse(req.body);
-      }
-
-      const source = {
-        ...(req.query || {}),
-        ...(bodyData || {}),
-      };
-
-      const terminalnumber =
-        source.terminalnumber ||
-        source.TerminalNumber ||
-        source.terminalNumber ||
-        null;
-
-      const lowprofilecode =
-        source.lowprofilecode ||
-        source.LowProfileCode ||
-        source.lowProfileCode ||
-        null;
-
-      const returnValueRaw =
-        source.ReturnValue ||
-        source.returnvalue ||
-        source.returnValue ||
-        source.session ||
-        null;
-
-      logger.info("Webhook normalized params", {
-        terminalnumber,
-        lowprofilecode,
-        ReturnValue: returnValueRaw,
-      });
-
-      if (!lowprofilecode || !terminalnumber) {
-        logger.warn("Webhook missing critical params", {
-          terminalnumber,
-          lowprofilecode,
-          ReturnValue: returnValueRaw,
-          rawQuery: req.query || null,
-          rawBody: req.body || null,
-        });
+      if (!lowprofilecode || !terminalnumber || !ReturnValue) {
         res.status(200).send("ok");
         return;
       }
 
-      let sessionId = returnValueRaw ? String(returnValueRaw).trim() : null;
-      let sessionDocRef = null;
-      let sessionSnap = null;
+      const sessionId = ReturnValue;
+      const sessionRef = db.collection("checkoutSessions").doc(sessionId);
 
-      if (sessionId) {
-        sessionDocRef = db.collection("checkoutSessions").doc(sessionId);
-        sessionSnap = await sessionDocRef.get();
-      }
-
-      if ((!sessionSnap || !sessionSnap.exists) && lowprofilecode) {
-        const byLowProfile = await db
-          .collection("checkoutSessions")
-          .where("lowProfileCode", "==", lowprofilecode)
-          .limit(1)
-          .get();
-
-        if (!byLowProfile.empty) {
-          sessionSnap = byLowProfile.docs[0];
-          sessionDocRef = sessionSnap.ref;
-          sessionId = sessionSnap.id;
-
-          logger.info("Session resolved by lowProfileCode", {
-            sessionId,
-            lowprofilecode,
-          });
-        }
-      }
-
-      if (!sessionSnap || !sessionSnap.exists || !sessionDocRef || !sessionId) {
-        logger.warn("Session not found", {
-          sessionId,
-          lowprofilecode,
-          ReturnValue: returnValueRaw,
-        });
+      // ── שלב 1: בדוק session קיים ──
+      const sessionSnap = await sessionRef.get();
+      if (!sessionSnap.exists) {
+        logger.warn("Session not found", { sessionId });
         res.status(200).send("ok");
         return;
       }
 
       const session = sessionSnap.data();
-
       if (session.status === "paid") {
         logger.info("Duplicate webhook (session already paid)", { sessionId });
         res.status(200).send("ok");
         return;
       }
 
+      // ── שלב 2: אמת מול קארדקום ──
       const username = CARDCOM_USERNAME.value();
-      const verifyUrl =
-        `${CARDCOM_URLS.indicator}?terminalnumber=${encodeURIComponent(terminalnumber)}` +
-        `&username=${encodeURIComponent(username)}` +
-        `&lowprofilecode=${encodeURIComponent(lowprofilecode)}`;
-
-      logger.info("Cardcom verify URL prepared", {
-        terminalnumber,
-        lowprofilecode,
-        sessionId,
-      });
-
+      const verifyUrl = `${CARDCOM_URLS.indicator}?terminalnumber=${terminalnumber}&username=${username}&lowprofilecode=${lowprofilecode}`;
       const verifyRaw = await httpGet(verifyUrl);
       const verified = parseNV(verifyRaw);
 
-      logger.info("Cardcom verify response", {
+      logger.info("Cardcom verify", {
         op: verified.OperationResponse,
         deal: verified.DealResponse,
-        internalDealNumber: verified.InternalDealNumber || null,
-        token: verified.Token || null,
-        tokenExDate: verified.TokenExDate || null,
       });
 
       if (verified.OperationResponse !== "0" || verified.DealResponse !== "0") {
-        await sessionDocRef.update({
-          status: "failed",
-          verifyResponse: verified,
-        });
-
+        await sessionRef.update({ status: "failed" });
         logger.warn("Payment verification failed", verified);
         res.status(200).send("ok");
         return;
@@ -389,8 +291,9 @@ exports.cardcomWebhook = onRequest(
       }
 
       const payRef = db.collection("payments").doc(String(dealNumber));
-      const DUPLICATE = "DUPLICATE_PAYMENT";
 
+      // ── שלב 3: Atomic idempotency עם Firestore Transaction ──
+      const DUPLICATE = "DUPLICATE_PAYMENT";
       try {
         await db.runTransaction(async (t) => {
           const paySnap = await t.get(payRef);
@@ -403,39 +306,31 @@ exports.cardcomWebhook = onRequest(
           t.set(payRef, {
             sessionId,
             uid: session.uid,
-            email: session.email || null,
             planId: session.planId,
-            billingMode: session.billingMode,
             amount: session.amount,
-            lowProfileCode: lowprofilecode,
-            cardcomDealNumber: dealNumber,
             processedAt: admin.firestore.FieldValue.serverTimestamp(),
-            type: "initial",
           });
 
-          t.update(sessionDocRef, {
+          t.update(sessionRef, {
             status: "paid",
             paidAt: admin.firestore.FieldValue.serverTimestamp(),
             planId: session.planId,
             billingMode: session.billingMode,
-            lowProfileCode: lowprofilecode,
-            cardcomDealNumber: dealNumber,
           });
         });
       } catch (e) {
         if (e.code === DUPLICATE || e.message === DUPLICATE) {
-          logger.info("Atomic duplicate detected", { dealNumber, sessionId });
+          logger.info("Atomic duplicate detected", { dealNumber });
           res.status(200).send("ok");
           return;
         }
         throw e;
       }
 
+      // ── שלב 4: עדכן billing ──
       const { uid, planId, billingMode } = session;
       const plan = PLANS[planId];
-
       if (!plan) {
-        logger.warn("Plan not found for billing", { uid, planId, sessionId });
         res.status(200).send("ok");
         return;
       }
@@ -443,46 +338,47 @@ exports.cardcomWebhook = onRequest(
       const now = new Date();
       const subEnd = calcEnd(billingMode, now);
 
-      await db.collection("billing").doc(uid).set(
-        {
-          plan: planId,
-          billingMode,
-          status: "active",
-          subscriptionStart: admin.firestore.Timestamp.fromDate(now),
-          subscriptionEnd: admin.firestore.Timestamp.fromDate(subEnd),
-          lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
-          lastPaymentAmount:
-            billingMode === "annual" ? plan.annual : plan.monthly,
-          cardcomToken: verified.Token || null,
-          cardcomTokenExp: verified.TokenExDate || null,
-          cardcomDealNumber: dealNumber || null,
-          reportsThisMonth: 0,
-          reportsResetAt: admin.firestore.Timestamp.fromDate(subEnd),
-        },
-        { merge: true },
-      );
+      await db
+        .collection("billing")
+        .doc(uid)
+        .set(
+          {
+            plan: planId,
+            billingMode,
+            status: "active",
+            subscriptionStart: admin.firestore.Timestamp.fromDate(now),
+            subscriptionEnd: admin.firestore.Timestamp.fromDate(subEnd),
+            lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastPaymentAmount:
+              billingMode === "annual" ? plan.annual : plan.monthly,
+            cardcomToken: verified.Token || null,
+            cardcomTokenExp: verified.TokenExDate || null,
+            cardcomDealNumber: dealNumber || null,
+            reportsThisMonth: 0,
+            reportsResetAt: admin.firestore.Timestamp.fromDate(subEnd),
+          },
+          { merge: true },
+        );
 
       logger.info("Payment processed OK", {
         uid,
         planId,
         billingMode,
         dealNumber,
-        sessionId,
       });
 
       res.status(200).send("ok");
     } catch (e) {
-      logger.error("cardcomWebhook error", {
-        message: e?.message || String(e),
-        stack: e?.stack || null,
-      });
-      res.status(200).send("ok");
+      logger.error("cardcomWebhook error", e);
+      res.status(200).send("ok"); // תמיד 200 לקארדקום
     }
   },
 );
 
 // ════════════════════════════════════════════════════════
-//  Function 3: cardcomRenewSubscriptions
+//  Function 3: cardcomRenewSubscriptions (Scheduled)
+//  חיוב מתחדש — Scheduler בלבד, לקוח לא יכול להפעיל
+//  רץ 09:00 כל יום (ישראל)
 // ════════════════════════════════════════════════════════
 exports.cardcomRenewSubscriptions = onSchedule(
   {
@@ -516,6 +412,16 @@ exports.cardcomRenewSubscriptions = onSchedule(
       const uid = docSnap.id;
       const b = docSnap.data();
 
+      // בדוק ביטול — אל תחייב אם המשתמש ביטל
+      if (b.cancelAtEnd === true) {
+        logger.info("Subscription canceled, skipping renewal", { uid });
+        await db.collection("billing").doc(uid).update({
+          status: "canceled",
+          canceledAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        continue;
+      }
+
       if (!b.cardcomToken) {
         logger.warn("No token", { uid });
         continue;
@@ -547,6 +453,7 @@ exports.cardcomRenewSubscriptions = onSchedule(
           const dealNum = parsed.InternalDealNumber;
           const newEnd = calcEnd(b.billingMode, b.subscriptionEnd.toDate());
 
+          // Atomic idempotency גם לחידושים
           const payRef = db.collection("payments").doc(String(dealNum));
           const DUPLICATE = "DUPLICATE_RENEWAL";
 
@@ -568,39 +475,52 @@ exports.cardcomRenewSubscriptions = onSchedule(
               });
             });
           } catch (e) {
-            if (e.code === DUPLICATE || e.message === DUPLICATE) {
+            if (e.code === DUPLICATE) {
               logger.info("Duplicate renewal skipped", { dealNum });
               continue;
             }
             throw e;
           }
 
-          await db.collection("billing").doc(uid).update({
-            status: "active",
-            subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd),
-            lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
-            lastPaymentAmount: amount,
-            reportsThisMonth: 0,
-          });
+          await db
+            .collection("billing")
+            .doc(uid)
+            .update({
+              status: "active",
+              subscriptionEnd: admin.firestore.Timestamp.fromDate(newEnd),
+              lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+              lastPaymentAmount: amount,
+              reportsThisMonth: 0,
+            });
 
           logger.info("Renewal OK", { uid, newEnd });
         } else {
-          await db.collection("billing").doc(uid).update({
-            status: "renewal_failed",
-            renewalError: parsed.Description || parsed.ResponseCode,
-          });
+          await db
+            .collection("billing")
+            .doc(uid)
+            .update({
+              status: "renewal_failed",
+              renewalError: parsed.Description || parsed.ResponseCode,
+            });
 
-          logger.warn("Renewal failed", {
-            uid,
-            err: parsed.Description || parsed.ResponseCode,
-          });
+          logger.warn("Renewal failed", { uid, err: parsed.Description });
         }
       } catch (e) {
-        logger.error("Renewal error", {
-          uid,
-          err: e?.message || String(e),
-        });
+        logger.error("Renewal error", { uid, err: e.message });
       }
     }
   },
 );
+
+// ════════════════════════════════════════════════════════
+//  Function 4: cancelSubscription
+//  ביטול מנוי — נכנס לתוקף בסוף תקופה שולמה
+//  נקרא מ-account-billing.html (לא נדרש — Firestore write ישיר)
+//  הפונקציה כאן ל-admin operations ועתיד
+// ════════════════════════════════════════════════════════
+// הערה: הביטול מבוצע ישירות מהפרונטאנד ב-Firestore
+// (updateDoc billing/{uid} { cancelAtEnd: true })
+// הschedule יבדוק cancelAtEnd לפני חידוש ולא יחייב.
+
+// עדכון cardcomRenewSubscriptions — כבר בודק cancelAtEnd
+// אם cancelAtEnd === true → לא מחייב, מסמן status: 'canceled'
