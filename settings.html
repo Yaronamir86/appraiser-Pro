@@ -638,7 +638,8 @@ function updateLogoPreview(){
   const preview = document.getElementById('logoPreview');
   const initials = document.getElementById('logoInitials')?.value.trim() || 'YA';
   document.getElementById('logoInitialsDisplay').textContent = initials;
-  document.getElementById('sbLogoSq').textContent = initials;
+  const sbSq = document.getElementById('sbLogoSq');
+  if(sbSq){ sbSq.textContent = initials; sbSq.style.background = logoColor; sbSq.style.color = logoTextColor; }
 
   if(logoMode === 'upload' && logoImageUrl){
     preview.innerHTML = `<img src="${logoImageUrl}"><div class="logo-overlay">📷</div>`;

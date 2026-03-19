@@ -1162,7 +1162,7 @@ function updateHeaderProfile(p){
       logoImg.style.height='36px';
     } else {
       // ראשי תיבות אנגלית — החלף תמונה בSVG
-      const letters = p.logoLetters ||
+      const letters = p.logoLetters || p.logoInitials ||
         (p.nameEn ? p.nameEn.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '') ||
         'YA';
       const bg  = p.logoColor || '#f59e0b';
