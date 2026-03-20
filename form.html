@@ -57,6 +57,25 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 select{cursor:pointer;}
 select option{background:var(--primary2);}
 textarea{resize:vertical;min-height:80px;}
+/* ── BOQ table override — מבטל את כל כללי ה-input הגלובליים ── */
+.boq-table td input, .boq-table td textarea, .boq-table td select {
+  padding:4px 6px !important;
+  border-radius:4px !important;
+  min-height:unset !important;
+  height:auto !important;
+  font-size:12px !important;
+  border:1px solid transparent !important;
+  box-shadow:none !important;
+  resize:none !important;
+  background:var(--primary2) !important;
+  line-height:1.5 !important;
+}
+.boq-table td input:focus, .boq-table td textarea:focus {
+  border-color:var(--accent) !important;
+  box-shadow:none !important;
+}
+.boq-table td input[type=number] { width:80px !important; text-align:left !important; }
+.boq-table td textarea { width:100% !important; min-height:24px !important; overflow:hidden !important; }
 .field{display:flex;flex-direction:column;gap:5px;}
 
 /* ── BUTTONS ── */
@@ -246,11 +265,40 @@ textarea{resize:vertical;min-height:80px;}
 .card-nav .btn{min-width:110px;justify-content:center;}
 
 /* ── AREA CARDS (FINDINGS) ── */
-.area-card{background:rgba(15,23,42,.8);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;}
-.area-head{background:var(--primary2);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.area-card{background:rgba(15,23,42,.8);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:box-shadow .2s;}
+.area-card.ac-open{border-color:rgba(245,158,11,.35);box-shadow:0 0 0 1px rgba(245,158,11,.15);}
+.area-card.ac-done{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04);}
+/* Collapsed summary row */
+.area-head{background:var(--primary2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .15s;}
+.area-head:hover{background:var(--primary3);}
+.area-card.ac-done .area-head{background:rgba(16,185,129,.07);}
 .area-title{font-size:13px;font-weight:700;}
 .area-sqm{width:70px;background:var(--primary3);border:none;border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;text-align:left;}
 .area-body{padding:16px;}
+/* Wizard steps */
+.wz-step{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.wz-step-head{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--primary2);font-size:12px;font-weight:700;color:var(--muted);user-select:none;}
+.wz-step-head.active{color:var(--text);}
+.wz-step-head .wz-num{width:20px;height:20px;border-radius:50%;background:var(--primary3);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-left:8px;flex-shrink:0;}
+.wz-step-head .wz-num.done{background:var(--green);color:#000;}
+.wz-step-head .wz-num.active{background:var(--accent);color:#000;}
+.wz-step-body{padding:12px 14px 14px;display:none;}
+.wz-step-body.open{display:block;}
+.wz-next{margin-top:12px;display:flex;justify-content:flex-end;}
+.wz-btn{padding:7px 20px;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'Heebo',sans-serif;transition:opacity .15s;}
+.wz-btn:hover{opacity:.85;}
+.wz-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+/* Done summary */
+.area-done-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;}
+.area-done-badge{padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+.area-done-sev-none{background:rgba(107,114,128,.15);color:#9ca3af;}
+.area-done-sev-light{background:rgba(59,130,246,.12);color:#93c5fd;}
+.area-done-sev-medium{background:rgba(245,158,11,.12);color:#fbbf24;}
+.area-done-sev-severe{background:rgba(239,68,68,.12);color:#fca5a5;}
+/* Sub-area chips */
+.sub-chip{padding:5px 12px;border-radius:12px;border:1.5px solid var(--primary3);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;transition:all .14s;display:inline-block;margin:3px 3px 0 0;}
+.sub-chip:hover{border-color:var(--muted);}
+.sub-chip.on{border-color:var(--blue);background:rgba(59,130,246,.12);color:#93c5fd;}
 
 /* ── SIGN CHIPS ── */
 .sign-group{margin-bottom:14px;}
@@ -280,10 +328,10 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
 .boq-input{background:var(--primary2);border:1px solid transparent;border-radius:4px;padding:4px 7px;color:var(--text);font-size:12px;font-family:'Heebo',sans-serif;width:100%;outline:none;line-height:1.5;}
 .boq-input:focus{border-color:var(--accent);}
 /* override global input[type=number] specificity */
-.boq-table input.boq-input,.boq-table textarea.boq-input{padding:4px 7px;border-radius:4px;border:1px solid transparent;font-size:12px;line-height:1.5;min-height:unset;}
-.boq-table input.boq-input:focus,.boq-table textarea.boq-input:focus{border-color:var(--accent);box-shadow:none;}
+.boq-table input.boq-input,.boq-table textarea.boq-input{padding:4px 7px !important;border-radius:4px !important;border:1px solid transparent;font-size:12px;line-height:1.5;min-height:unset !important;box-shadow:none !important;}
+.boq-table input.boq-input:focus,.boq-table textarea.boq-input:focus{border-color:var(--accent);box-shadow:none !important;}
 .boq-input.num{text-align:left;width:80px;}
-.boq-table input.boq-input.num{width:80px;padding:4px 6px;}
+.boq-table input.boq-input.num{width:80px;padding:4px 6px !important;}
 /* Description textarea — wraps naturally */
 .boq-input.desc-input{
   resize:none;
@@ -1421,6 +1469,20 @@ const WATER_SIGNS = {
 
 // Which WATER_SIGNS categories apply to which room types
 // key = category name, value = array of room IDs that should show it (empty = all rooms)
+// ── תתי-אזורים לסימון בכל אזור פגוע ──
+const SUB_AREAS = [
+  {id:'floor',   l:'רצפה',       icon:'⬛'},
+  {id:'walls',   l:'קירות',      icon:'🧱'},
+  {id:'ceiling', l:'תקרה',       icon:'⬜'},
+  {id:'frames',  l:'משקופים',    icon:'🚪'},
+  {id:'windows', l:'חלונות',     icon:'🪟'},
+  {id:'plumbing',l:'אינסטלציה',  icon:'🔧'},
+  {id:'electric',l:'חשמל',       icon:'⚡'},
+  {id:'cabinets',l:'ארונות',     icon:'🗄️'},
+  {id:'ceiling2',l:'תקרה משנית', icon:'▫️'},
+  {id:'parquet', l:'פרקט',       icon:'🟫'},
+];
+
 const WATER_SIGNS_ROOM_FILTER = {
   'חדרים רטובים': ['bath','toilet','service','bath_biz'],
   'מטבח ונגרות':  ['kitchen','ind_kitchen'],
@@ -2222,182 +2284,273 @@ function renderCard5(){
 // CARD 6 – FINDINGS
 // ══════════════════════════════════════════════════
 function renderCard6(){
-  const f = STATE.findings;
-  const et = STATE.event.eventType;
+  const f   = STATE.findings;
+  const et  = STATE.event.eventType;
   const usage = STATE.property.usage;
+  const sevLabels = {none:'אין פגיעה', light:'קלה', medium:'בינונית', severe:'משמעותית'};
+  const sevClass  = {none:'area-done-sev-none', light:'area-done-sev-light', medium:'area-done-sev-medium', severe:'area-done-sev-severe'};
 
+  // ── חלק עליון: דיירים + מגורים ──
   let html = `<div class="grid2 mb16">
-    <div class="field"><label class="label">👥 מספר דיירים בנכס</label>
-      <input type="number" min="0" max="20" value="${esc(f.residents)}" oninput="STATE.findings.residents=this.value" >
+    <div class="field"><label class="label">👥 מספר דיירים</label>
+      <input type="number" min="0" max="20" value="${esc(f.residents)}" oninput="STATE.findings.residents=this.value">
     </div>
-    <div class="field"><label class="label">🏠 הנכס ראוי למגורים בזמן תיקון?</label>
+    <div class="field"><label class="label">🏠 ראוי למגורים בזמן תיקון?</label>
       <div class="pill-group" id="habitPills">
-        ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא – נדרשת שכירות'}], f.habitableStatus, "STATE.findings.habitableStatus=v;refreshPills('habitPills',v);renderCard(6)")}
+        ${makePills([{v:'yes',l:'כן'},{v:'no',l:'לא — נדרשת שכירות'}], f.habitableStatus, "STATE.findings.habitableStatus=v;refreshPills('habitPills',v);renderCard(6)")}
       </div>
     </div>
-    ${f.habitableStatus==='no'?`<div class="field"><label class="label">תקופת שכירות (חודשים)</label>
-      <input type="number" min="1" max="24" value="${esc(f.rentalMonths)}" oninput="STATE.findings.rentalMonths=this.value" >
+    ${f.habitableStatus==='no'?`
+    <div class="field"><label class="label">תקופת שכירות (חודשים)</label>
+      <input type="number" min="1" max="24" value="${esc(f.rentalMonths)}" oninput="STATE.findings.rentalMonths=this.value">
     </div>
     <div class="field"><label class="label">שכירות חודשית (₪)</label>
       <input type="text" value="${fmtCurrency(f.rentalMonthly)}" oninput="STATE.findings.rentalMonthly=parseCurrency(this.value);this.value=fmtCurrency(this.value)" placeholder="₪">
-    </div>
-    <div class="note note-blue span2" style="font-size:12px;">⚠️ עלות שכירות לא תיכלל בסיכום השיפוי – תשולם בכפוף להצגת הסכם שכירות חתום.</div>`:''}
+    </div>`:''}
   </div>`;
 
-  // ── Smart area picker ──
+  // ── בוחר אזורים ──
   const isBiz = usage === 'business';
   const interiorRooms = isBiz ? ROOMS_BIZ : ROOMS_RES;
   const allRooms = [...interiorRooms, ...ROOMS_EXT];
-  const addedIds = f.areas.map(a => a.id.replace(/_\d+$/, ''));
   const quickPickIds = AREA_QUICK_PICKS[et] || AREA_QUICK_PICKS.default;
   const showAll = f._showAllAreas || false;
+  const addedIds = f.areas.map(a => a.id.replace(/_\d+$/, ''));
 
-  // Helper: next available id for repeatable room
   const nextRepId = (room) => {
-    for(let n = 1; n <= 5; n++){
-      const uid = `${room.id}_${n}`;
-      if(!f.areas.find(a => a.id === uid)) return {uid, label:`${room.l} ${n}`};
+    for(let n=1;n<=5;n++){
+      const uid=`${room.id}_${n}`;
+      if(!f.areas.find(a=>a.id===uid)) return {uid,label:`${room.l} ${n}`};
     }
     return null;
   };
-  // Helper: chip for a room
   const roomChip = (room) => {
     if(room.rep){
       const next = nextRepId(room);
-      if(!next) return ''; // max reached
-      const alreadyHasOne = f.areas.find(a => a.id.startsWith(room.id+'_'));
-      return `<button class="chip area-chip" onclick="addArea('${next.uid}','${next.label}',${room.sqm})">
-        ${alreadyHasOne ? `+ ${room.l} ${parseInt(next.uid.split('_').pop())}` : `${room.icon||'+'} ${room.l}`}</button>`;
-    } else {
-      const added = f.areas.find(a => a.id === room.id);
-      if(added) return `<button class="chip checked area-chip" style="cursor:default;">✓ ${room.l}</button>`;
-      return `<button class="chip area-chip" onclick="addArea('${room.id}','${room.l}',${room.sqm})">${room.icon||'+'} ${room.l}</button>`;
+      if(!next) return '';
+      const has = f.areas.find(a=>a.id.startsWith(room.id+'_'));
+      return `<button class="chip area-chip" onclick="addArea('${next.uid}','${next.label}',${room.sqm})">${has?`+ ${room.l} ${parseInt(next.uid.split('_').pop())}`:room.icon||'+'} ${room.l}</button>`;
     }
+    const added = f.areas.find(a=>a.id===room.id);
+    if(added) return `<button class="chip checked area-chip" style="cursor:default;">✓ ${room.l}</button>`;
+    return `<button class="chip area-chip" onclick="addArea('${room.id}','${room.l}',${room.sqm})">${room.icon||'+'} ${room.l}</button>`;
   };
 
-  // Quick picks section
-  const quickRooms = quickPickIds.map(id => allRooms.find(r => r.id === id)).filter(Boolean);
-  const quickHtml = quickRooms.map(roomChip).join('');
-
-  // Remaining interior rooms (not in quick picks)
-  const moreInterior = interiorRooms.filter(r => !quickPickIds.includes(r.id));
-  const moreInteriorHtml = moreInterior.map(roomChip).join('');
-
-  // Exterior rooms
-  const extHtml = ROOMS_EXT.map(roomChip).join('');
-
+  const quickRooms = quickPickIds.map(id=>allRooms.find(r=>r.id===id)).filter(Boolean);
   html += `<div class="area-picker mb16">
-    <label class="label mb8">בחר אזורים שנבדקו</label>
-
+    <label class="label mb8">📍 בחר אזורים שנפגעו</label>
     <div class="area-group mb8">
       <div class="area-group-label">⚡ מוצע לאירוע זה</div>
-      <div class="flex flex-wrap gap8">${quickHtml}</div>
+      <div class="flex flex-wrap gap8">${quickRooms.map(roomChip).join('')}</div>
     </div>
-
-    ${showAll ? `
+    ${showAll?`
     <div class="area-group mb8">
       <div class="area-group-label">🏠 חדרי פנים</div>
-      <div class="flex flex-wrap gap8">${moreInteriorHtml}</div>
+      <div class="flex flex-wrap gap8">${interiorRooms.filter(r=>!quickPickIds.includes(r.id)).map(roomChip).join('')}</div>
     </div>
     <div class="area-group mb8">
       <div class="area-group-label">🏗️ חוץ ומעטפת</div>
-      <div class="flex flex-wrap gap8">${extHtml}</div>
+      <div class="flex flex-wrap gap8">${ROOMS_EXT.map(roomChip).join('')}</div>
     </div>
-    ` : `<button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=true;renderCard(6)" style="font-size:12px;">▾ הצג את כל האזורים</button>`}
-    ${showAll ? `<button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=false;renderCard(6)" style="font-size:12px;">▴ הסתר</button>` : ''}
-  </div>`;
+    <button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=false;renderCard(6)" style="font-size:12px;">▴ הסתר</button>`
+    :`<button class="btn btn-ghost btn-xs mt4" onclick="STATE.findings._showAllAreas=true;renderCard(6)" style="font-size:12px;">▾ כל האזורים</button>`}
+  </div>
 
-  // Free area addition
-  html += `<div class="flex gap8 mb16 items-center">
-    <input type="text" id="freeAreaInput" value="${esc(f.freeAreaName||'')}" oninput="STATE.findings.freeAreaName=this.value" placeholder="שם אזור חופשי..." style="flex:1;padding:8px 12px;border-radius:8px;background:var(--primary2);border:1px solid var(--primary3);color:var(--text);font-size:13px;">
+  <div class="flex gap8 mb16 items-center">
+    <input type="text" id="freeAreaInput" value="${esc(f.freeAreaName||'')}" oninput="STATE.findings.freeAreaName=this.value" placeholder="אזור חופשי..." style="flex:1;padding:8px 12px;border-radius:8px;background:var(--primary2);border:1px solid var(--primary3);color:var(--text);font-size:13px;">
     <button class="btn btn-secondary btn-sm" onclick="addFreeArea()">+ הוסף</button>
   </div>`;
-  f.areas.forEach((area,ai)=>{
-    const signsMap = et==='water'?WATER_SIGNS:et==='fire'?FIRE_SIGNS:et==='burglary'?BURGLARY_SIGNS:et==='tax'?TAX_SIGNS:{};
-    html += `<div class="area-card" id="area_${area.id}">
-      <div class="area-head">
+
+  // ── כרטיסיות אזורים — Wizard ──
+  const signsMap = et==='water'?WATER_SIGNS:et==='fire'?FIRE_SIGNS:et==='burglary'?BURGLARY_SIGNS:et==='tax'?TAX_SIGNS:{};
+  const doneCount = f.areas.filter(a=>a._done).length;
+  if(f.areas.length>0){
+    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:600;">
+      ✅ ${doneCount}/${f.areas.length} אזורים הושלמו
+    </div>`;
+  }
+
+  f.areas.forEach((area)=>{
+    const step  = area._step || 1;
+    const done  = area._done || false;
+    const areaRoomKey = area.id.replace(/_\d+$/, '');
+
+    // ── תצוגה מקופלת (done) ──
+    if(done){
+      const sevLabel = sevLabels[area.severity] || '—';
+      const sevCls   = sevClass[area.severity]  || 'area-done-sev-none';
+      const subLabels = (area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ');
+      const sigCount = (area.signs||[]).length;
+      html += `<div class="area-card ac-done" id="area_${area.id}">
+        <div class="area-head" onclick="areaToggleDone('${area.id}')">
+          <div class="area-done-row">
+            <span style="font-size:15px;">✅</span>
+            <span class="area-title">${area.label}</span>
+            ${area.sqm?`<span style="font-size:11px;color:var(--muted);">${area.sqm} מ"ר</span>`:''}
+            <span class="area-done-badge ${sevCls}">${sevLabel}</span>
+            ${subLabels?`<span style="color:var(--muted);font-size:11px;">${subLabels}</span>`:''}
+            ${sigCount?`<span style="font-size:11px;color:var(--muted);">${sigCount} סימנים</span>`:''}
+            ${area.causeDesc?`<span style="font-size:11px;color:var(--accent);">📌 ${area.causeDesc}</span>`:''}
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();areaToggleDone('${area.id}')">✏️ ערוך</button>
+        </div>
+      </div>`;
+      return;
+    }
+
+    // ── כרטיסייה פתוחה ──
+    html += `<div class="area-card ac-open" id="area_${area.id}">
+      <div class="area-head" onclick="void(0)" style="cursor:default;">
         <div class="flex items-center gap12">
           <span class="area-title">${area.label}</span>
-          <input class="area-sqm" type="number" value="${area.sqm}" oninput="setAreaField('${area.id}','sqm',this.value)" placeholder='מ"ר'>
-          <span style="font-size:12px;color:var(--muted);font-weight:600;">מ"ר</span>
+          <input class="area-sqm" type="number" value="${area.sqm}" oninput="setAreaField('${area.id}','sqm',this.value)" placeholder='מ"ר' onclick="event.stopPropagation()">
+          <span style="font-size:11px;color:var(--muted);">מ"ר</span>
         </div>
         <button class="btn btn-danger btn-xs" onclick="removeArea('${area.id}')">✕ הסר</button>
       </div>
       <div class="area-body">
-        <div class="field mb12"><label class="label">רמת פגיעה</label><div class="pill-group" id="sev_${area.id}">
-          ${[{v:'none',l:'אין פגיעה'},{v:'light',l:'קלה'},{v:'medium',l:'בינונית'},{v:'severe',l:'משמעותית'}].map(o=>`<button class="pill ${area.severity===o.v?'active':''}" onclick="setAreaField('${area.id}','severity','${o.v}');refreshPills('sev_${area.id}','${o.v}')">${o.l}</button>`).join('')}
-        </div></div>`;
 
-    const areaRoomKey = area.id.replace(/_\d+$/, '');
-    Object.entries(signsMap).forEach(([catName, signs])=>{
-      // Filter: skip categories that don't apply to this room type
-      if(signsMap === WATER_SIGNS && WATER_SIGNS_ROOM_FILTER[catName]){
-        const allowed = WATER_SIGNS_ROOM_FILTER[catName];
-        if(!allowed.includes(areaRoomKey)) return;
-      }
-      html += `<div class="sign-group"><div class="sign-group-label">${catName}</div><div>`;
-      signs.forEach(s=>{
-        const on = (area.signs||[]).includes(s.id);
-        html += `<button class="sign-chip ${on?'on':''}" onclick="toggleSign('${area.id}','${s.id}',this)">${s.l}</button>`;
-      });
-      html += `</div></div>`;
-    });
+        <!-- שלב 1: רמת פגיעה -->
+        <div class="wz-step">
+          <div class="wz-step-head ${step===1?'active':''}" onclick="areaSetStep('${area.id}',1)">
+            <div style="display:flex;align-items:center;">
+              <span class="wz-num ${area.severity&&step>1?'done':step===1?'active':''}">
+                ${area.severity&&step>1?'✓':'1'}
+              </span>
+              רמת פגיעה
+              ${area.severity&&step>1?`<span class="area-done-badge ${sevClass[area.severity]||''}" style="margin-right:8px;">${sevLabels[area.severity]}</span>`:''}
+            </div>
+            <span style="font-size:11px;">${step===1?'▲':'▼'}</span>
+          </div>
+          <div class="wz-step-body ${step===1?'open':''}">
+            <div class="pill-group" id="sev_${area.id}">
+              ${[{v:'none',l:'אין פגיעה'},{v:'light',l:'קלה'},{v:'medium',l:'בינונית'},{v:'severe',l:'משמעותית'}].map(o=>
+                `<button class="pill ${area.severity===o.v?'active':''}" onclick="setAreaField('${area.id}','severity','${o.v}');refreshPills('sev_${area.id}','${o.v}');renderCard(6)">${o.l}</button>`
+              ).join('')}
+            </div>
+            <div class="wz-next">
+              <button class="wz-btn" onclick="areaSetStep('${area.id}',2)" ${!area.severity?'disabled style="opacity:.4;"':''}>הבא ›</button>
+            </div>
+          </div>
+        </div>
 
-    // Room-specific damage items
-    const mappedKey = ROOM_ITEM_MAP[areaRoomKey];
-    const roomItems = mappedKey ? ROOM_ITEMS[mappedKey] : null;
-    if(roomItems){
-      const allRoomSigns = [...(roomItems.struct||[]),...(roomItems.cont||[])];
-      const checkedRoomSigns = area.roomSigns||[];
-      if(allRoomSigns.length>0){
-        html += `<div class="sign-group"><div class="sign-group-label" style="color:var(--green);">🔍 פרטי נזק לפי איזור</div><div>`;
-        (roomItems.struct||[]).forEach(s=>{
-          const on = checkedRoomSigns.includes(s.id);
-          html += `<button class="sign-chip ${on?'on':''}" style="${on?'border-color:var(--blue);background:rgba(59,130,246,.15);':''}" onclick="toggleRoomSign('${area.id}','${s.id}',this)" title="מבנה">${s.l} <span style="font-size:9px;color:var(--blue);">מב'</span></button>`;
-        });
-        (roomItems.cont||[]).forEach(s=>{
-          const on = checkedRoomSigns.includes(s.id);
-          html += `<button class="sign-chip ${on?'on':''}" style="${on?'border-color:var(--green);background:rgba(16,185,129,.15);':''}" onclick="toggleRoomSign('${area.id}','${s.id}',this)" title="תכולה">${s.l} <span style="font-size:9px;color:var(--green);">תכ'</span></button>`;
-        });
-        html += `</div></div>`;
-      }
-    }
+        <!-- שלב 2: תתי-אזורים -->
+        <div class="wz-step">
+          <div class="wz-step-head ${step===2?'active':''}" onclick="${step>1?`areaSetStep('${area.id}',2)`:'void(0)'}">
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+              <span class="wz-num ${(area.subAreas||[]).length&&step>2?'done':step===2?'active':''}">
+                ${(area.subAreas||[]).length&&step>2?'✓':'2'}
+              </span>
+              אזורי פגיעה
+              ${step>2&&(area.subAreas||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ')}</span>`:''}
+            </div>
+            <span style="font-size:11px;">${step===2?'▲':'▼'}</span>
+          </div>
+          <div class="wz-step-body ${step===2?'open':''}">
+            <div style="display:flex;flex-wrap:wrap;">
+              ${SUB_AREAS.map(s=>{
+                const on = (area.subAreas||[]).includes(s.id);
+                return `<button class="sub-chip ${on?'on':''}" onclick="areaToggleSub('${area.id}','${s.id}',this)">${s.icon} ${s.l}</button>`;
+              }).join('')}
+            </div>
+            <div class="wz-next" style="gap:8px;">
+              <button class="wz-btn ghost" onclick="areaSetStep('${area.id}',1)">‹ חזור</button>
+              <button class="wz-btn" onclick="areaSetStep('${area.id}',3)">הבא ›</button>
+            </div>
+          </div>
+        </div>
 
+        <!-- שלב 3: סימני נזק -->
+        <div class="wz-step">
+          <div class="wz-step-head ${step===3?'active':''}" onclick="${step>2?`areaSetStep('${area.id}',3)`:'void(0)'}">
+            <div style="display:flex;align-items:center;">
+              <span class="wz-num ${(area.signs||[]).length&&step>3?'done':step===3?'active':''}">
+                ${(area.signs||[]).length&&step>3?'✓':'3'}
+              </span>
+              סימני נזק
+              ${step>3&&(area.signs||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.signs||[]).length} סימנים</span>`:''}
+            </div>
+            <span style="font-size:11px;">${step===3?'▲':'▼'}</span>
+          </div>
+          <div class="wz-step-body ${step===3?'open':''}">
+            ${Object.entries(signsMap).map(([catName, signs])=>{
+              if(signsMap===WATER_SIGNS && WATER_SIGNS_ROOM_FILTER[catName]){
+                const allowed = WATER_SIGNS_ROOM_FILTER[catName];
+                if(!allowed.includes(areaRoomKey)) return '';
+              }
+              return `<div class="sign-group">
+                <div class="sign-group-label">${catName}</div>
+                <div>${signs.map(s=>{
+                  const on = (area.signs||[]).includes(s.id);
+                  return `<button class="sign-chip ${on?'on':''}" onclick="toggleSign('${area.id}','${s.id}',this)">${s.l}</button>`;
+                }).join('')}</div>
+              </div>`;
+            }).join('')}
+            ${Object.keys(signsMap).length===0?`<div style="color:var(--muted);font-size:13px;">אין סימנים מוגדרים לסוג אירוע זה</div>`:''}
+            <div class="wz-next" style="gap:8px;">
+              <button class="wz-btn ghost" onclick="areaSetStep('${area.id}',2)">‹ חזור</button>
+              <button class="wz-btn" onclick="areaSetStep('${area.id}',4)">הבא ›</button>
+            </div>
+          </div>
+        </div>
 
-    if(et==='water'){
-      html += `<div style="background:var(--primary2);border:1px solid var(--primary3);border-radius:8px;padding:12px;margin-top:12px;">
-        <div class="label" style="color:var(--blue);font-size:11px;">🔬 בדיקת לחות</div>
-        <div class="field mb8"><label class="label">תוצאת מד לחות</label><div class="pill-group" id="humid_${area.id}">
-          ${[{v:'normal',l:'תקינה'},{v:'borderline',l:'גבולית'},{v:'high',l:'חריגה ⚠️'}].map(o=>`<button class="pill ${area.humidTest===o.v?'active':''}" onclick="setAreaField('${area.id}','humidTest','${o.v}');refreshPills('humid_${area.id}','${o.v}')">${o.l}</button>`).join('')}
-        </div></div>
-        ${area.humidTest==='high'?`
-        <div class="field"><label class="label">טיפול מצע</label><div class="pill-group" id="dry_${area.id}">
-          ${[{v:'dry_system',l:'ייבוש מערכת'},{v:'remove_replace',l:'פינוי והחלפה'}].map(o=>`<button class="pill ${area.dryTreatment===o.v?'active':''}" onclick="setAreaField('${area.id}','dryTreatment','${o.v}');refreshPills('dry_${area.id}','${o.v}')">${o.l}</button>`).join('')}
-        </div></div>
-        <div class="note note-blue" style="font-size:11px;">⚠️ יירשם: "אינדיקציה ללחות חריגה" – לא קביעה עובדתית.</div>
-        `:''}
-      </div>`;
-    }
+        <!-- שלב 4: גורם + הערות -->
+        <div class="wz-step">
+          <div class="wz-step-head ${step===4?'active':''}" onclick="${step>3?`areaSetStep('${area.id}',4)`:'void(0)'}">
+            <div style="display:flex;align-items:center;">
+              <span class="wz-num ${step===4?'active':''}">4</span>
+              גורם הנזק והערות
+            </div>
+            <span style="font-size:11px;">${step===4?'▲':'▼'}</span>
+          </div>
+          <div class="wz-step-body ${step===4?'open':''}">
+            ${et==='water'?`
+            <div style="background:var(--primary2);border:1px solid var(--primary3);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+              <div class="label" style="color:var(--blue);font-size:11px;margin-bottom:6px;">🔬 בדיקת מד לחות</div>
+              <div class="pill-group" id="humid_${area.id}">
+                ${[{v:'normal',l:'תקינה'},{v:'borderline',l:'גבולית'},{v:'high',l:'חריגה ⚠️'}].map(o=>`<button class="pill ${area.humidTest===o.v?'active':''}" onclick="setAreaField('${area.id}','humidTest','${o.v}');refreshPills('humid_${area.id}','${o.v}')">${o.l}</button>`).join('')}
+              </div>
+              ${area.humidTest==='high'?`
+              <div class="pill-group mt8" id="dry_${area.id}">
+                ${[{v:'dry_system',l:'ייבוש מערכת'},{v:'remove_replace',l:'פינוי והחלפה'}].map(o=>`<button class="pill ${area.dryTreatment===o.v?'active':''}" onclick="setAreaField('${area.id}','dryTreatment','${o.v}');refreshPills('dry_${area.id}','${o.v}')">${o.l}</button>`).join('')}
+              </div>
+              <div class="note note-blue mt6" style="font-size:11px;">⚠️ יירשם: "אינדיקציה ללחות חריגה" – לא קביעה עובדתית.</div>
+              `:''}
+            </div>`:''}
+            <div class="field mb10">
+              <label class="label">📌 גורם / סיבת הנזק</label>
+              <input type="text" value="${esc(area.causeDesc||'')}" oninput="setAreaField('${area.id}','causeDesc',this.value)" placeholder="נזילה מדירה עילאית, חדירת גשם...">
+            </div>
+            <div class="field mb12">
+              <label class="label">📝 הערות שמאי</label>
+              <textarea rows="2" oninput="setAreaField('${area.id}','notes',this.value)" placeholder="ממצאים נוספים, הסתייגויות...">${esc(area.notes||'')}</textarea>
+            </div>
+            <div class="wz-next" style="gap:8px;">
+              <button class="wz-btn ghost" onclick="areaSetStep('${area.id}',3)">‹ חזור</button>
+              <button class="wz-btn" style="background:var(--green);color:#000;" onclick="areaDone('${area.id}')">✓ סיים אזור</button>
+            </div>
+          </div>
+        </div>
 
-    html += `<div class="field mt12">
-      <label class="label">📌 גורם/סיבת הנזק באזור זה</label>
-      <input type="text" value="${esc(area.causeDesc||'')}" oninput="setAreaField('${area.id}','causeDesc',this.value)" placeholder="נזילה מדירה עילאית, חדירת גשם, רקטה...">
-    </div>
-    <div class="field mt8"><label class="label">הערות שמאי לאזור</label><textarea rows="2" oninput="setAreaField('${area.id}','notes',this.value)" placeholder="ממצאים נוספים, הסתייגויות...">${esc(area.notes||'')}</textarea></div>`;
-    html += `</div></div>`;
+      </div>
+    </div>`;
   });
 
+  // ── חלק תחתון ──
   if(et==='water'){
     html += `<div class="flex items-center gap12 mt12">
-      <button class="chip ${f.labTest?'checked':''}" onclick="STATE.findings.labTest=!STATE.findings.labTest;this.classList.toggle('checked')">🔬 בדיקת מעבדה / מכון התקנים (קדיחה ודגימה)</button>
+      <button class="chip ${f.labTest?'checked':''}" onclick="STATE.findings.labTest=!STATE.findings.labTest;this.classList.toggle('checked')">🔬 בדיקת מעבדה / מכון התקנים</button>
     </div>`;
   }
   if(mode==='insurance'){
-    html += `<div class="field mt16"><label class="label">ממצאים תואמים גרסת המבוטח?</label><div class="pill-group" id="matchPills">
-      ${makePills([{v:'yes',l:'תואם'},{v:'partial',l:'תואם חלקית'},{v:'no',l:'לא תואם'},{v:'tbd',l:'טרם הוכרע'}], f.matchesStory, "STATE.findings.matchesStory=v;refreshPills('matchPills',v)")}
-    </div></div>`;
+    html += `<div class="field mt16"><label class="label">ממצאים תואמים גרסת המבוטח?</label>
+      <div class="pill-group" id="matchPills">
+        ${makePills([{v:'yes',l:'תואם'},{v:'partial',l:'תואם חלקית'},{v:'no',l:'לא תואם'},{v:'tbd',l:'טרם הוכרע'}], f.matchesStory, "STATE.findings.matchesStory=v;refreshPills('matchPills',v)")}
+      </div></div>`;
   }
-  html += `<div class="field mt12"><label class="label">הערות כלליות לממצאים</label><textarea oninput="STATE.findings.generalNotes=this.value" placeholder="הערות מקצועיות נוספות...">${esc(f.generalNotes)}</textarea></div>`;
+  html += `<div class="field mt12"><label class="label">הערות כלליות</label>
+    <textarea oninput="STATE.findings.generalNotes=this.value" placeholder="הערות מקצועיות נוספות...">${esc(f.generalNotes)}</textarea>
+  </div>`;
 
   if(f.areas.length>0){
     const findTxt = genFindingsText();
@@ -2414,7 +2567,7 @@ function renderCard6(){
   if(STATE.findings.findingsOverride){
     html += `<div class="field mt12">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <label class="label" style="color:var(--accent);margin-bottom:0;">✏️ עריכה ידנית של ממצאים</label>
+        <label class="label" style="color:var(--accent);margin-bottom:0;">✏️ עריכה ידנית</label>
         <button class="btn btn-ghost btn-xs" onclick="STATE.findings.findingsOverride='';renderCard(6)">↩ חזור לאוטומטי</button>
       </div>
       <textarea oninput="STATE.findings.findingsOverride=this.value" rows="8">${esc(f.findingsOverride)}</textarea>
@@ -2422,6 +2575,8 @@ function renderCard6(){
   }
   return html;
 }
+
+
 
 // ══════════════════════════════════════════════════
 // CARD 7 – BOQ
@@ -4173,7 +4328,13 @@ function setProfDetail(id, field, val){
 }
 function addArea(id, label, sqm){
   if(STATE.findings.areas.find(a=>a.id===id)) return;
-  STATE.findings.areas.push({id,label,sqm:sqm?sqm.toString():'',severity:'',signs:[],humidTest:'',dryTreatment:'dry_system',notes:''});
+  STATE.findings.areas.push({
+    id, label, sqm:sqm?sqm.toString():'',
+    severity:'', signs:[], subAreas:[],
+    humidTest:'', dryTreatment:'dry_system',
+    causeDesc:'', notes:'',
+    _step:1, _done:false
+  });
   renderCard(6);
 }
 function removeArea(id){
@@ -4192,17 +4353,34 @@ function toggleSign(areaId, signId, btn){
   else area.signs.push(signId);
   btn.classList.toggle('on');
 }
-
-function toggleRoomSign(areaId, signId, btn){
-  const area = STATE.findings.areas.find(a=>a.id===areaId);
+// ── Wizard helpers ──
+function areaSetStep(id, step){
+  const area = STATE.findings.areas.find(a=>a.id===id);
   if(!area) return;
-  if(!area.roomSigns) area.roomSigns = [];
-  const on = area.roomSigns.includes(signId);
-  if(on){
-    area.roomSigns = area.roomSigns.filter(s=>s!==signId);
-  } else {
-    area.roomSigns.push(signId);
-  }
+  // only go forward if previous step has required data
+  if(step===2 && !area.severity) return;
+  area._step = step;
+  renderCard(6);
+}
+function areaToggleSub(id, subId, btn){
+  const area = STATE.findings.areas.find(a=>a.id===id);
+  if(!area) return;
+  if(!area.subAreas) area.subAreas=[];
+  if(area.subAreas.includes(subId)) area.subAreas=area.subAreas.filter(s=>s!==subId);
+  else area.subAreas.push(subId);
+  btn.classList.toggle('on');
+}
+function areaDone(id){
+  const area = STATE.findings.areas.find(a=>a.id===id);
+  if(!area) return;
+  area._done = true;
+  renderCard(6);
+}
+function areaToggleDone(id){
+  const area = STATE.findings.areas.find(a=>a.id===id);
+  if(!area) return;
+  area._done = !area._done;
+  if(!area._done) area._step = 4; // reopen at last step
   renderCard(6);
 }
 
