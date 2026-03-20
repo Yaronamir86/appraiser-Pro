@@ -32,6 +32,15 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 .pw-bar{height:3px;border-radius:2px;margin-top:6px;background:#1f2937;overflow:hidden;}
 .pw-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0%;}
 .pw-hint{font-size:11px;color:#6b7280;margin-top:4px;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-left:40px;}
+.pw-toggle{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b7280;padding:0;display:flex;align-items:center;font-size:18px;line-height:1;}
+.pw-toggle:hover{color:#f59e0b;}
+.btn-google{width:100%;background:#1e1e2e;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:13px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;}
+.btn-google:hover{background:#2a2a3e;border-color:rgba(255,255,255,.3);}
+.or-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.or-divider span{font-size:11px;color:#4b5563;white-space:nowrap;}
+.or-divider::before,.or-divider::after{content:'';flex:1;border-top:1px solid rgba(255,255,255,.08);}
 </style>
 </head>
 <body>
@@ -59,6 +68,11 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
   <div id="regErr" class="err"></div>
 
   <div id="regForm">
+    <button class="btn-google" id="googleBtn" onclick="doGoogleRegister()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      הרשמה עם Google
+    </button>
+    <div class="or-divider"><span>או עם אימייל וסיסמה</span></div>
     <div class="section-title">פרטים אישיים</div>
     <div class="row-2">
       <div class="field">
@@ -90,13 +104,19 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
     </div>
     <div class="field">
       <label>סיסמה</label>
-      <input type="password" id="regPass" placeholder="לפחות 8 תווים" autocomplete="new-password" oninput="checkPW(this.value)">
+      <div class="pw-wrap">
+        <input type="password" id="regPass" placeholder="לפחות 8 תווים" autocomplete="new-password" oninput="checkPW(this.value)">
+        <button type="button" class="pw-toggle" onclick="togglePW('regPass',this)" tabindex="-1">👁</button>
+      </div>
       <div class="pw-bar"><div class="pw-fill" id="pwFill"></div></div>
       <div class="pw-hint" id="pwHint">לפחות 8 תווים</div>
     </div>
     <div class="field">
       <label>אימות סיסמה</label>
-      <input type="password" id="regPass2" placeholder="הקלד שוב" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+      <div class="pw-wrap">
+        <input type="password" id="regPass2" placeholder="הקלד שוב" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+        <button type="button" class="pw-toggle" onclick="togglePW('regPass2',this)" tabindex="-1">👁</button>
+      </div>
     </div>
 
     <button class="btn-register" id="regBtn" onclick="doRegister()">התחל ניסיון חינמי ←</button>
@@ -122,7 +142,7 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged }
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -310,6 +330,63 @@ window.doRegister = async function(){
   }
 };
 
+// ── Google Sign-In ──
+window.doGoogleRegister = async function(){
+  const btn = document.getElementById('googleBtn');
+  btn.disabled = true;
+  btn.textContent = 'מתחבר...';
+  _handlingAuth = true;
+  try {
+    const provider = new GoogleAuthProvider();
+    const cred = await signInWithPopup(auth, provider);
+    const user = cred.user;
+    const uid  = user.uid;
+
+    // בדוק אם משתמש חדש או קיים
+    const isNew = cred._tokenResponse?.isNewUser;
+    if (isNew) {
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 14);
+      const nameParts = (user.displayName || '').split(' ');
+      await setDoc(doc(db,'users',uid), {
+        uid,
+        firstName: nameParts[0] || '',
+        lastName:  nameParts.slice(1).join(' ') || '',
+        fullName:  user.displayName || '',
+        phone: '', city: '',
+        email: user.email,
+        role: 'appraiser',
+        plan: 'trial',
+        trialEnd: trialEnd.toISOString(),
+        createdAt: serverTimestamp()
+      });
+      await setDoc(doc(db,'billing',uid), {
+        uid, email: user.email, plan: 'trial',
+        products: ['appraiser-pro'],
+        trialEnd: trialEnd.toISOString(),
+        subscriptionEnd: null,
+        reportsThisMonth: 0,
+        reportsResetAt: new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toISOString(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+
+    if (pendingPlan && PLAN_NAMES[pendingPlan]) {
+      await proceedToCheckout(user);
+    } else {
+      window.location.href = 'index.html';
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> הרשמה עם Google`;
+    _handlingAuth = false;
+    if (e.code !== 'auth/popup-closed-by-user') {
+      showErr('שגיאה בהתחברות עם Google: ' + e.message);
+    }
+  }
+};
+
 function showErr(msg){
   const el = document.getElementById('regErr');
   el.innerHTML = msg;
@@ -318,6 +395,12 @@ function showErr(msg){
 </script>
 
 <script>
+function togglePW(id, btn){
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
 function checkPW(v){
   const fill=document.getElementById('pwFill');
   const hint=document.getElementById('pwHint');
