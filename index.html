@@ -1151,7 +1151,6 @@ const CASES_KEY = 'appraisal_cases';
 
 function updateHeaderProfile(p){
   if(!p) return;
-  // Update logo
   const logoImg = document.getElementById('headerLogoImg');
   if(logoImg){
     if(p.logoMode==='upload' && p.logoImageUrl){
@@ -1161,23 +1160,27 @@ function updateHeaderProfile(p){
       logoImg.style.objectFit='cover';
       logoImg.style.height='36px';
     } else {
-      // ראשי תיבות אנגלית — החלף תמונה בSVG
+      // ראשי תיבות — רק אם יש נתוני פרופיל מוגדרים
       const letters = p.logoLetters || p.logoInitials ||
         (p.nameEn ? p.nameEn.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '') ||
-        'YA';
-      const bg  = p.logoColor || '#f59e0b';
-      const r=parseInt(bg.slice(1,3),16)||0, g=parseInt(bg.slice(3,5),16)||0, b_=parseInt(bg.slice(5,7),16)||0;
-      const fg  = (0.299*r+0.587*g+0.114*b_)/255>0.5?'#0f1117':'#ffffff';
-      const fs  = letters.length>2?'14':letters.length===2?'17':'22';
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="36" height="36"><rect width="40" height="40" rx="10" fill="${bg}"/><text x="20" y="28" font-family="'Helvetica Neue',Arial,sans-serif" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle">${letters}</text></svg>`;
-      const blob = new Blob([svg], {type:'image/svg+xml'});
-      logoImg.src = URL.createObjectURL(blob);
-      logoImg.style.borderRadius='10px';
-      logoImg.style.height='36px';
-      logoImg.style.width='36px';
+        '';
+      if(letters){
+        // יש ראשי תיבות — הצג SVG
+        const bg  = p.logoColor || '#f59e0b';
+        const r=parseInt(bg.slice(1,3),16)||0, g=parseInt(bg.slice(3,5),16)||0, b_=parseInt(bg.slice(5,7),16)||0;
+        const fg  = (0.299*r+0.587*g+0.114*b_)/255>0.5?'#0f1117':'#ffffff';
+        const fs  = letters.length>2?'14':letters.length===2?'17':'22';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="36" height="36"><rect width="40" height="40" rx="10" fill="${bg}"/><text x="20" y="28" font-family="'Helvetica Neue',Arial,sans-serif" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle">${letters}</text></svg>`;
+        const blob = new Blob([svg], {type:'image/svg+xml'});
+        logoImg.src = URL.createObjectURL(blob);
+        logoImg.style.borderRadius='10px';
+        logoImg.style.height='36px';
+        logoImg.style.width='36px';
+      }
+      // אם אין ראשי תיבות — נשאר לוגו OMDAN ברירת מחדל
     }
   }
-  // Update name
+  // Update name — רק אם יש שם מוגדר
   const nameEl = document.getElementById('headerName');
   if(nameEl && (p.nameHe||p.fullName)) nameEl.textContent = p.nameHe||p.fullName;
   const titleEl = document.getElementById('headerTitle');

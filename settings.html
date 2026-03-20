@@ -298,7 +298,7 @@ body::before{
 <!-- ── Sidebar ── -->
 <aside class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-sq" id="sbLogoSq">YA</div>
+    <div class="sb-logo-sq" id="sbLogoSq" style="background:#f59e0b;color:#0f1117;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;">YA</div>
     <div>
       <div class="sb-logo-name" id="sbLogoName">שמאי רכוש</div>
       <div class="sb-logo-sub">הגדרות</div>
@@ -337,7 +337,7 @@ body::before{
     <div class="section-body">
       <div class="logo-builder">
         <div class="logo-preview" id="logoPreview" onclick="document.getElementById('logoFileInput').click()">
-          <span id="logoInitialsDisplay">YA</span>
+          <span id="logoInitialsDisplay"></span>
           <div class="logo-overlay">📷</div>
         </div>
         <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
@@ -636,7 +636,8 @@ function loadProfile(p){
 // ══════════════════════════════════════════════════
 function updateLogoPreview(){
   const preview = document.getElementById('logoPreview');
-  const initials = document.getElementById('logoInitials')?.value.trim() || 'YA';
+  const rawInitials = document.getElementById('logoInitials')?.value.trim() || '';
+  const initials = rawInitials || (document.getElementById('sbLogoName')?.textContent?.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)) || '';
   document.getElementById('logoInitialsDisplay').textContent = initials;
   const sbSq = document.getElementById('sbLogoSq');
   if(sbSq){ sbSq.textContent = initials; sbSq.style.background = logoColor; sbSq.style.color = logoTextColor; }
@@ -856,7 +857,7 @@ async function saveAll(){
       email:    v('email'),    website: v('website'),
       linkedin: v('linkedin'), social:  v('social'),
       logoMode, logoColor, logoTextColor,
-      logoInitials: v('logoInitials') || 'YA',
+      logoInitials: v('logoInitials') || '',
       fieldDefaults, textSnippets
     };
 
