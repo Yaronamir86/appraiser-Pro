@@ -2598,8 +2598,7 @@ function renderBOQSection(key, title, color){
 
     if(isIns){
       html += `<tr class="boq-row-draggable ${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}" draggable="true" data-boqid="${item.id}" data-boqkey="${key}" data-room="${item.roomHeader||''}">
-        <td style="width:18px;padding:0 2px;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span></td>
-        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;">${displayId}</td>
+        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;white-space:nowrap;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span> ${displayId}</td>
         <td><textarea class="boq-input desc-input w100" rows="1" oninput="updateBOQItem('${key}','${item.id}','desc',this.value);autoResizeTA(this)">${esc(item.desc)}</textarea></td>
         <td><input class="boq-input" style="width:44px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
         <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
@@ -2611,8 +2610,7 @@ function renderBOQSection(key, title, color){
       </tr>`;
     } else {
       html += `<tr class="boq-row-draggable ${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}" draggable="true" data-boqid="${item.id}" data-boqkey="${key}" data-room="${item.roomHeader||''}">
-        <td style="width:18px;padding:0 2px;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span></td>
-        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;">${displayId}</td>
+        <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;white-space:nowrap;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span> ${displayId}</td>
         <td><textarea class="boq-input desc-input w100" rows="1" oninput="updateBOQItem('${key}','${item.id}','desc',this.value);autoResizeTA(this)">${esc(item.desc)}</textarea></td>
         <td><input class="boq-input" style="width:60px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
         <td><input class="boq-input num" type="number" value="${esc(item.qty)}" oninput="updateBOQItem('${key}','${item.id}','qty',this.value)"></td>
