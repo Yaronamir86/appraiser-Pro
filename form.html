@@ -4485,12 +4485,12 @@ function openBOQLibrary(){
   _boqLibSelected.clear();
   // Auto-check damage filter if eventType set
   const hasEvent = ['water','fire','burglary'].includes(STATE.event.eventType);
-  const cb = document.getElementById('boqLibFilter');
+  const cb = _getBoqEl('boqLibFilter');
   if(cb) cb.checked = hasEvent;
   // Reset chapter filter
-  const sel = document.getElementById('boqLibChapter');
+  const sel = _getBoqEl('boqLibChapter');
   if(sel) sel.value = '';
-  document.getElementById('boqLibSearch').value = '';
+  _getBoqEl('boqLibSearch').value = '';
   document.getElementById('boqLibModal').style.display = 'flex';
   // Load custom library first, then render
   loadCustomLibrary().then(()=>renderBOQLibList());
@@ -4654,6 +4654,7 @@ function benaritLoadSubs(){
   subSel.innerHTML = '<option value="">— בחר תת-פרק —</option>';
   subSel.disabled = true;
   document.getElementById('benaritList').innerHTML = '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">בחר תת-פרק לצפייה בסעיפים</div>';
+  const ch = document.getElementById('benaritChapter').value;
   if(!ch) return;
   const data = BENARIT_CHAPTERS[ch];
   if(!data) return;
@@ -4787,7 +4788,7 @@ async function saveBenaritToCustomLibrary(btn){
   if(saved > 0){
     switchBOQTab('lib');
     // Filter to show personal library
-    const sel = document.getElementById('boqLibChapter');
+    const sel = _getBoqEl('boqLibChapter');
     if(sel){ sel.value = '16'; }
     renderBOQLibList();
   }
@@ -4826,10 +4827,29 @@ function addBenaritItemsToBOQ(){
   }, 100);
 }
 
+
+// ══ BOQ HELPER — מחזיר element נראה כשיש כפילות IDs ══
+function _getBoqEl(id){
+  const els = document.querySelectorAll('#'+id);
+  if(els.length === 1) return els[0];
+  for(const el of els){
+    // בדוק שה-element נמצא בcontainer נראה
+    let p = el.parentElement;
+    let visible = true;
+    while(p){
+      const s = p.style?.display;
+      if(s === 'none'){ visible=false; break; }
+      p = p.parentElement;
+    }
+    if(visible) return el;
+  }
+  return els[0];
+}
+
 function renderBOQLibList(){
-  const search   = (document.getElementById('boqLibSearch')?.value||'').trim().toLowerCase();
-  const chapter  = document.getElementById('boqLibChapter')?.value||'';
-  const filtered = document.getElementById('boqLibFilter')?.checked;
+  const search   = (_getBoqEl('boqLibSearch')?.value||'').trim().toLowerCase();
+  const chapter  = _getBoqEl('boqLibChapter')?.value||'';
+  const filtered = _getBoqEl('boqLibFilter')?.checked;
   const evtType  = STATE.event.eventType;
   const allowedDT = filtered && BOQ_DT_MAP[evtType] ? BOQ_DT_MAP[evtType] : null;
 
@@ -4915,8 +4935,8 @@ function renderBOQLibList(){
     }
   }
 
-  document.getElementById('boqLibList').innerHTML = html;
-  const statsEl = document.getElementById('boqLibStats');
+  _getBoqEl('boqLibList').innerHTML = html;
+  const statsEl = _getBoqEl('boqLibStats');
   if(statsEl) statsEl.textContent = `מציג ${items.length} סעיפים מתוך 297`;
   updateBOQLibCount();
 }
@@ -4929,7 +4949,7 @@ function boqLibToggle(code, checked){
 
 function updateBOQLibCount(){
   const n = _boqLibSelected.size;
-  const el = document.getElementById('boqLibCount');
+  const el = _getBoqEl('boqLibCount');
   if(el) el.textContent = n===0 ? 'לא נבחרו פריטים' : `נבחרו ${n} פריטים`;
 }
 
