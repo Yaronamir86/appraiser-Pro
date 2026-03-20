@@ -264,6 +264,13 @@ textarea{resize:vertical;min-height:80px;}
 .boq-section{margin-bottom:20px;}
 .boq-section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;border-radius:6px;margin-bottom:8px;}
 .boq-table{width:100%;border-collapse:collapse;font-size:12px;}
+/* Drag & Drop */
+.boq-row-draggable{cursor:grab;}
+.boq-row-draggable:active{cursor:grabbing;}
+.boq-drag-handle{cursor:grab;color:#4b5563;font-size:14px;padding:0 4px;user-select:none;opacity:.5;transition:opacity .15s;}
+.boq-drag-handle:hover{opacity:1;color:#9ca3af;}
+tr.boq-dragging{opacity:.4;background:rgba(245,158,11,.06)!important;}
+tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
 .boq-table th{background:var(--primary2);padding:8px 10px;text-align:right;font-weight:700;color:var(--muted);font-size:11px;border-bottom:2px solid var(--primary3);}
 .boq-table th.ta-l,.boq-table td.ta-l{text-align:left;}
 .boq-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
@@ -2590,7 +2597,8 @@ function renderBOQSection(key, title, color){
     const shiput_val = (item.isSupervision||item.isRental||item.noShiput) ? null : Math.round(kinun*0.67);
 
     if(isIns){
-      html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
+      html += `<tr class="boq-row-draggable ${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}" draggable="true" data-boqid="${item.id}" data-boqkey="${key}" data-room="${item.roomHeader||''}">
+        <td style="width:18px;padding:0 2px;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span></td>
         <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;">${displayId}</td>
         <td><textarea class="boq-input desc-input w100" rows="1" oninput="updateBOQItem('${key}','${item.id}','desc',this.value);autoResizeTA(this)">${esc(item.desc)}</textarea></td>
         <td><input class="boq-input" style="width:44px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
@@ -2602,7 +2610,8 @@ function renderBOQSection(key, title, color){
         <td><button class="del-btn" onclick="removeBOQItem('${key}','${item.id}')">✕</button></td>
       </tr>`;
     } else {
-      html += `<tr class="${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}">
+      html += `<tr class="boq-row-draggable ${item.zeroPrice?'row-zero':''} ${item.isRental?'row-rental':''}" draggable="true" data-boqid="${item.id}" data-boqkey="${key}" data-room="${item.roomHeader||''}">
+        <td style="width:18px;padding:0 2px;"><span class="boq-drag-handle" title="גרור להזזה">⠿</span></td>
         <td class="c-subtle fs11" style="color:var(--accent);font-weight:700;vertical-align:top;padding-top:9px;">${displayId}</td>
         <td><textarea class="boq-input desc-input w100" rows="1" oninput="updateBOQItem('${key}','${item.id}','desc',this.value);autoResizeTA(this)">${esc(item.desc)}</textarea></td>
         <td><input class="boq-input" style="width:60px;text-align:center;" value="${esc(item.unit)}" oninput="updateBOQItem('${key}','${item.id}','unit',this.value)"></td>
@@ -4301,6 +4310,61 @@ function removeBOQItem(section, id){
   STATE.boq[section]=(STATE.boq[section]||[]).filter(i=>String(i.id)!==String(id));
   renderCard(7);
 }
+
+// ══════════════════════════════════════════════════
+//  BOQ DRAG & DROP — גרירת שורות בתוך פרק
+// ══════════════════════════════════════════════════
+let _boqDragId   = null;
+let _boqDragKey  = null;
+let _boqDragRoom = null;
+
+document.addEventListener('dragstart', e => {
+  const tr = e.target.closest('tr[data-boqid]');
+  if(!tr) return;
+  _boqDragId   = tr.dataset.boqid;
+  _boqDragKey  = tr.dataset.boqkey;
+  _boqDragRoom = tr.dataset.room;
+  tr.classList.add('boq-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', _boqDragId);
+});
+
+document.addEventListener('dragend', e => {
+  document.querySelectorAll('tr.boq-dragging').forEach(t=>t.classList.remove('boq-dragging'));
+  document.querySelectorAll('tr.boq-drag-over').forEach(t=>t.classList.remove('boq-drag-over'));
+  _boqDragId = null;
+});
+
+document.addEventListener('dragover', e => {
+  const tr = e.target.closest('tr[data-boqid]');
+  if(!tr || !_boqDragId) return;
+  // רק באותו פרק
+  if(tr.dataset.room !== _boqDragRoom || tr.dataset.boqkey !== _boqDragKey) return;
+  e.preventDefault();
+  document.querySelectorAll('tr.boq-drag-over').forEach(t=>t.classList.remove('boq-drag-over'));
+  tr.classList.add('boq-drag-over');
+});
+
+document.addEventListener('drop', e => {
+  const tr = e.target.closest('tr[data-boqid]');
+  if(!tr || !_boqDragId || tr.dataset.boqid === _boqDragId) return;
+  if(tr.dataset.room !== _boqDragRoom || tr.dataset.boqkey !== _boqDragKey) return;
+  e.preventDefault();
+
+  const section = _boqDragKey;
+  const items   = STATE.boq[section];
+  if(!items) return;
+
+  const fromIdx = items.findIndex(i=>String(i.id)===String(_boqDragId));
+  const toIdx   = items.findIndex(i=>String(i.id)===String(tr.dataset.boqid));
+  if(fromIdx===-1||toIdx===-1) return;
+
+  // Move in array
+  const [moved] = items.splice(fromIdx, 1);
+  items.splice(toIdx, 0, moved);
+
+  renderCard(7);
+});
 function toggleSection(head){
   head.closest('.sc').classList.toggle('collapsed');
   const arrow = head.querySelector('.sc-toggle');
@@ -4885,56 +4949,129 @@ function boqLibClearAll(){
   updateBOQLibCount();
 }
 
+// ══════════════════════════════════════════════════
+//  BOQ CHAPTER PICKER MODAL
+//  מציג בחירת פרק לפני הוספה מספרייה/בנארית
+// ══════════════════════════════════════════════════
+function _getAvailableRooms(){
+  // קבץ פרקים קיימים מתוך structItems
+  const rooms = new Set();
+  (STATE.boq.structItems||[]).forEach(i=>{ if(i.roomHeader) rooms.add(i.roomHeader); });
+  // הוסף גם פרקים מהאזורים הפעילים
+  (STATE.findings?.areas||[]).forEach(a=>{ if(a.label) rooms.add(a.label); });
+  return [...rooms];
+}
+
+function showChapterPickerAndAdd(itemsAdder){
+  const rooms = _getAvailableRooms();
+
+  // אם אין פרקים — הוסף לסעיפים כלליים ישירות
+  if(rooms.length === 0){
+    itemsAdder('');
+    return;
+  }
+
+  // בנה modal
+  const existing = document.getElementById('_chapterPickerModal');
+  if(existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = '_chapterPickerModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#111827;border:1px solid #374151;border-radius:18px;padding:28px;width:340px;font-family:'Heebo',sans-serif;direction:rtl;">
+      <div style="font-size:17px;font-weight:800;color:#f9fafb;margin-bottom:6px;">לאיזה פרק להוסיף?</div>
+      <div style="font-size:13px;color:#9ca3af;margin-bottom:18px;">בחר פרק קיים או הוסף לסעיפים כלליים</div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-bottom:18px;" id="_cpRoomList">
+        <button onclick="_cpPick('')" style="padding:10px 16px;border-radius:10px;border:1px solid #374151;background:rgba(245,158,11,.08);color:#f59e0b;font-weight:700;font-size:13px;cursor:pointer;font-family:'Heebo',sans-serif;text-align:right;">
+          📋 סעיפים כלליים (ללא פרק)
+        </button>
+        ${rooms.map(r=>`
+          <button onclick="_cpPick('${r.replace(/'/g,"\\'")}',this)"
+            style="padding:10px 16px;border-radius:10px;border:1px solid #374151;background:transparent;color:#f9fafb;font-size:13px;cursor:pointer;font-family:'Heebo',sans-serif;text-align:right;transition:background .15s;"
+            onmouseover="this.style.background='rgba(255,255,255,.05)'" onmouseout="this.style.background='transparent'">
+            🏠 ${r}
+          </button>`).join('')}
+      </div>
+      <button onclick="document.getElementById('_chapterPickerModal').remove()"
+        style="width:100%;padding:10px;border-radius:10px;border:1px solid #374151;background:transparent;color:#9ca3af;font-size:13px;cursor:pointer;font-family:'Heebo',sans-serif;">
+        ביטול
+      </button>
+    </div>`;
+
+  document.body.appendChild(modal);
+
+  // close on backdrop click
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+
+  window._cpPick = function(room){
+    modal.remove();
+    itemsAdder(room);
+  };
+}
+
 function addLibraryItemsToBOQ(){
   if(_boqLibSelected.size===0){ alert('לא נבחרו פריטים'); return; }
-  let added = 0;
-  _boqLibSelected.forEach(code=>{
-    // Custom library item
-    if(code.startsWith('CL_')){
-      const clId = code.slice(3);
-      const clItem = _customLibrary.find(i=>i.id===clId);
-      if(!clItem) return;
-      if(STATE.boq.structItems.some(i=>i.libCode===code)) return;
-      const newId = 'CL_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,5);
-      STATE.boq.structItems.push({id:newId,libCode:code,desc:clItem.desc,unit:clItem.unit||"קומפ'",qty:'1',price:'',zeroPrice:false,roomHeader:''});
+  showChapterPickerAndAdd(function(targetRoom){
+    let added = 0;
+    _boqLibSelected.forEach(code=>{
+      if(code.startsWith('CL_')){
+        const clId = code.slice(3);
+        const clItem = _customLibrary.find(i=>i.id===clId);
+        if(!clItem) return;
+        if(STATE.boq.structItems.some(i=>i.libCode===code)) return;
+        const newId = 'CL_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,5);
+        STATE.boq.structItems.push({id:newId,libCode:code,desc:clItem.desc,unit:clItem.unit||"קומפ'",qty:'1',price:'',zeroPrice:false,roomHeader:targetRoom});
+        added++;
+        return;
+      }
+      const libItem = BOQ_LIBRARY.find(i=>i.code===code);
+      if(!libItem) return;
+      const section = BOQ_CH_SECTION[libItem.ch]||'structItems';
+      const items = STATE.boq[section];
+      if(items.some(i=>i.libCode===code)) return;
+      const prefix = section==='structItems'?'L':section==='contentsItems'?'LC':'LS';
+      const newId = prefix+(items.length+1)+'_'+Date.now().toString(36);
+      items.push({id:newId,libCode:code,desc:libItem.title,unit:libItem.unit,qty:'1',price:'',zeroPrice:false,roomHeader:targetRoom});
       added++;
-      return;
-    }
-    // Standard library item
-    const libItem = BOQ_LIBRARY.find(i=>i.code===code);
-    if(!libItem) return;
-    const section = BOQ_CH_SECTION[libItem.ch]||'structItems';
-    const items = STATE.boq[section];
-    // Avoid duplicate by code
-    if(items.some(i=>i.libCode===code)) return;
-    const prefix = section==='structItems'?'L':section==='contentsItems'?'LC':'LS';
-    const newId = prefix+(items.length+1)+'_'+Date.now().toString(36);
-    items.push({
-      id: newId,
-      libCode: code,
-      desc: libItem.title,
-      unit: libItem.unit,
-      qty: '1',
-      price: '',
-      zeroPrice: false,
-      roomHeader: ''
     });
-    added++;
-  });
-  closeBOQLibrary();
-  renderCard(7);
-  // Show feedback
-  setTimeout(()=>{
-    const btn = document.querySelector('.boq-lib-toast');
-    if(!btn) {
-      const toast = document.createElement('div');
-      toast.className = 'boq-lib-toast';
-      toast.textContent = `✅ ${added} פריטים נוספו לכתב הכמויות`;
-      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#059669;color:#fff;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3);';
-      document.body.appendChild(toast);
-      setTimeout(()=>toast.remove(), 3000);
+    closeBOQLibrary();
+    renderCard(7);
+    if(added>0){
+      const t=document.createElement('div');
+      t.textContent=`✅ ${added} פריטים נוספו${targetRoom?' ל'+targetRoom:''}`;
+      t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a2e1a;color:#6ee7b7;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;border:1px solid #10b981;';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),3000);
     }
-  }, 100);
+  });
+}
+
+function addBenaritItemsToBOQ(){
+  if(!_benaritSelected.size){ alert('לא נבחרו סעיפים'); return; }
+  showChapterPickerAndAdd(function(targetRoom){
+    let added = 0;
+    _benaritSelected.forEach(id => {
+      const cb = document.querySelector(`input[data-bnid="${id}"]`);
+      if(!cb) return;
+      const desc = cb.dataset.desc;
+      const unit = cb.dataset.unit || "קומפ'";
+      const newId = 'BN' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,5);
+      STATE.boq.structItems.push({id:newId,desc,unit,qty:'1',price:'',zeroPrice:false,roomHeader:targetRoom});
+      added++;
+    });
+    _benaritSelected.clear();
+    updateBenaritCount();
+    closeBOQLibrary();
+    renderCard(7);
+    if(added>0){
+      const t=document.createElement('div');
+      t.textContent=`✅ ${added} סעיפים מבנארית נוספו${targetRoom?' ל'+targetRoom:''}`;
+      t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a2e1a;color:#6ee7b7;padding:10px 20px;border-radius:12px;font-family:Heebo,sans-serif;font-weight:700;font-size:13px;z-index:9999;border:1px solid #10b981;';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),3000);
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════
