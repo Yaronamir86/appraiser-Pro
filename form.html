@@ -509,12 +509,26 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
   .chip{font-size:11px;padding:5px 10px;}
   .sign-chip{font-size:10px;padding:4px 7px;}
 
-  /* Report */
-  .rpt-body{padding:14px 10px;}
-  .rpt-header h1{font-size:18px;}
+  /* Report header */
+  .rpt-body{padding:10px 6px;}
+  .rpt-header h1{font-size:16px;}
   .rpt-topbar{flex-direction:column;align-items:flex-start;gap:8px;}
   .rpt-topbar > div:last-child{width:100%;justify-content:stretch;}
   .rpt-topbar > div:last-child button{flex:1;}
+
+  /* Report table — גלילה אופקית, מניעת שבירת טקסט */
+  .rpt-section{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .rpt-table{font-size:10px;min-width:480px;word-break:normal;white-space:nowrap;}
+  .rpt-table th,.rpt-table td{padding:5px 6px;white-space:nowrap;}
+  /* עמודת תיאור — אפשר גלישה */
+  .rpt-table td:nth-child(2),.rpt-table th:nth-child(2){white-space:normal;min-width:80px;max-width:120px;word-break:break-word;}
+
+  /* Summary box */
+  .rpt-summary-box{padding:12px 10px;}
+  .rpt-summary-row{font-size:12px;}
+
+  /* data panels — single column */
+  .rpt-data-grid{grid-template-columns:1fr!important;}
 }
 
 /* ── LOADING OVERLAY ── */
@@ -3896,33 +3910,6 @@ function _doGenerateReport(){
   const rehabRec = s.recommendations || genRehabRecommendations();
   if(rehabRec) rpt+=`<div class="rpt-section"><h3>המלצות לשיקום</h3><p class="rpt-p" style="white-space:pre-line;">${esc(rehabRec)}</p></div>`;
   if(s.claimTotal) rpt+=`<div class="rpt-section"><h3>הערת סיכום</h3><p class="rpt-p">${esc(s.claimTotal)}</p></div>`;
-
-  // ── נספחים ──
-  const appendices = [];
-  const hasPhotos = ph.main || (ph.items||[]).length > 0;
-  if(hasPhotos) appendices.push('תיעוד צילומי מביקור הבדיקה בנכס');
-  const profLabels = {
-    leak:'מאתר נזילות', fire_inv:'חוקר שריפות', electrician:'חשמלאי',
-    plumber:'אינסטלטור', contractor:'קבלן/שיפוצניק', engineer:'מהנדס/קונסטרוקטור', fire_dept:'כבאות'
-  };
-  (STATE.event.professionals||[]).forEach(pid=>{
-    const det = (STATE.event.profDetails||{})[pid]||{};
-    if(det.report==='yes'){
-      const label = profLabels[pid]||pid;
-      const name = det.name ? ` — ${det.name}` : '';
-      appendices.push(`דו"ח ${label}${name}`);
-    }
-  });
-
-  if(appendices.length>0){
-    rpt += `<div class="rpt-section" style="border-top:1px solid #E5E7EB;margin-top:20px;padding-top:18px;">
-      <h3>נספחים המצורפים לדו"ח</h3>
-      <p class="rpt-p" style="margin-bottom:8px;">המסמכים הבאים מהווים חלק בלתי נפרד מחוות דעת זו ומצורפים אליה:</p>
-      <ol style="margin:0;padding-right:20px;line-height:2;font-size:14px;color:#374151;">
-        ${appendices.map(a=>`<li>${esc(a)}</li>`).join('')}
-      </ol>
-    </div>`;
-  }
 
   const sigLine = s.signature || 'ירון אמיר, שמאי רכוש מוסמך';
   const declText = `הצהרת שמאי\nאני הח"מ מצהיר כי חוות דעת זו נערכה על ידי באופן מקצועי, עצמאי ובלתי תלוי, בהתאם לממצאים שנצפו בביקור בנכס ולנתונים שעמדו בפניי במועד עריכת הדו"ח.\nההערכה בוצעה בהתאם לכללים המקובלים בתחום שמאות הרכוש ועל בסיס ניסיון מקצועי ומקורות תמחור מקובלים.\nחוות דעת זו מיועדת להערכת הנזק נשוא האירוע בלבד.`;
