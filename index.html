@@ -1372,6 +1372,7 @@ async function renderCases() {
           ${c.state?.findings?.areas?.length ? `<span class="case-meta-item">📐 <strong>${c.state.findings.areas.length} אזורים</strong></span>` : ''}
         </div>
         <div class="case-actions" onclick="event.stopPropagation()">
+          ${progress >= 50 ? `<button class="action-btn" title="צפייה בדוח" onclick="viewReport('${c.id}')">👁</button>` : ''}
           <button class="action-btn danger" title="מחיקת תיק" onclick="promptDelete('${c.id}', '${escHtml(name).replace(/'/g,"\\'")}')">🗑️</button>
         </div>
       </div>`;
@@ -1388,6 +1389,10 @@ async function render() {
 // ══════════════════════════════════════════════════
 function openCase(id) {
   window.location.href = `${FORM_URL}?case=${id}`;
+}
+
+function viewReport(id) {
+  window.location.href = `${FORM_URL}?case=${id}&report=1`;
 }
 
 function setFilter(mode) {

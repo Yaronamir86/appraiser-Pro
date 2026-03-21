@@ -4786,6 +4786,10 @@ function attachListeners(n){/* no-op, inline handlers used */}
   if(found?.state){
     currentCaseId=caseId; STATE=found.state; mode=found.mode;
     applyModeUI(mode); goCard(1);
+    // פתח דוח ישירות אם הגיע מהדשבורד עם report=1
+    if(params.get('report')==='1'){
+      setTimeout(()=>generateReport(), 400);
+    }
   } else if(found?.mode){
     currentCaseId=caseId;
     mode=found.mode; applyModeUI(found.mode); goCard(1);
