@@ -979,6 +979,25 @@ window.doForgotPassword = async () => {
 // ══════════════════════════════════════════════════
 let mode = null;
 
+// ── שמות פרקי BOQ ──
+const BOQ_CHAPTER_NAMES = {
+  1:'פירוק, הריסה ופינוי',
+  2:'בדיקות ותיקונים',
+  3:'אינסטלציה וצנרת',
+  4:'איטום וצפוי',
+  5:'עבודות בניה',
+  6:'ריצוף ואריחים',
+  7:'טיח, שפכטל וצבע',
+  8:'נגרות ועץ',
+  9:'אלומיניום וזגגות',
+  10:'שיש ואבן',
+  11:'חשמל ותאורה',
+  12:'דלתות ומשקופים',
+  13:'ניקוי וטיפול',
+  14:'שירותים ותוספות',
+  15:'סעיפים מותנים',
+};
+
 const BOQ_LIBRARY = [
 
   // ═══════════════════════════════════════════════
@@ -3423,19 +3442,16 @@ function _doGenerateReport(){
   const recPayout = Math.max(0,shiput-deduct);
 
   const mkInfoRow = (k,v) => v ? `<tr><td style="padding:6px 8px;font-weight:700;color:#6B7280;width:160px;">${k}:</td><td style="padding:6px 8px;">${esc(v)}</td></tr>` : '';
-  const mkBOQSection = (items, title) => {
+  const mkBOQSection = (items, sectionTitle) => {
     if(!items.length) return '';
-    const sec = calcSectionTotal(items);
-    const secShiput = Math.round(calcShiputBase(items)*0.67);
-    const secClaim = items.reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
     const isIns = (mode === 'insurance');
-    const showClaim = !isIns && STATE.boq.hasClaim; // תביעה — רק בשמאות פרטית עם claim
+    const showClaim = !!STATE.boq.hasClaim;
 
-    // צבעי badge לחדרים — מחזורי
+    // badge צבעים לחדרים
     const badgePalette = [
       {bg:'#E6F1FB',color:'#185FA5'},{bg:'#EAF3DE',color:'#3B6D11'},
       {bg:'#FAEEDA',color:'#854F0B'},{bg:'#FBEAF0',color:'#993556'},
-      {bg:'#F1EFE8',color:'#5F5E5A'},{bg:'#EAF3DE',color:'#27500A'},
+      {bg:'#F1EFE8',color:'#5F5E5A'},{bg:'#E1F5EE',color:'#085041'},
     ];
     const roomColorMap = {};
     let colorIdx = 0;
@@ -3446,64 +3462,109 @@ function _doGenerateReport(){
       }
     });
 
-    const colSpanTotal = isIns ? (showClaim?8:7) : (showClaim?7:6);
-
-    let h = `<div style="margin-bottom:24px;">
-      <h4 style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;padding:6px 0;border-bottom:2px solid #E5E7EB;">${title}</h4>
-      <table class="rpt-table"><thead><tr style="font-size:11px;">
-        <th style="width:36px">#</th>
-        <th>תיאור עבודה</th>
-        <th style="width:72px">אזור</th>
-        <th style="width:38px;text-align:center">יח'</th>
-        <th style="width:48px;text-align:right">כמות</th>
-        <th style="width:64px;text-align:right">מחיר יח'</th>`;
-    if(isIns){
-      h += `<th style="width:70px;text-align:right;color:#185FA5">כינון ₪</th>
-             <th style="width:70px;text-align:right;color:#0F6E56">שיפוי ₪</th>`;
-    } else {
-      h += `<th style="width:80px;text-align:right">סה"כ ₪</th>`;
-    }
-    if(showClaim) h += `<th style="width:70px;text-align:right;color:#92400E">תביעה ₪</th>`;
-    h += `</tr></thead><tbody>`;
-
-    let rowIdx = 0;
+    // קבץ לפי פרק (ch) — שמור סדר הופעה
+    const chapterOrder = [];
+    const chapterMap = {};
     items.forEach(item=>{
-      const kinun=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
-      const shiput=Math.round(kinun*0.67);
-      const claimVal=parseFloat(item.claim)||0;
-      const zebra = rowIdx%2===1 ? 'background:#FAFAFA;' : '';
-      rowIdx++;
-      const pal = item.roomHeader ? roomColorMap[item.roomHeader] : null;
-      const badge = pal
-        ? `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:${pal.bg};color:${pal.color};">${esc(item.roomHeader)}</span>`
-        : `<span style="color:#9CA3AF;font-size:10px;">—</span>`;
-
-      h += `<tr style="${zebra}">
-        <td style="color:#9CA3AF;font-size:10px;">${item.id}</td>
-        <td>${esc(item.desc)}</td>
-        <td>${badge}</td>
-        <td style="text-align:center;color:#6B7280;">${esc(item.unit)}</td>
-        <td style="text-align:right;">${esc(item.qty)}</td>
-        <td style="text-align:right;color:#6B7280;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>`;
-      if(isIns){
-        h += `<td style="text-align:right;font-weight:600;color:#185FA5;">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
-              <td style="text-align:right;font-weight:600;color:#0F6E56;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>`;
-      } else {
-        h += `<td style="text-align:right;font-weight:600;color:${item.zeroPrice?'#9CA3AF':'#111'};">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>`;
-      }
-      if(showClaim) h += `<td style="text-align:right;font-weight:600;color:#92400E;">${claimVal>0?'₪'+fmtNum(claimVal):'—'}</td>`;
-      h += `</tr>`;
+      const ch = item.ch || 0;
+      if(!chapterMap[ch]){ chapterMap[ch]=[]; chapterOrder.push(ch); }
+      chapterMap[ch].push(item);
     });
 
-    // שורת סיכום פרק
-    h += `<tr class="st"><td colspan="${colSpanTotal-( isIns?2:1)}" style="text-align:right;padding:8px 10px;">סה"כ ${title}</td>`;
+    const totalCols = 6 + (isIns?2:1) + (showClaim?1:0);
+
+    // כותרת סעיף ראשי (פרק א׳ / ב׳ / ג׳)
+    let h = `<div style="margin-bottom:28px;">
+      <h4 style="font-size:13px;font-weight:800;color:#111827;margin-bottom:10px;padding:8px 0;border-bottom:2px solid #1F2937;">${sectionTitle}</h4>
+      <table class="rpt-table" style="width:100%;"><thead><tr style="font-size:11px;">
+        <th style="width:42px">מס'</th>
+        <th>תיאור עבודה</th>
+        <th style="width:72px">אזור</th>
+        <th style="width:36px;text-align:center">יח'</th>
+        <th style="width:46px;text-align:right">כמות</th>
+        <th style="width:62px;text-align:right">מחיר יח'</th>`;
     if(isIns){
-      h += `<td style="text-align:right;padding:8px 10px;color:#185FA5;">₪${fmtNum(sec)}</td>
-            <td style="text-align:right;padding:8px 10px;color:#0F6E56;">₪${fmtNum(secShiput)}</td>`;
+      h += `<th style="width:68px;text-align:right;color:#185FA5">כינון ₪</th>
+            <th style="width:68px;text-align:right;color:#0F6E56">שיפוי ₪</th>`;
     } else {
-      h += `<td style="text-align:right;padding:8px 10px;">₪${fmtNum(sec)}</td>`;
+      h += `<th style="width:78px;text-align:right">סה"כ ₪</th>`;
     }
-    if(showClaim) h += `<td style="text-align:right;padding:8px 10px;color:#92400E;">${secClaim>0?'₪'+fmtNum(secClaim):'—'}</td>`;
+    if(showClaim) h += `<th style="width:68px;text-align:right;color:#92400E">תביעה ₪</th>`;
+    h += `</tr></thead><tbody>`;
+
+    // סיכומים לסעיף הראשי
+    let secTotal=0, secShiputTotal=0, secClaimTotal=0;
+
+    // עבור כל פרק (תת-מספור)
+    chapterOrder.forEach((chNum, chIdx)=>{
+      const chItems = chapterMap[chNum];
+      const chName = chNum ? BOQ_CHAPTER_NAMES[chNum] || `פרק ${chNum}` : 'כללי';
+      const chNumDisplay = chIdx+1;
+      const chTotal = calcSectionTotal(chItems);
+      const chShiput = Math.round(calcShiputBase(chItems)*0.67);
+      const chClaim = chItems.reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
+      secTotal+=chTotal; secShiputTotal+=chShiput; secClaimTotal+=chClaim;
+
+      // כותרת פרק
+      h += `<tr style="background:#F3F4F6;">
+        <td colspan="${totalCols}" style="padding:6px 10px;font-weight:700;font-size:12px;color:#374151;border-top:1px solid #D1D5DB;">
+          ${chNumDisplay}. ${chName}
+        </td>
+      </tr>`;
+
+      // פריטים בפרק
+      chItems.forEach((item, itemIdx)=>{
+        const kinun=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
+        const shiput=Math.round(kinun*0.67);
+        const claimVal=parseFloat(item.claim)||0;
+        const zebra = itemIdx%2===1 ? 'background:#FAFAFA;' : '';
+        const subNum = `${chNumDisplay}.${String(itemIdx+1).padStart(2,'0')}`;
+        const pal = item.roomHeader ? roomColorMap[item.roomHeader] : null;
+        const badge = pal
+          ? `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:${pal.bg};color:${pal.color};">${esc(item.roomHeader)}</span>`
+          : `<span style="color:#D1D5DB;font-size:10px;">—</span>`;
+
+        h += `<tr style="${zebra}">
+          <td style="color:#9CA3AF;font-size:10px;padding-right:16px;">${subNum}</td>
+          <td style="word-break:break-word;">${esc(item.desc)}</td>
+          <td>${badge}</td>
+          <td style="text-align:center;color:#6B7280;">${esc(item.unit)}</td>
+          <td style="text-align:right;">${esc(item.qty)}</td>
+          <td style="text-align:right;color:#6B7280;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>`;
+        if(isIns){
+          h += `<td style="text-align:right;font-weight:600;color:#185FA5;">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
+                <td style="text-align:right;font-weight:600;color:#0F6E56;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>`;
+        } else {
+          h += `<td style="text-align:right;font-weight:600;color:${item.zeroPrice?'#9CA3AF':'#111'};">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>`;
+        }
+        if(showClaim) h += `<td style="text-align:right;font-weight:600;color:#92400E;">${claimVal>0?'₪'+fmtNum(claimVal):'—'}</td>`;
+        h += `</tr>`;
+      });
+
+      // סיכום פרק — רק אם יש יותר מפרק אחד
+      if(chapterOrder.length > 1 && chTotal>0){
+        h += `<tr style="background:#F9FAFB;border-top:1px solid #E5E7EB;">
+          <td colspan="${6}" style="text-align:right;padding:5px 10px;font-size:11px;color:#6B7280;">סה"כ ${chNumDisplay}. ${chName}</td>`;
+        if(isIns){
+          h += `<td style="text-align:right;padding:5px 10px;font-size:11px;color:#185FA5;">₪${fmtNum(chTotal)}</td>
+                <td style="text-align:right;padding:5px 10px;font-size:11px;color:#0F6E56;">₪${fmtNum(chShiput)}</td>`;
+        } else {
+          h += `<td style="text-align:right;padding:5px 10px;font-size:11px;">₪${fmtNum(chTotal)}</td>`;
+        }
+        if(showClaim) h += `<td style="text-align:right;padding:5px 10px;font-size:11px;color:#92400E;">${chClaim>0?'₪'+fmtNum(chClaim):'—'}</td>`;
+        h += `</tr>`;
+      }
+    });
+
+    // שורת סיכום סעיף ראשי
+    h += `<tr class="st"><td colspan="${6}" style="text-align:right;padding:9px 10px;">סה"כ ${sectionTitle}</td>`;
+    if(isIns){
+      h += `<td style="text-align:right;padding:9px 10px;color:#185FA5;">₪${fmtNum(secTotal)}</td>
+            <td style="text-align:right;padding:9px 10px;color:#0F6E56;">₪${fmtNum(secShiputTotal)}</td>`;
+    } else {
+      h += `<td style="text-align:right;padding:9px 10px;">₪${fmtNum(secTotal)}</td>`;
+    }
+    if(showClaim) h += `<td style="text-align:right;padding:9px 10px;color:#92400E;">${secClaimTotal>0?'₪'+fmtNum(secClaimTotal):'—'}</td>`;
     h += `</tr></tbody></table></div>`;
     return h;
   };
