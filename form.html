@@ -3834,20 +3834,21 @@ function _doGenerateReport(){
 
       const TD = (txt,style='') => `<td style="padding:9px 12px;border:1px solid #D1D5DB;${style}">${txt}</td>`;
       const TH = (txt,style='') => `<th style="padding:9px 12px;border:1px solid #D1D5DB;font-weight:700;${style}">${txt}</th>`;
+      const showClaimCol = !!STATE.boq.hasClaim;
       const mkRow = (label, kinunV, shiputV, claimV, rowStyle='') =>
         `<tr style="${rowStyle}">
           ${TD(label,'font-weight:600;')}
           ${TD(kinunV?'₪ '+fmtNum(kinunV):'—','text-align:right;color:#1D4ED8;font-weight:700;background:#F0F9FF;')}
           ${TD(shiputV?'₪ '+fmtNum(shiputV):'—','text-align:right;color:#065F46;font-weight:700;background:#F0FDF4;')}
-          ${TD(claimV?'₪ '+fmtNum(claimV):'—','text-align:right;color:#92400E;font-weight:700;background:#FFFBEB;')}
+          ${showClaimCol?TD(claimV?'₪ '+fmtNum(claimV):'—','text-align:right;color:#92400E;font-weight:700;background:#FFFBEB;'):''}
         </tr>`;
 
-      rpt += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px;">
+      rpt += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px;border:1px solid #D1D5DB;border-radius:8px;overflow:hidden;">
         <thead><tr style="background:#F3F4F6;">
           ${TH('פרק','text-align:right;')}
           ${TH('הערכה בכינון','text-align:right;background:#EFF6FF;color:#1D4ED8;')}
           ${TH('הערכה בשיפוי','text-align:right;background:#ECFDF5;color:#065F46;')}
-          ${TH('תביעה (שמאי פרטי)','text-align:right;background:#FFFBEB;color:#92400E;')}
+          ${showClaimCol?TH('תביעה (שמאי פרטי)','text-align:right;background:#FFFBEB;color:#92400E;'):''}
         </tr></thead><tbody>
         ${structKinun>0?mkRow('א. מבנה', structKinun, structShiput, structClaim):''}
         ${supervisionKinun>0?mkRow('פיקוח 5%', supervisionKinun, Math.round(supervisionKinun*0.67), 0):''}
@@ -3858,14 +3859,14 @@ function _doGenerateReport(){
           ${TD('<strong>סה"כ כללי</strong>','font-weight:900;font-size:13px;')}
           ${TD('₪ '+fmtNum(boq.vat?Math.round(totalKinun*1.18):totalKinun),'text-align:right;background:#DBEAFE;color:#1D4ED8;font-weight:900;font-size:13px;')}
           ${TD('₪ '+fmtNum(boq.vat?Math.round(totalShiput*1.18):totalShiput),'text-align:right;background:#D1FAE5;color:#065F46;font-weight:900;font-size:13px;')}
-          ${TD(totalClaim>0?'₪ '+fmtNum(totalClaim):'—','text-align:right;background:#FEF3C7;color:#92400E;font-weight:900;font-size:13px;')}
+          ${showClaimCol?TD(totalClaim>0?'₪ '+fmtNum(totalClaim):'—','text-align:right;background:#FEF3C7;color:#92400E;font-weight:900;font-size:13px;'):''}
         </tr>
         </tbody></table>
-      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;border:1px solid #D1D5DB;border-radius:8px;overflow:hidden;">
         <tbody>
           <tr><td style="padding:8px 12px;border:1px solid #D1D5DB;">פחות השתתפות עצמית:</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;">${deduct>0?`₪ ${fmtNum(deduct)} לפי פוליסה`:'—'}</td></tr>
           ${rentalTotal>0?`<tr style="background:#EFF6FF;"><td style="padding:8px 12px;border:1px solid #D1D5DB;">שכירות חלופית (${f.rentalMonths} חודשים × ₪${fmtNum(parseCurrency(f.rentalMonthly))}):</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;color:#1D4ED8;font-weight:700;">₪ ${fmtNum(rentalTotal)}</td></tr>`:''}
-          <tr style="background:#FFFBEB;"><td style="padding:8px 12px;border:1px solid #D1D5DB;font-weight:900;font-size:13px;color:#92400E;">סה"כ תביעה (שמאי פרטי):</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:900;font-size:15px;color:#92400E;">${totalClaim>0?'₪ '+fmtNum(totalClaim):'לא צוין'}</td></tr>
+          ${showClaimCol?`<tr style="background:#FFFBEB;"><td style="padding:8px 12px;border:1px solid #D1D5DB;font-weight:900;font-size:13px;color:#92400E;">סה"כ תביעה (שמאי פרטי):</td><td style="padding:8px 12px;border:1px solid #D1D5DB;text-align:right;font-weight:900;font-size:15px;color:#92400E;">${totalClaim>0?'₪ '+fmtNum(totalClaim):'לא צוין'}</td></tr>`:''}
         </tbody>
       </table>`;
     } else if(mode==='private'){
