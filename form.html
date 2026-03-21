@@ -1483,6 +1483,35 @@ const SUB_AREAS = [
   {id:'parquet', l:'פרקט',       icon:'🟫'},
 ];
 
+// תתי-אזורים ספציפיים לחדרים רטובים
+const SUB_AREAS_BATH = [
+  {id:'floor',    l:'ריצוף',         icon:'⬛'},
+  {id:'walls',    l:'אריחי קירות',   icon:'🧱'},
+  {id:'ceiling',  l:'תקרה',          icon:'⬜'},
+  {id:'plumbing', l:'אינסטלציה',     icon:'🔧'},
+  {id:'electric', l:'חשמל',          icon:'⚡'},
+  {id:'shower',   l:'מקלחון',        icon:'🚿'},
+  {id:'bathtub',  l:'אמבטיה',        icon:'🛁'},
+  {id:'cabinets', l:'ארון רחצה',     icon:'🗄️'},
+  {id:'frames',   l:'משקופים',       icon:'🚪'},
+];
+
+const SUB_AREAS_TOILET = [
+  {id:'floor',    l:'ריצוף',         icon:'⬛'},
+  {id:'walls',    l:'אריחי קירות',   icon:'🧱'},
+  {id:'ceiling',  l:'תקרה',          icon:'⬜'},
+  {id:'plumbing', l:'אינסטלציה',     icon:'🔧'},
+  {id:'electric', l:'חשמל',          icon:'⚡'},
+  {id:'frames',   l:'משקופים',       icon:'🚪'},
+];
+
+function getSubAreas(areaId) {
+  const base = areaId.replace(/_\d+$/, '');
+  if (base === 'bath' || base === 'bath_biz') return SUB_AREAS_BATH;
+  if (base === 'toilet' || base === 'service') return SUB_AREAS_TOILET;
+  return SUB_AREAS;
+}
+
 const WATER_SIGNS_ROOM_FILTER = {
   'חדרים רטובים': ['bath','toilet','service','bath_biz'],
   'מטבח ונגרות':  ['kitchen','ind_kitchen'],
@@ -2379,7 +2408,7 @@ function renderCard6(){
     if(done){
       const sevLabel = sevLabels[area.severity] || '—';
       const sevCls   = sevClass[area.severity]  || 'area-done-sev-none';
-      const subLabels = (area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ');
+      const subLabels = (area.subAreas||[]).map(s=>getSubAreas(area.id).find(x=>x.id===s)?.l).filter(Boolean).join(' · ');
       const sigCount = (area.signs||[]).length;
       html += `<div class="area-card ac-done" id="area_${area.id}">
         <div class="area-head" onclick="areaToggleDone('${area.id}')">
@@ -2442,13 +2471,13 @@ function renderCard6(){
                 ${(area.subAreas||[]).length&&step>2?'✓':'2'}
               </span>
               אזורי פגיעה
-              ${step>2&&(area.subAreas||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ')}</span>`:''}
+              ${step>2&&(area.subAreas||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.subAreas||[]).map(s=>getSubAreas(area.id).find(x=>x.id===s)?.l).filter(Boolean).join(' · ')}</span>`:''}
             </div>
             <span style="font-size:11px;">${step===2?'▲':'▼'}</span>
           </div>
           <div class="wz-step-body ${step===2?'open':''}">
             <div style="display:flex;flex-wrap:wrap;">
-              ${SUB_AREAS.map(s=>{
+              ${getSubAreas(area.id).map(s=>{
                 const on = (area.subAreas||[]).includes(s.id);
                 return `<button class="sub-chip ${on?'on':''}" onclick="areaToggleSub('${area.id}','${s.id}',this)">${s.icon} ${s.l}</button>`;
               }).join('')}
