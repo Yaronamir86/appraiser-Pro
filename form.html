@@ -3897,6 +3897,35 @@ function _doGenerateReport(){
   if(rehabRec) rpt+=`<div class="rpt-section"><h3>המלצות לשיקום</h3><p class="rpt-p" style="white-space:pre-line;">${esc(rehabRec)}</p></div>`;
   if(s.claimTotal) rpt+=`<div class="rpt-section"><h3>הערת סיכום</h3><p class="rpt-p">${esc(s.claimTotal)}</p></div>`;
 
+  // ── נספחים ──
+  const appendices = [];
+  // תמונות — תמיד אם יש
+  const hasPhotos = ph.main || (ph.items||[]).length > 0;
+  if(hasPhotos) appendices.push('תיעוד צילומי מביקור הבדיקה בנכס');
+  // דוחות בעלי מקצוע
+  const profLabels = {
+    leak:'מאתר נזילות', fire_inv:'חוקר שריפות', electrician:'חשמלאי',
+    plumber:'אינסטלטור', contractor:'קבלן/שיפוצניק', engineer:'מהנדס/קונסטרוקטור', fire_dept:'כבאות'
+  };
+  (ev.professionals||[]).forEach(pid=>{
+    const det = ev.profDetails[pid]||{};
+    if(det.report==='yes'){
+      const label = profLabels[pid]||pid;
+      const name = det.name ? ` — ${det.name}` : '';
+      appendices.push(`דו"ח ${label}${name}`);
+    }
+  });
+
+  if(appendices.length>0){
+    rpt += `<div class="rpt-section" style="border-top:1px solid #E5E7EB;margin-top:20px;padding-top:18px;">
+      <h3>נספחים המצורפים לדו"ח</h3>
+      <p class="rpt-p" style="margin-bottom:8px;">המסמכים הבאים מהווים חלק בלתי נפרד מחוות דעת זו ומצורפים אליה:</p>
+      <ol style="margin:0;padding-right:20px;line-height:2;font-size:14px;color:#374151;">
+        ${appendices.map(a=>`<li>${esc(a)}</li>`).join('')}
+      </ol>
+    </div>`;
+  }
+
   const sigLine = s.signature || 'ירון אמיר, שמאי רכוש מוסמך';
   const declText = `הצהרת שמאי\nאני הח"מ מצהיר כי חוות דעת זו נערכה על ידי באופן מקצועי, עצמאי ובלתי תלוי, בהתאם לממצאים שנצפו בביקור בנכס ולנתונים שעמדו בפניי במועד עריכת הדו"ח.\nההערכה בוצעה בהתאם לכללים המקובלים בתחום שמאות הרכוש ועל בסיס ניסיון מקצועי ומקורות תמחור מקובלים.\nחוות דעת זו מיועדת להערכת הנזק נשוא האירוע בלבד.`;
   rpt+=`<div class="rpt-section" style="border-top:2px solid #E5E7EB;margin-top:24px;padding-top:20px;">
