@@ -357,10 +357,13 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
 .rpt-header h2{font-size:16px;font-weight:600;color:#6B7280;}
 .rpt-section{margin-bottom:28px;}
 .rpt-section h3{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#374151;border-bottom:2px solid #E5E7EB;padding-bottom:6px;margin-bottom:12px;}
-.rpt-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px;}
-.rpt-table th{background:#F3F4F6;padding:8px 10px;text-align:right;font-weight:700;color:#6B7280;font-size:11px;}
-.rpt-table td{padding:7px 10px;border-bottom:1px solid #F3F4F6;}
-.rpt-table .st{background:#F9FAFB;border-top:2px solid #E5E7EB;font-weight:800;}
+.rpt-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;}
+.rpt-table th{background:#F3F4F6;padding:9px 10px;text-align:right;font-weight:700;color:#374151;font-size:11px;border-bottom:2px solid #D1D5DB;border-left:1px solid #E5E7EB;}
+.rpt-table td{padding:8px 10px;border-bottom:1px solid #F3F4F6;border-left:1px solid #F3F4F6;vertical-align:middle;}
+.rpt-table tbody tr:nth-child(even) td{background:#FAFAFA;}
+.rpt-table tbody tr:hover td{background:#FFF9EC;}
+.rpt-table .st{background:#F3F4F6!important;border-top:2px solid #D1D5DB;font-weight:800;}
+.rpt-table .st td{background:#F3F4F6!important;}
 .rpt-summary-box{background:#F9FAFB;border:2px solid #1F2937;border-radius:8px;padding:18px;margin-top:12px;}
 .rpt-summary-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;}
 .rpt-summary-row+.rpt-summary-row{border-top:1px solid #E5E7EB;}
@@ -534,17 +537,37 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
    PRINT / PDF
 ══════════════════════════════════════════ */
 @media print{
+  /* ── הסתר כל ממשק המערכת ── */
   .rpt-topbar{display:none!important;}
   #rptLockBar{display:none!important;}
   #appShell{display:none!important;}
   #landing{display:none!important;}
   #loginScreen{display:none!important;}
   #caseMgr{display:none!important;}
-  #reportView{display:block!important;}
-  .rpt-body{padding:10px;max-width:100%;}
-  body{background:#fff!important;}
-  .rpt-table{page-break-inside:avoid;}
-  .rpt-section{page-break-inside:avoid;}
+  #authModal{display:none!important;}
+
+  /* ── הצג רק את הדוח ── */
+  #reportView{display:block!important;position:static!important;}
+  body{background:#fff!important;margin:0!important;padding:0!important;}
+
+  /* ── גדלי עמוד ושוליים ── */
+  @page{size:A4 portrait;margin:18mm 16mm 18mm 16mm;}
+
+  /* ── גוף הדוח ── */
+  .rpt-body{padding:0!important;max-width:100%!important;margin:0!important;font-size:13px!important;}
+
+  /* ── מניעת חיתוך ── */
+  .rpt-section{page-break-inside:avoid;orphans:3;widows:3;}
+  .rpt-table{page-break-inside:auto;}
+  .rpt-table tr{page-break-inside:avoid;page-break-after:auto;}
+  .rpt-table thead{display:table-header-group;}
+  .rpt-summary-box{page-break-inside:avoid;}
+  .rpt-signature{page-break-inside:avoid;}
+  .rpt-header{page-break-after:avoid;}
+  h3,h4{page-break-after:avoid;}
+
+  /* ── שמור צבעי רקע בהדפסה ── */
+  .rpt-table th,.rpt-table .st,.rpt-table td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 
 /* ── PROGRESS BAR ── */
@@ -2834,18 +2857,13 @@ function renderCard8(){
   const rentalTotal = (f.habitableStatus==='no' && parseFloat(f.rentalMonths)>0 && parseFloat(f.rentalMonthly)>0)
     ? Math.round(parseFloat(f.rentalMonths)*parseCurrency(f.rentalMonthly)) : 0;
 
-  // שמור autoVal בזמן render — מונע שבירת onclick בגלל תווים מיוחדים
-  window._editBlockVals = window._editBlockVals || {};
-
   function editBlock(key, autoVal, rows=4){
-    const safeKey = key.replace(/[^a-zA-Z0-9_]/g,'');
-    window._editBlockVals[safeKey] = autoVal;
     const isEditing = !!s[key];
     return `<div class="preview-box mb8">
       <div class="pb-label" style="display:flex;justify-content:space-between;align-items:center;">
         <span>${isEditing?'✏️ עריכה ידנית':'טקסט אוטומטי'}</span>
         <div style="display:flex;gap:6px;">
-          ${!isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']=window._editBlockVals['${safeKey}']||'';renderCard(8)">✏️ ערוך</button>`:''}
+          ${!isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']=\`${autoVal.replace(/`/g,"'")}\`;renderCard(8)">✏️ ערוך</button>`:''}
           ${isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']='';renderCard(8)">↩ אוטומטי</button>`:''}
         </div>
       </div>
@@ -3037,6 +3055,7 @@ function genOpeningText(){
 
 function genCircumText(){
   const c = STATE.circ;
+  if(!c.infoSource && !c.discDate) return '';
   const srcMap={insured:'המבוטח',tenant:'הדייר',employee:'העובד',manager:'מנהל העסק',other:c.infoName||'הגורם הרלוונטי'};
   const src = srcMap[c.infoSource]||'המבוטח';
   const parts = [];
@@ -3063,10 +3082,8 @@ function genCircumText(){
   }
   if(et==='fire'&&c.fireLocation) parts.push(`השריפה פרצה ב${c.fireLocation}`);
   if(et==='burglary'&&c.burglaryMethod) parts.push(`הפריצה בוצעה ע"י ${c.burglaryMethod}`);
-  // אם אין נתוני בסיס כלל — החזר רק extraNotes אם קיים
-  if(!c.infoSource && !c.discDate) return c.extraNotes || '';
   const base = `לדברי ${src}, ${parts.join('. ')}.`;
-  return base + (c.extraNotes ? `\n${c.extraNotes}` : '');
+  return base + (c.extraNotes ? ` ${c.extraNotes}` : '');
 }
 
 function genFindingsText(){
