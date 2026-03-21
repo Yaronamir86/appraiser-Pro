@@ -3899,16 +3899,14 @@ function _doGenerateReport(){
 
   // ── נספחים ──
   const appendices = [];
-  // תמונות — תמיד אם יש
   const hasPhotos = ph.main || (ph.items||[]).length > 0;
   if(hasPhotos) appendices.push('תיעוד צילומי מביקור הבדיקה בנכס');
-  // דוחות בעלי מקצוע
   const profLabels = {
     leak:'מאתר נזילות', fire_inv:'חוקר שריפות', electrician:'חשמלאי',
     plumber:'אינסטלטור', contractor:'קבלן/שיפוצניק', engineer:'מהנדס/קונסטרוקטור', fire_dept:'כבאות'
   };
-  (ev.professionals||[]).forEach(pid=>{
-    const det = ev.profDetails[pid]||{};
+  (STATE.event.professionals||[]).forEach(pid=>{
+    const det = (STATE.event.profDetails||{})[pid]||{};
     if(det.report==='yes'){
       const label = profLabels[pid]||pid;
       const name = det.name ? ` — ${det.name}` : '';
