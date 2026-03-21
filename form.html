@@ -357,10 +357,12 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
 .rpt-header h2{font-size:16px;font-weight:600;color:#6B7280;}
 .rpt-section{margin-bottom:28px;}
 .rpt-section h3{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#374151;border-bottom:2px solid #E5E7EB;padding-bottom:6px;margin-bottom:12px;}
-.rpt-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px;}
-.rpt-table th{background:#F3F4F6;padding:8px 10px;text-align:right;font-weight:700;color:#6B7280;font-size:11px;}
-.rpt-table td{padding:7px 10px;border-bottom:1px solid #F3F4F6;}
-.rpt-table .st{background:#F9FAFB;border-top:2px solid #E5E7EB;font-weight:800;}
+.rpt-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;}
+.rpt-table th{background:#F3F4F6;padding:9px 10px;text-align:right;font-weight:700;color:#374151;font-size:11px;border-bottom:2px solid #D1D5DB;border-left:1px solid #E5E7EB;}
+.rpt-table td{padding:8px 10px;border-bottom:1px solid #F3F4F6;border-left:1px solid #F3F4F6;vertical-align:middle;}
+.rpt-table tbody tr:nth-child(even) td{background:#FAFAFA;}
+.rpt-table .st{background:#F3F4F6!important;border-top:2px solid #D1D5DB;font-weight:800;}
+.rpt-table .st td{background:#F3F4F6!important;}
 .rpt-summary-box{background:#F9FAFB;border:2px solid #1F2937;border-radius:8px;padding:18px;margin-top:12px;}
 .rpt-summary-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;}
 .rpt-summary-row+.rpt-summary-row{border-top:1px solid #E5E7EB;}
@@ -540,11 +542,20 @@ tr.boq-drag-over{border-top:2px solid #f59e0b!important;}
   #landing{display:none!important;}
   #loginScreen{display:none!important;}
   #caseMgr{display:none!important;}
-  #reportView{display:block!important;}
-  .rpt-body{padding:10px;max-width:100%;}
-  body{background:#fff!important;}
-  .rpt-table{page-break-inside:avoid;}
-  .rpt-section{page-break-inside:avoid;}
+  #authModal{display:none!important;}
+  #reportView{display:block!important;position:static!important;}
+  body{background:#fff!important;margin:0!important;padding:0!important;}
+  @page{size:A4 portrait;margin:18mm 16mm 18mm 16mm;}
+  .rpt-body{padding:0!important;max-width:100%!important;margin:0!important;font-size:13px!important;}
+  .rpt-section{page-break-inside:avoid;orphans:3;widows:3;}
+  .rpt-table{page-break-inside:auto;}
+  .rpt-table tr{page-break-inside:avoid;page-break-after:auto;}
+  .rpt-table thead{display:table-header-group;}
+  .rpt-summary-box{page-break-inside:avoid;}
+  .rpt-signature{page-break-inside:avoid;}
+  .rpt-header{page-break-after:avoid;}
+  h3,h4{page-break-after:avoid;}
+  .rpt-table th,.rpt-table .st,.rpt-table td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 
 /* ── PROGRESS BAR ── */
@@ -981,22 +992,33 @@ let mode = null;
 
 // ── שמות פרקי BOQ ──
 const BOQ_CHAPTER_NAMES = {
-  1:'פירוק, הריסה ופינוי',
-  2:'בדיקות ותיקונים',
-  3:'אינסטלציה וצנרת',
-  4:'איטום וצפוי',
-  5:'עבודות בניה',
-  6:'ריצוף ואריחים',
-  7:'טיח, שפכטל וצבע',
-  8:'נגרות ועץ',
-  9:'אלומיניום וזגגות',
-  10:'שיש ואבן',
-  11:'חשמל ותאורה',
-  12:'דלתות ומשקופים',
-  13:'ניקוי וטיפול',
-  14:'שירותים ותוספות',
-  15:'סעיפים מותנים',
+  1:'פירוק, הריסה ופינוי', 2:'בדיקות ותיקונים', 3:'אינסטלציה וצנרת',
+  4:'איטום וציפוי', 5:'עבודות בניה', 6:'ריצוף ואריחים',
+  7:'טיח, שפכטל וצבע', 8:'נגרות ועץ', 9:'אלומיניום וזגגות',
+  10:'שיש ואבן', 11:'חשמל ותאורה', 12:'דלתות ומשקופים',
+  13:'ניקוי וטיפול', 14:'שירותים ותוספות', 15:'סעיפים מותנים',
 };
+
+// מסיק פרק מתיאור — לפריטים אוטומטיים וידניים ללא ch
+function guessChFromDesc(desc){
+  if(!desc) return 0;
+  const d = desc;
+  if(/פירוק|הריסה|פינוי פסולת|פתיחת קיר/.test(d))        return 1;
+  if(/בדיקת לחות|מד לחות|בדיקת מכון|דיגום|ייבוש מצעים|ייבוש ע/.test(d)) return 2;
+  if(/אינסטלציה|צנרת|שרברב|ניקוז|ביוב|ברז|מד מים|ניתוק|חיבור מים/.test(d)) return 3;
+  if(/איטום|רובה|אטימה|ריסוס אטום|ציפוי אטום/.test(d))  return 4;
+  if(/בלוקים|גבס|טיח שחר|סגירת פתח|שלד|בניה/.test(d))   return 5;
+  if(/ריצוף|אריחים|קרמיקה|פורצלן|גרניט|ריצוף חדש|אספקה והתקנת ריצוף/.test(d)) return 6;
+  if(/טיח|שפכטל|צבע|פיח|עשן|ניקוי פיח/.test(d))          return 7;
+  if(/ארון|נגרות|עץ|פרקט|משקוף|דלת עץ|MDF|דלמן/.test(d)) return 8;
+  if(/אלומיניום|חלון|ויטרינה|תריס|זגוגית|זכוכית|גלריה/.test(d)) return 9;
+  if(/שיש|גרניט משטח|אבן|משטח מטבח/.test(d))              return 10;
+  if(/חשמל|לוח חשמל|תאורה|נקודת חשמל|גוף תאורה/.test(d)) return 11;
+  if(/דלת|משקוף|מנעול|ציר|סף דלת/.test(d))                return 12;
+  if(/ניקיון|ניקוי לאחר|שאיבה|חיטוי|עובש/.test(d))        return 13;
+  if(/שינוע|פיקוח|ניהול עבודות|הובלה|סיקור/.test(d))      return 14;
+  return 0; // כללי
+}
 
 const BOQ_LIBRARY = [
 
@@ -1489,18 +1511,60 @@ const WATER_SIGNS = {
 // Which WATER_SIGNS categories apply to which room types
 // key = category name, value = array of room IDs that should show it (empty = all rooms)
 // ── תתי-אזורים לסימון בכל אזור פגוע ──
+// SUB_AREAS גלובלי — לחדרים רגילים (סלון, חדר שינה וכו')
 const SUB_AREAS = [
-  {id:'floor',   l:'רצפה',       icon:'⬛'},
-  {id:'walls',   l:'קירות',      icon:'🧱'},
-  {id:'ceiling', l:'תקרה',       icon:'⬜'},
-  {id:'frames',  l:'משקופים',    icon:'🚪'},
-  {id:'windows', l:'חלונות',     icon:'🪟'},
-  {id:'plumbing',l:'אינסטלציה',  icon:'🔧'},
-  {id:'electric',l:'חשמל',       icon:'⚡'},
-  {id:'cabinets',l:'ארונות',     icon:'🗄️'},
-  {id:'ceiling2',l:'תקרה משנית', icon:'▫️'},
-  {id:'parquet', l:'פרקט',       icon:'🟫'},
+  {id:'floor',        l:'רצפה',          icon:'⬛'},
+  {id:'walls',        l:'קירות',         icon:'🧱'},
+  {id:'ceiling',      l:'תקרה',          icon:'⬜'},
+  {id:'frames',       l:'משקופים',       icon:'🚪'},
+  {id:'windows',      l:'חלונות',        icon:'🪟'},
+  {id:'plumbing',     l:'אינסטלציה',     icon:'🔧'},
+  {id:'electric',     l:'חשמל',          icon:'⚡'},
+  {id:'cabinets',     l:'ארונות',        icon:'🗄️'},
+  {id:'ceiling2',     l:'תקרה משנית',    icon:'▫️'},
+  {id:'parquet',      l:'פרקט',          icon:'🟫'},
 ];
+
+// SUB_AREAS מורחב — כולל כל האפשרויות (לחיפוש לפי id בכל מקום)
+const SUB_AREAS_ALL = [
+  ...SUB_AREAS,
+  {id:'tiling',       l:'ריצוף',         icon:'🔲'},
+  {id:'wall_tiles',   l:'אריחי קירות',   icon:'🟦'},
+  {id:'shower',       l:'מקלחון',        icon:'🚿'},
+  {id:'bathtub',      l:'אמבטיה',        icon:'🛁'},
+  {id:'bath_cabinet', l:'ארון רחצה',     icon:'🪞'},
+];
+
+// תתי-אזורים ספציפיים לחדרים — מחליף את הרשימה הגלובלית
+const ROOM_SUB_AREAS = {
+  // חדרים יבשים סטנדרטיים
+  living:      ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  bedroom:     ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  kids:        ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  hall:        ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2'],
+  office:      ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  mamad:       ['floor','walls','ceiling','frames','windows','electric'],
+  storage:     ['floor','walls','ceiling','electric'],
+  // חדרים רטובים
+  bath:        ['tiling','wall_tiles','ceiling','plumbing','electric','shower','bathtub','bath_cabinet','frames','windows'],
+  toilet:      ['tiling','wall_tiles','ceiling','plumbing','electric','frames'],
+  service:     ['floor','walls','ceiling','plumbing','electric','cabinets'],
+  // מטבח
+  kitchen:     ['floor','tiling','wall_tiles','ceiling','walls','plumbing','electric','cabinets','frames','windows'],
+  // מרפסת
+  balcony:     ['tiling','walls','ceiling','frames','windows','electric'],
+  // עסקי
+  sales:       ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  office_b:    ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2','cabinets'],
+  warehouse:   ['floor','walls','ceiling','electric'],
+  ind_kitchen: ['floor','tiling','wall_tiles','ceiling','walls','plumbing','electric','cabinets'],
+  bath_biz:    ['tiling','wall_tiles','ceiling','plumbing','electric','frames'],
+  lobby:       ['floor','parquet','walls','ceiling','frames','windows','electric','ceiling2'],
+  // חיצוני
+  facade:      ['walls','windows','frames','electric'],
+  roof:        ['tiling','walls','plumbing'],
+  stairwell:   ['floor','tiling','walls','ceiling','electric'],
+};
 
 const WATER_SIGNS_ROOM_FILTER = {
   'חדרים רטובים': ['bath','toilet','service','bath_biz'],
@@ -2398,7 +2462,7 @@ function renderCard6(){
     if(done){
       const sevLabel = sevLabels[area.severity] || '—';
       const sevCls   = sevClass[area.severity]  || 'area-done-sev-none';
-      const subLabels = (area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ');
+      const subLabels = (area.subAreas||[]).map(s=>SUB_AREAS_ALL.find(x=>x.id===s)?.l).filter(Boolean).join(' · ');
       const sigCount = (area.signs||[]).length;
       html += `<div class="area-card ac-done" id="area_${area.id}">
         <div class="area-head" onclick="areaToggleDone('${area.id}')">
@@ -2461,16 +2525,22 @@ function renderCard6(){
                 ${(area.subAreas||[]).length&&step>2?'✓':'2'}
               </span>
               אזורי פגיעה
-              ${step>2&&(area.subAreas||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.subAreas||[]).map(s=>SUB_AREAS.find(x=>x.id===s)?.l).filter(Boolean).join(' · ')}</span>`:''}
+              ${step>2&&(area.subAreas||[]).length?`<span style="font-size:11px;color:var(--muted);margin-right:6px;">${(area.subAreas||[]).map(s=>SUB_AREAS_ALL.find(x=>x.id===s)?.l).filter(Boolean).join(' · ')}</span>`:''}
             </div>
             <span style="font-size:11px;">${step===2?'▲':'▼'}</span>
           </div>
           <div class="wz-step-body ${step===2?'open':''}">
             <div style="display:flex;flex-wrap:wrap;">
-              ${SUB_AREAS.map(s=>{
-                const on = (area.subAreas||[]).includes(s.id);
-                return `<button class="sub-chip ${on?'on':''}" onclick="areaToggleSub('${area.id}','${s.id}',this)">${s.icon} ${s.l}</button>`;
-              }).join('')}
+              ${(()=>{
+                const baseId = area.id.replace(/_\d+$/,'');
+                const roomSubs = ROOM_SUB_AREAS[baseId]
+                  ? ROOM_SUB_AREAS[baseId].map(sid=>SUB_AREAS_ALL.find(x=>x.id===sid)).filter(Boolean)
+                  : SUB_AREAS; // fallback — חדרים סטנדרטיים ללא פריטי חדר רחצה
+                return roomSubs.map(s=>{
+                  const on = (area.subAreas||[]).includes(s.id);
+                  return `<button class="sub-chip ${on?'on':''}" onclick="areaToggleSub('${area.id}','${s.id}',this)">${s.icon} ${s.l}</button>`;
+                }).join('');
+              })()}
             </div>
             <div class="wz-next" style="gap:8px;">
               <button class="wz-btn ghost" onclick="areaSetStep('${area.id}',1)">‹ חזור</button>
@@ -2853,13 +2923,17 @@ function renderCard8(){
   const rentalTotal = (f.habitableStatus==='no' && parseFloat(f.rentalMonths)>0 && parseFloat(f.rentalMonthly)>0)
     ? Math.round(parseFloat(f.rentalMonths)*parseCurrency(f.rentalMonthly)) : 0;
 
+  window._editBlockVals = window._editBlockVals || {};
+
   function editBlock(key, autoVal, rows=4){
+    const safeKey = key.replace(/[^a-zA-Z0-9_]/g,'');
+    window._editBlockVals[safeKey] = autoVal;
     const isEditing = !!s[key];
     return `<div class="preview-box mb8">
       <div class="pb-label" style="display:flex;justify-content:space-between;align-items:center;">
         <span>${isEditing?'✏️ עריכה ידנית':'טקסט אוטומטי'}</span>
         <div style="display:flex;gap:6px;">
-          ${!isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']=\`${autoVal.replace(/`/g,"'")}\`;renderCard(8)">✏️ ערוך</button>`:''}
+          ${!isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']=window._editBlockVals['${safeKey}']||'';renderCard(8)">✏️ ערוך</button>`:''}
           ${isEditing?`<button class="btn btn-ghost btn-xs" onclick="STATE.summary['${key}']='';renderCard(8)">↩ אוטומטי</button>`:''}
         </div>
       </div>
@@ -3051,7 +3125,7 @@ function genOpeningText(){
 
 function genCircumText(){
   const c = STATE.circ;
-  if(!c.infoSource && !c.discDate) return '';
+  if(!c.infoSource && !c.discDate) return c.extraNotes || '';
   const srcMap={insured:'המבוטח',tenant:'הדייר',employee:'העובד',manager:'מנהל העסק',other:c.infoName||'הגורם הרלוונטי'};
   const src = srcMap[c.infoSource]||'המבוטח';
   const parts = [];
@@ -3079,7 +3153,7 @@ function genCircumText(){
   if(et==='fire'&&c.fireLocation) parts.push(`השריפה פרצה ב${c.fireLocation}`);
   if(et==='burglary'&&c.burglaryMethod) parts.push(`הפריצה בוצעה ע"י ${c.burglaryMethod}`);
   const base = `לדברי ${src}, ${parts.join('. ')}.`;
-  return base + (c.extraNotes ? ` ${c.extraNotes}` : '');
+  return base + (c.extraNotes ? `\n${c.extraNotes}` : '');
 }
 
 function genFindingsText(){
@@ -3446,8 +3520,6 @@ function _doGenerateReport(){
     if(!items.length) return '';
     const isIns = (mode === 'insurance');
     const showClaim = !!STATE.boq.hasClaim;
-
-    // badge צבעים לחדרים
     const badgePalette = [
       {bg:'#E6F1FB',color:'#185FA5'},{bg:'#EAF3DE',color:'#3B6D11'},
       {bg:'#FAEEDA',color:'#854F0B'},{bg:'#FBEAF0',color:'#993556'},
@@ -3461,24 +3533,21 @@ function _doGenerateReport(){
         colorIdx++;
       }
     });
-
-    // קבץ לפי פרק (ch) — שמור סדר הופעה
     const chapterOrder = [];
     const chapterMap = {};
     items.forEach(item=>{
-      const ch = item.ch || 0;
+      const ch = item.ch || guessChFromDesc(item.desc) || 0;
       if(!chapterMap[ch]){ chapterMap[ch]=[]; chapterOrder.push(ch); }
       chapterMap[ch].push(item);
     });
+    const fixedCols = 6;
+    const valueCols = isIns ? 2 : 1;
+    const totalCols = fixedCols + valueCols + (showClaim?1:0);
 
-    const totalCols = 6 + (isIns?2:1) + (showClaim?1:0);
-
-    // כותרת סעיף ראשי (פרק א׳ / ב׳ / ג׳)
     let h = `<div style="margin-bottom:28px;">
       <h4 style="font-size:13px;font-weight:800;color:#111827;margin-bottom:10px;padding:8px 0;border-bottom:2px solid #1F2937;">${sectionTitle}</h4>
       <table class="rpt-table" style="width:100%;"><thead><tr style="font-size:11px;">
-        <th style="width:42px">מס'</th>
-        <th>תיאור עבודה</th>
+        <th style="width:42px">מס'</th><th>תיאור עבודה</th>
         <th style="width:72px">אזור</th>
         <th style="width:36px;text-align:center">יח'</th>
         <th style="width:46px;text-align:right">כמות</th>
@@ -3492,38 +3561,28 @@ function _doGenerateReport(){
     if(showClaim) h += `<th style="width:68px;text-align:right;color:#92400E">תביעה ₪</th>`;
     h += `</tr></thead><tbody>`;
 
-    // סיכומים לסעיף הראשי
     let secTotal=0, secShiputTotal=0, secClaimTotal=0;
-
-    // עבור כל פרק (תת-מספור)
     chapterOrder.forEach((chNum, chIdx)=>{
       const chItems = chapterMap[chNum];
-      const chName = chNum ? BOQ_CHAPTER_NAMES[chNum] || `פרק ${chNum}` : 'כללי';
+      const chName = chNum ? (BOQ_CHAPTER_NAMES[chNum]||`פרק ${chNum}`) : 'כללי';
       const chNumDisplay = chIdx+1;
       const chTotal = calcSectionTotal(chItems);
       const chShiput = Math.round(calcShiputBase(chItems)*0.67);
       const chClaim = chItems.reduce((s,i)=>s+(parseFloat(i.claim)||0),0);
       secTotal+=chTotal; secShiputTotal+=chShiput; secClaimTotal+=chClaim;
 
-      // כותרת פרק
-      h += `<tr style="background:#F3F4F6;">
-        <td colspan="${totalCols}" style="padding:6px 10px;font-weight:700;font-size:12px;color:#374151;border-top:1px solid #D1D5DB;">
-          ${chNumDisplay}. ${chName}
-        </td>
-      </tr>`;
+      h += `<tr style="background:#F3F4F6;"><td colspan="${totalCols}" style="padding:6px 10px;font-weight:700;font-size:12px;color:#374151;border-top:1px solid #D1D5DB;">${chNumDisplay}. ${chName}</td></tr>`;
 
-      // פריטים בפרק
-      chItems.forEach((item, itemIdx)=>{
+      chItems.forEach((item,itemIdx)=>{
         const kinun=(parseFloat(item.qty)||0)*(parseFloat(item.price)||0);
         const shiput=Math.round(kinun*0.67);
         const claimVal=parseFloat(item.claim)||0;
-        const zebra = itemIdx%2===1 ? 'background:#FAFAFA;' : '';
+        const zebra = itemIdx%2===1?'background:#FAFAFA;':'';
         const subNum = `${chNumDisplay}.${String(itemIdx+1).padStart(2,'0')}`;
-        const pal = item.roomHeader ? roomColorMap[item.roomHeader] : null;
+        const pal = item.roomHeader?roomColorMap[item.roomHeader]:null;
         const badge = pal
-          ? `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:${pal.bg};color:${pal.color};">${esc(item.roomHeader)}</span>`
-          : `<span style="color:#D1D5DB;font-size:10px;">—</span>`;
-
+          ?`<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:${pal.bg};color:${pal.color};">${esc(item.roomHeader)}</span>`
+          :`<span style="color:#D1D5DB;font-size:10px;">—</span>`;
         h += `<tr style="${zebra}">
           <td style="color:#9CA3AF;font-size:10px;padding-right:16px;">${subNum}</td>
           <td style="word-break:break-word;">${esc(item.desc)}</td>
@@ -3532,40 +3591,38 @@ function _doGenerateReport(){
           <td style="text-align:right;">${esc(item.qty)}</td>
           <td style="text-align:right;color:#6B7280;">${item.price&&!item.zeroPrice?'₪'+fmtNum(parseFloat(item.price)):''}</td>`;
         if(isIns){
-          h += `<td style="text-align:right;font-weight:600;color:#185FA5;">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
-                <td style="text-align:right;font-weight:600;color:#0F6E56;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>`;
+          h+=`<td style="text-align:right;font-weight:600;color:#185FA5;">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>
+              <td style="text-align:right;font-weight:600;color:#0F6E56;">${item.zeroPrice?'—':shiput>0?'₪'+fmtNum(shiput):''}</td>`;
         } else {
-          h += `<td style="text-align:right;font-weight:600;color:${item.zeroPrice?'#9CA3AF':'#111'};">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>`;
+          h+=`<td style="text-align:right;font-weight:600;color:${item.zeroPrice?'#9CA3AF':'#111'};">${item.zeroPrice?'—':kinun>0?'₪'+fmtNum(kinun):''}</td>`;
         }
-        if(showClaim) h += `<td style="text-align:right;font-weight:600;color:#92400E;">${claimVal>0?'₪'+fmtNum(claimVal):'—'}</td>`;
-        h += `</tr>`;
+        if(showClaim) h+=`<td style="text-align:right;font-weight:600;color:#92400E;">${claimVal>0?'₪'+fmtNum(claimVal):'—'}</td>`;
+        h+=`</tr>`;
       });
 
-      // סיכום פרק — רק אם יש יותר מפרק אחד
-      if(chapterOrder.length > 1 && chTotal>0){
-        h += `<tr style="background:#F9FAFB;border-top:1px solid #E5E7EB;">
-          <td colspan="${6}" style="text-align:right;padding:5px 10px;font-size:11px;color:#6B7280;">סה"כ ${chNumDisplay}. ${chName}</td>`;
+      if(chapterOrder.length>1 && chTotal>0){
+        h+=`<tr style="background:#F9FAFB;border-top:1px solid #E5E7EB;">
+          <td colspan="${fixedCols}" style="text-align:right;padding:5px 10px;font-size:11px;color:#6B7280;">סה"כ ${chNumDisplay}. ${chName}</td>`;
         if(isIns){
-          h += `<td style="text-align:right;padding:5px 10px;font-size:11px;color:#185FA5;">₪${fmtNum(chTotal)}</td>
-                <td style="text-align:right;padding:5px 10px;font-size:11px;color:#0F6E56;">₪${fmtNum(chShiput)}</td>`;
+          h+=`<td style="text-align:right;padding:5px 10px;font-size:11px;color:#185FA5;">₪${fmtNum(chTotal)}</td>
+              <td style="text-align:right;padding:5px 10px;font-size:11px;color:#0F6E56;">₪${fmtNum(chShiput)}</td>`;
         } else {
-          h += `<td style="text-align:right;padding:5px 10px;font-size:11px;">₪${fmtNum(chTotal)}</td>`;
+          h+=`<td style="text-align:right;padding:5px 10px;font-size:11px;">₪${fmtNum(chTotal)}</td>`;
         }
-        if(showClaim) h += `<td style="text-align:right;padding:5px 10px;font-size:11px;color:#92400E;">${chClaim>0?'₪'+fmtNum(chClaim):'—'}</td>`;
-        h += `</tr>`;
+        if(showClaim) h+=`<td style="text-align:right;padding:5px 10px;font-size:11px;color:#92400E;">${chClaim>0?'₪'+fmtNum(chClaim):'—'}</td>`;
+        h+=`</tr>`;
       }
     });
 
-    // שורת סיכום סעיף ראשי
-    h += `<tr class="st"><td colspan="${6}" style="text-align:right;padding:9px 10px;">סה"כ ${sectionTitle}</td>`;
+    h+=`<tr class="st"><td colspan="${fixedCols}" style="text-align:right;padding:9px 10px;">סה"כ ${sectionTitle}</td>`;
     if(isIns){
-      h += `<td style="text-align:right;padding:9px 10px;color:#185FA5;">₪${fmtNum(secTotal)}</td>
-            <td style="text-align:right;padding:9px 10px;color:#0F6E56;">₪${fmtNum(secShiputTotal)}</td>`;
+      h+=`<td style="text-align:right;padding:9px 10px;color:#185FA5;">₪${fmtNum(secTotal)}</td>
+          <td style="text-align:right;padding:9px 10px;color:#0F6E56;">₪${fmtNum(secShiputTotal)}</td>`;
     } else {
-      h += `<td style="text-align:right;padding:9px 10px;">₪${fmtNum(secTotal)}</td>`;
+      h+=`<td style="text-align:right;padding:9px 10px;">₪${fmtNum(secTotal)}</td>`;
     }
-    if(showClaim) h += `<td style="text-align:right;padding:9px 10px;color:#92400E;">${secClaimTotal>0?'₪'+fmtNum(secClaimTotal):'—'}</td>`;
-    h += `</tr></tbody></table></div>`;
+    if(showClaim) h+=`<td style="text-align:right;padding:9px 10px;color:#92400E;">${secClaimTotal>0?'₪'+fmtNum(secClaimTotal):'—'}</td>`;
+    h+=`</tr></tbody></table></div>`;
     return h;
   };
 
@@ -5299,7 +5356,7 @@ function addLibraryItemsToBOQ(){
       if(items.some(i=>i.libCode===code)) return;
       const prefix = section==='structItems'?'L':section==='contentsItems'?'LC':'LS';
       const newId = prefix+(items.length+1)+'_'+Date.now().toString(36);
-      items.push({id:newId,libCode:code,desc:libItem.title,unit:libItem.unit,qty:'1',price:'',zeroPrice:false,roomHeader:targetRoom});
+      items.push({id:newId,libCode:code,desc:libItem.title,unit:libItem.unit,qty:'1',price:'',zeroPrice:false,roomHeader:targetRoom,ch:libItem.ch});
       added++;
     });
     closeBOQLibrary();
