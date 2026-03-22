@@ -142,7 +142,7 @@ body{font-family:'Heebo',sans-serif;background:#030712;color:#f9fafb;min-height:
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup }
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -331,18 +331,50 @@ window.doRegister = async function(){
 };
 
 // ── Google Sign-In ──
+// ── טיפול בתוצאת redirect (מובייל) ──
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+getRedirectResult(auth).then(async cred => {
+  if(!cred || !cred.user) return;
+  _handlingAuth = true;
+  const user = cred.user;
+  const uid  = user.uid;
+  const isNew = cred._tokenResponse?.isNewUser;
+  if(isNew){
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate()+14);
+    const nameParts = (user.displayName||'').split(' ');
+    await setDoc(doc(db,'users',uid),{
+      uid, firstName:nameParts[0]||'', lastName:nameParts.slice(1).join(' ')||'',
+      fullName:user.displayName||'', phone:'', city:'', email:user.email,
+      role:'appraiser', plan:'trial', trialEnd:trialEnd.toISOString(), createdAt:serverTimestamp()
+    });
+    await setDoc(doc(db,'billing',uid),{
+      uid, email:user.email, plan:'trial', products:['appraiser-pro'],
+      trialEnd:trialEnd.toISOString(), subscriptionEnd:null, reportsThisMonth:0,
+      reportsResetAt:new Date(new Date().getFullYear(),new Date().getMonth()+1,1).toISOString(),
+      createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+    });
+  }
+  if(pendingPlan && PLAN_NAMES[pendingPlan]){ await proceedToCheckout(user); }
+  else { window.location.href='index.html'; }
+}).catch(e=>{ if(e.code) console.warn('redirect result:',e.code); });
+
 window.doGoogleRegister = async function(){
   const btn = document.getElementById('googleBtn');
   btn.disabled = true;
   btn.textContent = 'מתחבר...';
   _handlingAuth = true;
+  const provider = new GoogleAuthProvider();
   try {
-    const provider = new GoogleAuthProvider();
+    if(isMobile){
+      // מובייל — redirect (לא popup)
+      await signInWithRedirect(auth, provider);
+      return; // הדף יועבר — הקוד ממשיך אחרי החזרה
+    }
     const cred = await signInWithPopup(auth, provider);
     const user = cred.user;
     const uid  = user.uid;
-
-    // בדוק אם משתמש חדש או קיים
     const isNew = cred._tokenResponse?.isNewUser;
     if (isNew) {
       const trialEnd = new Date();
@@ -371,7 +403,6 @@ window.doGoogleRegister = async function(){
         updatedAt: serverTimestamp()
       });
     }
-
     if (pendingPlan && PLAN_NAMES[pendingPlan]) {
       await proceedToCheckout(user);
     } else {
