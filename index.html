@@ -1116,9 +1116,13 @@ window.doForgotPassword = async () => {
         <span class="mode-choice-icon">👤</span>
         <span class="mode-choice-label">פרטי</span>
       </div>
-      <div class="mode-choice" id="mc-tax" onclick="selectNewMode('tax')">
-        <span class="mode-choice-icon">🏛️</span>
-        <span class="mode-choice-label">מס רכוש</span>
+      <div class="mode-choice" id="mc-tax-res" onclick="selectNewMode('tax-res')">
+        <span class="mode-choice-icon">🏠</span>
+        <span class="mode-choice-label">מס רכוש — מגורים</span>
+      </div>
+      <div class="mode-choice" id="mc-tax-biz" onclick="selectNewMode('tax-biz')">
+        <span class="mode-choice-icon">🏭</span>
+        <span class="mode-choice-label">מס רכוש — עסק</span>
       </div>
     </div>
     <div class="modal-actions">
@@ -1388,11 +1392,21 @@ async function render() {
 // ACTIONS
 // ══════════════════════════════════════════════════
 function openCase(id) {
-  window.location.href = `${FORM_URL}?case=${id}`;
+  const c = (_casesCache||[]).find(c=>c.id===id);
+  if(c && (c.mode==='tax-res'||c.mode==='tax-biz')){
+    window.location.href = `tax-form.html?case=${id}`;
+  } else {
+    window.location.href = `${FORM_URL}?case=${id}`;
+  }
 }
 
 function viewReport(id) {
-  window.location.href = `${FORM_URL}?case=${id}&report=1`;
+  const c = (_casesCache||[]).find(c=>c.id===id);
+  if(c && (c.mode==='tax-res'||c.mode==='tax-biz')){
+    window.location.href = `tax-form.html?case=${id}&report=1`;
+  } else {
+    window.location.href = `${FORM_URL}?case=${id}&report=1`;
+  }
 }
 
 function setFilter(mode) {
@@ -1405,8 +1419,8 @@ function setFilter(mode) {
 
 function openNewCase() {
   selectedNewMode = null;
-  ['insurance','private','tax'].forEach(m => {
-    document.getElementById('mc-'+m).className = 'mode-choice';
+  ['insurance','private','tax-res','tax-biz'].forEach(m => {
+    const el = document.getElementById('mc-'+m); if(el) el.className = 'mode-choice';
   });
   document.getElementById('createBtn').disabled = true;
   document.getElementById('createBtn').style.opacity = '0.5';
@@ -1416,11 +1430,12 @@ function openNewCase() {
 
 function selectNewMode(mode) {
   selectedNewMode = mode;
-  ['insurance','private','tax'].forEach(m => {
-    document.getElementById('mc-'+m).className = 'mode-choice';
+  ['insurance','private','tax-res','tax-biz'].forEach(m => {
+    const el = document.getElementById('mc-'+m); if(el) el.className = 'mode-choice';
   });
-  const cls = { insurance: 'sel-ins', private: 'sel-priv', tax: 'sel-tax' };
-  document.getElementById('mc-'+mode).className = 'mode-choice ' + cls[mode];
+  const cls = { insurance:'sel-ins', private:'sel-priv', 'tax-res':'sel-tax', 'tax-biz':'sel-tax' };
+  const el = document.getElementById('mc-'+mode);
+  if(el) el.className = 'mode-choice ' + (cls[mode]||'sel-tax');
   document.getElementById('createBtn').disabled = false;
   document.getElementById('createBtn').style.opacity = '1';
 }
@@ -1439,7 +1454,11 @@ async function createCase() {
   }catch(e){ alert('שגיאה ביצירת תיק: '+e.message); return; }
   closeModal('newCaseModal');
   if(nameInput) nameInput.value='';
-  window.location.href=`${FORM_URL}?case=${id}&mode=${selectedNewMode}`;
+  if(selectedNewMode==='tax-res'||selectedNewMode==='tax-biz'){
+    window.location.href=`tax-form.html?case=${id}&mode=${selectedNewMode}`;
+  } else {
+    window.location.href=`${FORM_URL}?case=${id}&mode=${selectedNewMode}`;
+  }
 }
 
 function promptDelete(id, name) {
