@@ -334,6 +334,20 @@ window.doRegister = async function(){
 // ── טיפול בתוצאת redirect (מובייל) ──
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+// במובייל — הסתר כפתור Google והצג הודעה
+if(isMobile){
+  const googleBtn = document.getElementById('googleBtn');
+  const orDiv = document.querySelector('.or-divider');
+  if(googleBtn) {
+    googleBtn.style.display = 'none';
+    const msg = document.createElement('div');
+    msg.style.cssText = 'background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:#fbbf24;margin-bottom:14px;text-align:center;';
+    msg.textContent = 'כניסה עם Google זמינה מהמחשב בלבד. אנא השתמש באימייל וסיסמה.';
+    googleBtn.parentNode.insertBefore(msg, googleBtn);
+  }
+  if(orDiv) orDiv.style.display = 'none';
+}
+
 getRedirectResult(auth).then(async cred => {
   if(!cred || !cred.user) return;
   _handlingAuth = true;
